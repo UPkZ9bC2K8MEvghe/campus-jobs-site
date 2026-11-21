@@ -1,0 +1,22 @@
+{
+  "name": "campus-jobs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "fetch": "node scripts/fetch-official.mjs",
+    "merge": "node scripts/export-data.mjs --merge-only",
+    "validate": "node scripts/validate-data.mjs",
+    "build": "node scripts/validate-data.mjs && node scripts/build-static.mjs",
+    "deploy:check": "node scripts/validate-data.mjs",
+    "test": "node scripts/validate-data.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "cheerio": "^1.2.0",
+    "playwright": "^1.65.1"
+  }
+}

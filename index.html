@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>校招信息查询 · 26/27 届校招与实习岗位筛选</title>
+<meta name="description" content="聚合企业官方公告的校招与实习岗位信息，支持按城市、届次、批次、行业、企业性质、学历等多维筛选与关键词搜索。">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <div class="header-inner">
+    <div class="brand-row">
+      <div class="brand">
+        <div class="brand-mark">校</div>
+        <div class="brand-text">
+          <h1>校招信息查询</h1>
+          <p>26/27 届校招 · 实习岗位 · 信息整理自各企业官方公告</p>
+        </div>
+      </div>
+      <div class="search-box" id="searchBox">
+        <span class="search-icon">⌕</span>
+        <input id="searchInput" type="search" placeholder="搜索公司、岗位、专业、城市…" autocomplete="off" aria-label="关键词搜索">
+        <button class="search-clear" id="searchClear" title="清空搜索" aria-label="清空搜索">×</button>
+      </div>
+    </div>
+    <nav class="tabs" role="tablist" aria-label="主导航">
+      <button class="tab" role="tab" data-view="jobs" aria-selected="true">校招汇总<span class="tab-count" id="countJobs"></span></button>
+      <button class="tab" role="tab" data-view="internships" aria-selected="false">实习汇总<span class="tab-count" id="countInternships"></span></button>
+      <button class="tab" role="tab" data-view="dashboard" aria-selected="false">数据看板</button>
+      <button class="tab" role="tab" data-view="soe" aria-selected="false">央国企名录</button>
+      <button class="tab" role="tab" data-view="docs" aria-selected="false">求职资料</button>
+    </nav>
+    <nav class="sub-tabs" id="docsSubTabs" role="tablist" aria-label="资料子栏目" hidden>
+      <button class="sub-tab" data-doc="interview" aria-selected="true">面试题库</button>
+      <button class="sub-tab" data-doc="usage" aria-selected="false">使用说明</button>
+      <button class="sub-tab" data-doc="experience" aria-selected="false">面经分享</button>
+    </nav>
+  </div>
+</header>
+
+<!-- 列表视图（校招 / 实习） -->
+<div class="layout" id="listPane">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-head">
+      <strong>筛选条件</strong>
+      <button class="reset-btn" id="resetFilters">重置全部</button>
+    </div>
+    <section class="filter-group"><div class="filter-title">届次</div><div class="chips" id="filter-years"></div></section>
+    <section class="filter-group"><div class="filter-title">工作地点 <span class="hint">包含即命中</span></div><div class="chips" id="filter-cities"></div><div class="city-list" id="cityMoreList"></div></section>
+    <section class="filter-group"><div class="filter-title">批次</div><div class="chips" id="filter-batches"></div></section>
+    <section class="filter-group"><div class="filter-title">行业分类</div><div class="chips" id="filter-industries"></div></section>
+    <section class="filter-group"><div class="filter-title">企业性质</div><div class="chips" id="filter-ownership"></div></section>
+    <section class="filter-group"><div class="filter-title">学历要求</div><div class="chips" id="filter-degree"></div></section>
+    <section class="filter-group"><div class="filter-title">投递状态</div><div class="chips" id="filter-status"></div></section>
+    <div class="sidebar-foot"><button id="sidebarDone">查看结果</button></div>
+  </aside>
+
+  <main>
+    <div class="mobile-filter-bar">
+      <button class="filter-toggle" id="filterToggle">筛选 <b id="activeCount"></b></button>
+      <div class="result-count" id="mobileCount"></div>
+    </div>
+    <div class="quick-filters" id="quickFilters" role="group" aria-label="快捷筛选"></div>
+    <div class="results-head">
+      <div class="result-count" id="resultCount"><b>0</b> 条</div>
+      <div class="active-filters" id="activeFilters"></div>
+      <select class="sort-select" id="sortSelect" aria-label="排序方式">
+        <option value="updated">按更新时间</option>
+        <option value="deadline">按截止时间</option>
+        <option value="company">按公司名称</option>
+      </select>
+    </div>
+    <div class="card-list" id="cardList"></div>
+    <div class="sentinel" id="sentinel"></div>
+    <div class="loading" id="loading">正在加载数据…</div>
+  </main>
+</div>
+
+<!-- 看板视图 -->
+<section class="page-pane" id="dashboardPane" hidden>
+  <div class="loading">正在加载看板…</div>
+</section>
+
+<!-- 名录视图 -->
+<section class="page-pane" id="soePane" hidden>
+  <div class="soe-head">
+    <h2>央国企 &amp; 事业单位招聘官网名录</h2>
+    <p class="muted">共 <span id="soeTotal">0</span> 家，点击名称访问官方招聘入口。可在顶部搜索框按公司名过滤。</p>
+  </div>
+  <div class="soe-grid" id="soeGrid"></div>
+</section>
+
+<!-- 资料视图 -->
+<section class="page-pane" id="docsPane" hidden>
+  <article class="doc-body" id="docBody"><div class="loading">正在加载…</div></article>
+</section>
+
+<p class="footer-note">信息整理自各企业官方招聘公告，仅供参考；投递前请以企业官方最新公告为准。数据共 <span id="footerTotal">—</span> 条 · 最后更新 <span id="lastUpdated">—</span><span id="changelogNote"></span>。</p>
+
+<div class="drawer-mask" id="drawerMask"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="岗位详情">
+  <div class="drawer-head">
+    <div>
+      <h2 id="drawerTitle">—</h2>
+      <p id="drawerSub"></p>
+    </div>
+    <button class="drawer-fav" id="drawerFav" aria-label="收藏该岗位" title="收藏">☆</button>
+    <button class="drawer-close" id="drawerClose" aria-label="关闭">×</button>
+  </div>
+  <div class="drawer-body" id="drawerBody"></div>
+</aside>
+
+<script src="assets/app.js"></script>
+</body>
+</html>
