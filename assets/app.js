@@ -1011,7 +1011,20 @@
     loadChangelog();
 
     if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
-      navigator.serviceWorker.register('sw.js').catch(() => { /* 离线缓存非关键路径 */ });
+      const hadController = !!navigator.serviceWorker.controller;
+      // updateViaCache: none 让 sw.js 每次都绕过 HTTP 缓存校验，避免旧缓存长期驻留
+      navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).catch(() => { /* 离线缓存非关键路径 */ });
+      if (hadController) {
+        let reloaded = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (reloaded) return;
+          reloaded = true;
+          if (!sessionStorage.getItem('sw-reloaded')) {
+            sessionStorage.setItem('sw-reloaded', '1');
+            location.reload();
+          }
+        });
+      }
     }
   }
 
