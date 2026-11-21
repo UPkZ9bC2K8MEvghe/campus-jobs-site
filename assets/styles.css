@@ -1058,6 +1058,9 @@ a.soe-card:hover {
 }
 .seo-summary p { margin: 0; }
 .seo-summary b { font-weight: 600; color: #1f2733; }
+.seo-summary .seo-more { margin-top: 4px; }
+.seo-summary .seo-more a { color: #3b5bdb; text-decoration: none; }
+.seo-summary .seo-more a:hover { text-decoration: underline; }
 
 .noscript-note {
   max-width: 760px;
