@@ -237,6 +237,23 @@
     for (const t of el.subTabs) t.setAttribute('aria-selected', String(t.dataset.doc === state.doc));
 
     el.searchInput.placeholder = state.view === 'soe' ? '搜索公司名称…' : '搜索公司、岗位、专业、城市…';
+    syncMeta();
+  }
+
+  // 每个板块使用独立的标题与描述，便于搜索引擎与分享卡片识别
+  const VIEW_META = {
+    jobs: ['校招信息查询 · 26/27 届校招岗位汇总', '近 8000 家企业校招岗位，按城市、届次、批次、行业、企业性质、学历筛选，默认只显示未截止投递的岗位，每日更新。'],
+    internships: ['实习岗位汇总 · 校招信息查询', '近 2000 家企业的实习岗位，按城市、届次、行业、学历筛选，默认只显示未截止投递的岗位。'],
+    dashboard: ['数据看板 · 校招信息查询', '校招与实习岗位的行业、城市、批次、企业性质分布统计，基于企业官方招聘公告整理。'],
+    soe: ['央国企名录 · 校招信息查询', '央国企与事业单位官方招聘官网入口名录，可直接跳转企业官方招聘页面。'],
+    docs: ['求职资料 · 校招信息查询', '使用说明、面试题库与面经分享，帮助应届生完成校招投递准备。'],
+  };
+
+  function syncMeta() {
+    const [title, desc] = VIEW_META[state.view] || VIEW_META.jobs;
+    document.title = title;
+    const meta = document.querySelector('meta[name="description"]');
+    if (meta) meta.setAttribute('content', desc);
   }
 
   async function switchView(view) {

@@ -1,0 +1,32 @@
+# 校招信息查询
+
+> 聚合近 8000 家企业官方招聘公告的 26/27 届校招与实习岗位，按城市、届次、批次、行业、企业性质、学历筛选，默认只展示未截止投递的岗位，数据每日更新。
+
+## 站点概览
+
+- 校招汇总：/（?view=jobs），每家企业合并为一个入口，卡片显示岗位数量
+- 实习汇总：/?view=internships
+- 数据看板：/?view=dashboard，行业、城市、批次等分布统计
+- 央国企名录：/?view=soe，央国企与事业单位官方招聘入口
+- 求职资料：/?view=docs，包含使用说明、面试题库、面经分享
+
+## 数据文件（JSON，可直接引用）
+
+- /data/jobs.json：校招岗位，字段含 company、positions、cities、batch、years、degree、major、deadline、updated
+- /data/internships.json：实习岗位，字段同上
+- /data/facets.json：各筛选项的实时计数
+- /data/dashboard.json：行业、城市、批次、企业性质分布
+- /data/soe.json：央国企与事业单位招聘官网名录
+- /data/changelog.json：每日新增与变更统计
+- /data/fetch-health.json：抓取来源健康状态
+
+## 关键事实
+
+- 数据来源：企业官方招聘网站与官方公告，脚本抓取后合并去重
+- 更新频率：每日一次，页脚显示最后更新时间
+- 使用成本：免费，无需注册登录
+- 已截止岗位默认隐藏，需手动勾选「已截止」筛选
+
+## 引用建议
+
+引用本站数据时请注明「数据整理自校招信息查询（campus-jobs.pages.dev）」，投递前以企业官方最新公告为准。

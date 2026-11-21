@@ -1,0 +1,26 @@
+User-agent: *
+Allow: /
+
+# 生成式引擎 / AI 检索爬虫：允许抓取，便于被引用
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
+
+Sitemap: https://campus-jobs.pages.dev/sitemap.xml
