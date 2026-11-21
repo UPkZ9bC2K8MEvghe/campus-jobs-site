@@ -685,7 +685,9 @@
         renderDrawerBody({ ...row, ...detail }, tab);
       }
     } catch (e) {
-      el.drawerBody.innerHTML = `<div class="empty">详情加载失败：${esc(e.message)}</div>`;
+      const msg = /Failed to fetch|NetworkError|503/.test(e.message) ? '网络请求失败，请检查网络后重试' : e.message;
+      el.drawerBody.innerHTML = `<div class="empty">详情加载失败：${esc(msg)}<button class="retry-btn" type="button">重试</button></div>`;
+      el.drawerBody.querySelector('.retry-btn').addEventListener('click', () => openDrawer(row, tab, { history: false }));
     }
   }
 

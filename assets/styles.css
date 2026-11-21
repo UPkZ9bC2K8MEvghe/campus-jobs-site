@@ -1062,6 +1062,18 @@ a.soe-card:hover {
 .seo-summary .seo-more a { color: #3b5bdb; text-decoration: none; }
 .seo-summary .seo-more a:hover { text-decoration: underline; }
 
+.retry-btn {
+  margin-left: 8px;
+  padding: 4px 12px;
+  border: 1px solid #cfd6e3;
+  border-radius: 6px;
+  background: #fff;
+  color: #3b5bdb;
+  font-size: 13px;
+  cursor: pointer;
+}
+.retry-btn:hover { border-color: #3b5bdb; }
+
 .noscript-note {
   max-width: 760px;
   margin: 24px auto;
