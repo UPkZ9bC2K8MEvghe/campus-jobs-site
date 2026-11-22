@@ -86,12 +86,41 @@ ul{margin:0;padding-left:20px}
 li{margin:2px 0}
 .note{font-size:12px;color:#8b93a1;margin-top:20px}
 .btn{display:inline-block;margin-top:12px;padding:8px 14px;border-radius:8px;background:#3b5bdb;color:#fff;text-decoration:none;font-size:14px}
+.jump{position:fixed;right:18px;bottom:20px;z-index:5;width:42px;height:42px;border-radius:50%;border:1px solid #d8e0f5;background:#fff;color:#3b5bdb;display:none;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 8px 20px rgba(20,40,110,.16);padding:0}
+.jump.show{display:flex}
+.jump.up{bottom:70px}
+.jump:hover{background:#3b5bdb;color:#fff}
+@media (max-width:640px){.jump{right:12px;bottom:14px;width:38px;height:38px}.jump.up{bottom:60px}}
 </style>
 <script type="application/ld+json">${JSON.stringify(ld)}</script>
 </head>
 <body><div class="wrap">${body}
 <p class="note">信息整理自企业官方招聘公告，投递前请以企业官方最新公告为准。数据更新于 ${todayStr}。</p>
-</div></body></html>`;
+</div>
+<button class="jump up" id="jumpTop" type="button" title="回到顶部（Alt + ↑）" aria-label="滚动到页面顶部"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 19V6m0 0l-5.5 5.5M12 6l5.5 5.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+<button class="jump" id="jump" type="button" title="一键到底（Alt + ↓）" aria-label="滚动到页面底部"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v13m0 0l-5.5-5.5M12 18l5.5-5.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+<script>
+(function(){
+  var b=document.getElementById('jump'),t=document.getElementById('jumpTop');
+  function upd(){
+    var r=document.documentElement.scrollHeight-window.innerHeight-window.scrollY;
+    b.classList.toggle('show',r>160);
+    t.classList.toggle('show',window.scrollY>160);
+  }
+  function go(top){window.scrollTo({top:top?0:document.documentElement.scrollHeight,behavior:'smooth'})}
+  b.addEventListener('click',function(){go(false)});
+  t.addEventListener('click',function(){go(true)});
+  window.addEventListener('scroll',upd,{passive:true});
+  window.addEventListener('resize',upd);
+  document.addEventListener('keydown',function(e){
+    if(!e.altKey)return;
+    if(e.key==='ArrowDown'){e.preventDefault();go(false)}
+    if(e.key==='ArrowUp'){e.preventDefault();go(true)}
+  });
+  upd();
+})();
+</script>
+</body></html>`;
 
 const links = [];
 for (const g of [...groups.values()].sort((a, b) => a.company.localeCompare(b.company, 'zh-CN'))) {

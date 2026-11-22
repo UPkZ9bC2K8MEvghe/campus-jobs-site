@@ -1,0 +1,81 @@
+{
+  "generatedAt": "2026-11-22",
+  "scope": "sample",
+  "note": "公开面经中的面试问题摘录，网友回忆版，仅供参考；仅收录问题本身，不搬运答案，版权归原作者，附原文链接。",
+  "source": "牛客网 / 超级简历 WonderCV / 思格教育 / HI简历 / 原创力文档 / 豆丁网 / 面试AI助手",
+  "companies": {
+    "美团": [
+      { "q": "请做一下自我介绍。", "src": "牛客网", "url": "https://m.nowcoder.com/feed/main/detail/ace74546c3e344a59d42c47e0bc7a20a?sourceSSR=subject" },
+      { "q": "AI 是如何融入你的学习和实践中的？", "src": "牛客网", "url": "https://m.nowcoder.com/feed/main/detail/ace74546c3e344a59d42c47e0bc7a20a?sourceSSR=subject" },
+      { "q": "在你做过的项目中，哪个场景让 AI 工具发挥了特别大的作用？解决了什么技术难题或优化了什么流程？", "src": "牛客网", "url": "https://m.nowcoder.com/feed/main/detail/ace74546c3e344a59d42c47e0bc7a20a?sourceSSR=subject" },
+      { "q": "HTTP 和 HTTPS 有什么区别？HTTPS 是如何实现数据加密的？", "src": "牛客网", "url": "https://m.nowcoder.com/feed/main/detail/ace74546c3e344a59d42c47e0bc7a20a?sourceSSR=subject" },
+      { "q": "Redis 扣减库存时，如何保证用户能抢到秒杀商品、如何处理剩余请求、如何保证消息只被消费一次？", "src": "牛客网", "url": "https://m.nowcoder.com/feed/main/detail/14ad097549fb4c759585e3a4de6ba101" },
+      { "q": "如果美团外卖某城市日均订单量突然下滑 15%，你会如何排查原因？", "src": "超级简历WonderCV", "url": "https://www.wondercv.com/mianjing/meituan-operations-2026-283/" }
+    ],
+    "华为": [
+      { "q": "介绍你的项目、部署情况和技术栈。", "src": "牛客网", "url": "https://m.nowcoder.com/discuss/927377559333933056" },
+      { "q": "MySQL 和 MongoDB 有什么区别？", "src": "牛客网", "url": "https://m.nowcoder.com/discuss/927377559333933056" },
+      { "q": "Python 的内存管理机制是什么？什么时候触发分代回收？", "src": "牛客网", "url": "https://m.nowcoder.com/discuss/927377559333933056" },
+      { "q": "Python 子类继承多个父类时，方法查找顺序是怎样的？", "src": "牛客网", "url": "https://m.nowcoder.com/discuss/927377559333933056" },
+      { "q": "为什么选择华为 OD？为什么选择这个城市？能否接受加班？", "src": "牛客网", "url": "https://m.nowcoder.com/subject/index/0a6171aba16646c9b4b0945157e13726" },
+      { "q": "手撕代码：有重复元素的全排列。", "src": "牛客网", "url": "https://www.nowcoder.com/enterprise/239/interview" }
+    ],
+    "腾讯": [
+      { "q": "请做一下自我介绍（技术方向）。", "src": "牛客网", "url": "https://www.nowcoder.com/enterprise/138/interview" },
+      { "q": "加载数据 IO 卡顿怎么优化？", "src": "牛客网", "url": "https://m.nowcoder.com/feed/main/detail/0961e87fe18c49278f53008386357fd0" },
+      { "q": "内存泄露怎么排查？", "src": "牛客网", "url": "https://m.nowcoder.com/feed/main/detail/0961e87fe18c49278f53008386357fd0" },
+      { "q": "Redis 缓存击穿是什么？怎么处理？", "src": "牛客网", "url": "https://m.nowcoder.com/feed/main/detail/0961e87fe18c49278f53008386357fd0" },
+      { "q": "Redis 主从、哨兵、集群三种架构怎么选型？", "src": "牛客网", "url": "https://m.nowcoder.com/feed/main/detail/37c64318e134459bbd9a5c7953e99aea?sourceSSR=circle" },
+      { "q": "RAG 的流程是什么？分片怎么做、检索如何优化（多路召回等）？", "src": "牛客网", "url": "https://m.nowcoder.com/feed/main/detail/37c64318e134459bbd9a5c7953e99aea?sourceSSR=circle" },
+      { "q": "浏览器地址栏输入 qq.com 后发生了什么？请讲出你知道的全部过程（前端岗）。", "src": "牛客网", "url": "https://hr-pre.nowcoder.com/article/1797" }
+    ],
+    "京东": [
+      { "q": "讲一下你的项目亮点。", "src": "牛客网", "url": "https://m.nowcoder.com/discuss/934255208178155520?sourceSSR=post" },
+      { "q": "秒杀链路是怎么做的？", "src": "牛客网", "url": "https://m.nowcoder.com/discuss/934255208178155520?sourceSSR=post" },
+      { "q": "MQ 是怎么用的？讲一下各种 MQ 的区别。", "src": "牛客网", "url": "https://m.nowcoder.com/discuss/934255208178155520?sourceSSR=post" },
+      { "q": "讲一下 MySQL 事务、@Transactional，以及 Spring 事务失效的场景。", "src": "牛客网", "url": "https://m.nowcoder.com/discuss/934255208178155520?sourceSSR=post" },
+      { "q": "事务方法内对两个数据库进行操作，出错了会怎样？", "src": "牛客网", "url": "https://m.nowcoder.com/discuss/934255208178155520?sourceSSR=post" },
+      { "q": "你平时是怎么学习前端的？除了学习还做什么？", "src": "牛客网", "url": "https://www.nowcoder.com/discuss/353154336266067968" }
+    ],
+    "中国移动": [
+      { "q": "对实习有什么思考？有什么心得体会？", "src": "牛客网", "url": "https://m.nowcoder.com/discuss/949078402630250496?sourceSSR=%E5%85%B6%E4%BB%96" },
+      { "q": "你了解中国移动的大模型吗（如九天大模型）？", "src": "牛客网", "url": "https://m.nowcoder.com/discuss/949078402630250496?sourceSSR=%E5%85%B6%E4%BB%96" },
+      { "q": "为什么会回到地方移动？薪资方面有什么考虑？是否准备考公？", "src": "牛客网", "url": "https://m.nowcoder.com/discuss/949078402630250496?sourceSSR=%E5%85%B6%E4%BB%96" },
+      { "q": "请分享一次你策划并执行一个营销活动的完整经历。", "src": "超级简历WonderCV", "url": "https://www.wondercv.com/mianjing/marketing-operations-2026-402/" },
+      { "q": "请用 STAR 方法讲一个你在产品或项目中推动落地的经历。", "src": "超级简历WonderCV", "url": "https://www.wondercv.com/mianjing/product-2026-271/" }
+    ],
+    "国家电网": [
+      { "q": "国网在推行「三项制度改革」（劳动、人事、分配），你怎么理解这项改革的核心挑战？", "src": "超级简历WonderCV", "url": "https://www.chaojijianli.com/mianjing/2026-394/" },
+      { "q": "你的人生价值观是什么？", "src": "牛客网", "url": "https://www.nowcoder.com/feed/main/detail/408b72f731b44fa6a46f4202cd2db48e" },
+      { "q": "如果入职之后，你对自己的岗位不满意，你会怎么办？", "src": "思格教育", "url": "https://www.sigedu.cn/nfdwx.html?m8267pageno=2" },
+      { "q": "人力资源岗：SSC（共享服务中心）的层级如何设计？总部与省公司如何分工？", "src": "超级简历WonderCV", "url": "https://www.chaojijianli.com/mianjing/2026-394/" }
+    ],
+    "理想汽车": [
+      { "q": "你做过的项目里哪个挑战最大？请讲清业务背景、问题、你的方案、输出结果和最有技术含量的点。", "src": "牛客网", "url": "https://www.nowcoder.com/enterprise/12240/interview?pageSource=5011" },
+      { "q": "你用过 Vue 和 Element Plus 做后台管理相关开发吗？", "src": "牛客网", "url": "https://www.nowcoder.com/enterprise/12240/interview?pageSource=5011" },
+      { "q": "请介绍一款你最感兴趣/最熟悉的理想汽车产品，说说你喜欢它什么；如果让你改进，会从哪些方面入手？", "src": "超级简历WonderCV", "url": "https://www.wondercv.com/mianjing/product-2026-306/" }
+    ],
+    "比亚迪": [
+      { "q": "请做一下自我介绍。", "src": "牛客网", "url": "https://www.nowcoder.com/enterprise/157130/interview" },
+      { "q": "讲一讲你的实习经历。", "src": "牛客网", "url": "https://www.nowcoder.com/enterprise/157130/interview" },
+      { "q": "本科和硕士的成绩如何？四六级多少分？读研期间有哪些论文和专利？", "src": "牛客网", "url": "https://www.nowcoder.com/enterprise/157130/interview" },
+      { "q": "意向城市是哪里？能否接受去深圳坪山？", "src": "牛客网", "url": "https://www.nowcoder.com/enterprise/157130/interview" },
+      { "q": "英文写作（40 分钟，不少于 300 词）：Discuss the challenges and opportunities for Chinese EV brands in the European market.", "src": "超级简历WonderCV", "url": "https://www.wondercv.com/mianjing/marketing-2026-387/" }
+    ],
+    "招商银行": [
+      { "q": "请做一段 1 分钟的自我介绍。", "src": "超级简历WonderCV", "url": "https://www.chaojijianli.com/mianjing/2026-623/" },
+      { "q": "为什么选择银行业？为什么选择招商银行？谈谈你对所投岗位的理解。", "src": "面试AI助手", "url": "https://www.interviewgpt.cn/blog/cmb-ai-interview" },
+      { "q": "谈谈你对金融行业发展趋势的看法。", "src": "超级简历WonderCV", "url": "https://www.wondercv.com/mianjing/2026-603/" },
+      { "q": "追问实习经历：主要从事什么工作？如何评价自己的表现？最大的收获是什么？如何评价当时的上级？", "src": "超级简历WonderCV", "url": "https://www.wondercv.com/mianjing/2026-610/" },
+      { "q": "结合你的专业背景与实践经历，谈谈未来 3～5 年在招商银行的职业发展规划。", "src": "面试AI助手", "url": "https://www.interviewgpt.cn/blog/cmb-ai-interview" }
+    ],
+    "中国建筑": [
+      { "q": "请做一个简短的自我介绍，并说明你为什么选择人力资源管理工作。", "src": "超级简历WonderCV", "url": "https://www.wondercv.com/mianjing/2026-397/" },
+      { "q": "请简要介绍你自己，并说明为什么适合中国建筑的岗位。", "src": "原创力文档", "url": "https://m.book118.com/html/2026/0303/7051122053011055.shtm" },
+      { "q": "如果你在施工现场发现质量问题，会如何处理？", "src": "HI简历", "url": "https://hicv.cn/blog/2027-autumn-recruit-application" },
+      { "q": "请谈谈你对土木工程师这个岗位的理解。", "src": "原创力文档", "url": "https://m.book118.com/try_down/788023143132006050.pdf" },
+      { "q": "你在工作中是如何节能降耗、降低成本的？", "src": "原创力文档", "url": "https://m.book118.com/try_down/698073043126006117.pdf" },
+      { "q": "请描述建筑工程施工过程中常见的安全隐患及其预防措施。", "src": "豆丁网", "url": "https://www.docin.com/touch_new/preview_new.do?id=4985784942" }
+    ]
+  }
+}

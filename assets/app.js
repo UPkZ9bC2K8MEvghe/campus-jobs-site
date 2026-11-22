@@ -54,7 +54,7 @@
     jobs: null, internships: null,
     detail: { jobs: [], internships: [] },
     facets: null, dashboard: null, soe: null, docs: null, changelog: null, events: null,
-    reviews: null, questions: null,
+    reviews: null, questions: null, companyQuestions: null,
   };
   const ui = {
     filtered: [], rendered: 0, observer: null, current: null, soeFiltered: [],
@@ -1075,17 +1075,16 @@
     el.lastUpdated.textContent = new Date(d.generatedAt).toLocaleString('zh-CN');
     const addedN = cache.changelog.addedCount || 0;
 
-    const cards = [
-      ['校招岗位', c.jobsTotal, 'var(--brand)'],
-      ['实习岗位', c.internTotal, '#6b3fd4'],
-      ['26 届可投', c.grad26, 'var(--ok)'],
-      ['27 届可投', c.grad27, 'var(--brand)'],
-      ['央国企', c.soe, 'var(--warn)'],
-      ['外企', c.foreign, '#0ea5e9'],
-      ['7 天内截止', c.upcoming7, 'var(--danger)'],
-      ['本周更新', c.updatedThisWeek, 'var(--ok)'],
+    const pills = [
+      ['26 届可投', c.grad26],
+      ['27 届可投', c.grad27],
+      ['央国企', c.soe],
+      ['外企', c.foreign],
+      ['7 天内截止', c.upcoming7],
+      ['本周更新', c.updatedThisWeek],
     ];
-    if (addedN) cards.push(['本次抓取新增', addedN, '#0891b2']);
+    if (addedN) pills.push(['本次抓取新增', addedN]);
+    const pillHtml = pills.map(([label, val]) => `<div class="dh-pill"><span class="dh-pill-val">${val.toLocaleString('zh-CN')}</span><span class="dh-pill-label">${esc(label)}</span></div>`).join('');
 
     const wc = (items) => {
       const max = items[0]?.count || 1;
@@ -1097,8 +1096,9 @@
     };
 
     const countdown = d.upcoming.map((u) => {
-      const meta = { text: u.days === 0 ? '今天截止' : `剩 ${u.days} 天`, cls: u.days <= 1 ? 'urgent' : '' };
-      return `<div class="cd-row" data-id="${esc(u.id)}"><span class="cd-company">${esc(u.company)}</span><span class="deadline ${meta.cls}">${esc(meta.text)}</span><span class="cd-date">${esc(u.deadline)}</span></div>`;
+      const urgent = u.days <= 1 ? ' urgent' : '';
+      const label = u.days === 0 ? '今天' : `${u.days} 天`;
+      return `<button class="cd-item" data-id="${esc(u.id)}"><span class="cd-days${urgent}">${esc(label)}</span><span class="cd-main"><strong>${esc(u.company)}</strong><small>截止 ${esc(u.deadline)}</small></span><span class="cd-arrow">→</span></button>`;
     }).join('');
 
     // F6 今日新发布：来自 changelog 的新增记录，点击可打开岗位详情
@@ -1108,18 +1108,35 @@
     }).join('');
 
     el.dashboardPane.innerHTML = `
-      <div class="dash-grid">
-        ${cards.map(([label, val, color]) => `<div class="stat-card" style="--accent:${color}"><div class="stat-val">${val.toLocaleString('zh-CN')}</div><div class="stat-label">${esc(label)}</div></div>`).join('')}
+      <div class="dash-v2">
+        <div class="dash-hero">
+          <span class="dh-kicker">CAMPUS JOBS · 数据概览</span>
+          <h2>岗位数据速览</h2>
+          <div class="dh-numbers">
+            <div class="dh-num"><strong>${c.jobsTotal.toLocaleString('zh-CN')}</strong><span>校招岗位</span></div>
+            <div class="dh-num"><strong>${c.internTotal.toLocaleString('zh-CN')}</strong><span>实习岗位</span></div>
+          </div>
+          <div class="dh-pills">${pillHtml}</div>
+        </div>
+        <div class="dash-v2-grid">
+          <section class="dash-block">
+            <header class="dash-block-head"><h3>即将截止倒计时</h3><span class="dash-mini">点击查看岗位</span></header>
+            <div class="cd-timeline">${countdown || '<p class="muted">暂无</p>'}</div>
+          </section>
+          <section class="dash-block">
+            <header class="dash-block-head"><h3>岗位词云</h3><span class="dash-mini">按岗位数</span></header>
+            <div class="wordcloud">${wc(d.positions)}</div>
+          </section>
+          <section class="dash-block">
+            <header class="dash-block-head"><h3>城市词云</h3><span class="dash-mini">按岗位数</span></header>
+            <div class="wordcloud">${wc(d.cities)}</div>
+          </section>
+        </div>
+        ${addedList ? `<section class="dash-block dash-added"><header class="dash-block-head"><h3>本次新发布岗位（${addedN} 条）</h3><span class="dash-mini">点击查看详情 · 订阅 feeds.xml 可每日自动获取</span></header><div class="rec-list">${addedList}</div></section>` : ''}
+        <p class="muted dash-v2-tip">提示：点击「即将截止」的公司可直接打开岗位详情。数据生成于 ${esc(el.lastUpdated.textContent)}。</p>
       </div>
-      <div class="dash-row">
-        <div class="dash-card"><h3>即将截止倒计时</h3><div class="cd-list">${countdown || '<p class="muted">暂无</p>'}</div></div>
-        <div class="dash-card"><h3>岗位词云</h3><div class="wordcloud">${wc(d.positions)}</div></div>
-        <div class="dash-card"><h3>城市词云</h3><div class="wordcloud">${wc(d.cities)}</div></div>
-      </div>
-      ${addedList ? `<div class="dash-card" style="margin-top:16px"><h3>本次新发布岗位（${addedN} 条）<span class="section-source">点击查看详情 · 订阅 feeds.xml 可每日自动获取</span></h3><div class="rec-list">${addedList}</div></div>` : ''}
-      <p class="muted dash-tip">提示：点击「即将截止」的公司可直接打开岗位详情。数据生成于 ${esc(el.lastUpdated.textContent)}。</p>
     `;
-    el.dashboardPane.querySelectorAll('.cd-row').forEach((row) => {
+    el.dashboardPane.querySelectorAll('.cd-item').forEach((row) => {
       row.addEventListener('click', () => {
         const found = findRowById(row.dataset.id);
         if (found) openDrawer(found.row, found.tab);
@@ -1370,6 +1387,12 @@
       html += `<section class="detail-section"><h3>近期宣讲会<span class="section-source">${esc(cache.events?.today ? '数据更新于 ' + cache.events.today : '')}</span></h3><div class="rec-list">${items}</div></section>`;
     }
 
+    // 该公司公开面经题：只展示问题与原文链接，不搬运答案
+    const cq = findCompanyQuestions(r.company);
+    if (cq) {
+      const items = cq.map((x) => `<div class="q-item"><div class="qq">${esc(x.q)}</div><div class="qa q-src">来源：<a href="${esc(x.url)}" target="_blank" rel="noopener noreferrer">${esc(x.src)}</a></div></div>`).join('');
+      html += `<section class="detail-section"><h3>该公司面经题<span class="section-source">网友回忆版 · 仅供参考 · 附原文链接</span></h3>${items}</section>`;
+    }
     // F8 面试准备：题库是通用综合题，按岗位方向精选并明确标注非企业真题
     const qRec = recommendQuestions(r);
     if (qRec.list.length) {
@@ -1422,6 +1445,20 @@
     }
     // 该方向岗位占比不足 35% 时视为「综合」，不给多岗位企业乱贴方向标签
     return best && bestCount / pos.length >= 0.35 ? best : null;
+  }
+  // 该公司公开面经题（仅题目 + 来源链接），按公司名归一化前缀匹配
+  function findCompanyQuestions(company) {
+    const data = cache.companyQuestions?.companies;
+    if (!data) return null;
+    const k = companyKey(company);
+    for (const [name, list] of Object.entries(data)) {
+      const qk = companyKey(name);
+      if (!qk || !list?.length || !k.startsWith(qk)) continue;
+      const rest = k.slice(qk.length);
+      if (qk === '京东' && rest.startsWith('方')) continue; // 排除「京东方」
+      return list;
+    }
+    return null;
   }
   function recommendQuestions(r) {
     const all = cache.questions?.questions || [];
@@ -1557,6 +1594,49 @@
       if (el.installBanner) el.installBanner.hidden = true;
     });
     window.addEventListener('appinstalled', () => { if (el.installBanner) el.installBanner.hidden = true; });
+  }
+
+  // 一键到底 / 回到顶部：右下角上下箭头，Alt + ↓ / Alt + ↑ 也可触发
+  // 详情抽屉 / 对比弹层是内部滚动，需以当前活动滚动容器为准
+  function setupScrollJump() {
+    const btn = document.getElementById('scrollJump');
+    const btnTop = document.getElementById('scrollTop');
+    if (!btn || !btnTop) return;
+    const scroller = () => {
+      if (el.drawer.classList.contains('open')) return el.drawerBody;
+      return document.querySelector('.compare-body');
+    };
+    const measure = () => {
+      const s = scroller();
+      if (s) return { remain: s.scrollHeight - s.clientHeight - s.scrollTop, at: s.scrollTop, top: s.scrollHeight };
+      return { remain: document.documentElement.scrollHeight - window.innerHeight - window.scrollY, at: window.scrollY, top: document.documentElement.scrollHeight };
+    };
+    let raf = 0;
+    const update = () => {
+      const m = measure();
+      btn.classList.toggle('show', m.remain > 160);
+      btnTop.classList.toggle('show', m.at > 160);
+    };
+    const schedule = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => { raf = 0; update(); });
+    };
+    const jump = (toTop) => {
+      const s = scroller();
+      if (s) s.scrollTo({ top: toTop ? 0 : s.scrollHeight, behavior: 'smooth' });
+      else window.scrollTo({ top: toTop ? 0 : document.documentElement.scrollHeight, behavior: 'smooth' });
+    };
+    btn.addEventListener('click', () => jump(false));
+    btnTop.addEventListener('click', () => jump(true));
+    document.addEventListener('scroll', schedule, { passive: true, capture: true });
+    window.addEventListener('resize', schedule);
+    document.addEventListener('keydown', (e) => {
+      if (!e.altKey) return;
+      if (e.key === 'ArrowDown') { e.preventDefault(); jump(false); }
+      if (e.key === 'ArrowUp') { e.preventDefault(); jump(true); }
+    });
+    new MutationObserver(schedule).observe(document.body, { childList: true, subtree: true });
+    update();
   }
 
   /* ---------- 事件 ---------- */
@@ -1719,6 +1799,9 @@
     loadJSON('events.json')
       .then((d) => { cache.events = d; el.countEvents.textContent = (d.events || []).length || ''; })
       .catch(() => { /* 宣讲会为增量模块，失败不影响主列表 */ });
+    loadJSON('company-questions.json')
+      .then((d) => { cache.companyQuestions = d; })
+      .catch(() => { /* 面经题为增量模块，失败不影响主列表 */ });
 
     if (LIST_VIEWS.has(state.view)) {
       try { await loadTab(state.view); renderFilters(); renderResults(); }
@@ -1741,6 +1824,8 @@
     checkDeadlineReminders();
     // F12 PWA：监听安装提示
     setupInstallPrompt();
+    // 全站一键到底
+    setupScrollJump();
 
     if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
       const hadController = !!navigator.serviceWorker.controller;
