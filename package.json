@@ -7,6 +7,8 @@
     "fetch": "node scripts/fetch-official.mjs",
     "fetch:events": "node scripts/fetch-events.mjs",
     "fetch:reviews": "node scripts/fetch-reviews.mjs",
+    "fetch:questions": "node scripts/crawl-company-questions.mjs",
+    "fetch:questions:nowcoder": "node scripts/crawl-nowcoder-questions.mjs",
     "merge": "node scripts/export-data.mjs --merge-only",
     "validate": "node scripts/validate-data.mjs",
     "build:feeds": "node scripts/build-feeds.mjs",

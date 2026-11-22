@@ -830,7 +830,6 @@ async function exportSOE() {
 /* ---------- 文档导出（markdown → 简易 HTML） ---------- */
 
 const DOCS = [
-  { key: 'usage', token: 'Ev9zdpkcjomyNLxggUgcSNXwnDg', title: '表格使用说明' },
   { key: 'interview', token: 'Qkg2dwnISo6Jlqx5O16cSt1tnId', title: '校招面试常见问题及参考答案' },
   { key: 'experience', token: 'UHNMd1JBWonKQFxONCecVMFfnNG', title: '面经分享' },
 ];

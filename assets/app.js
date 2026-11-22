@@ -378,7 +378,7 @@
     dashboard: ['数据看板 · 校招信息查询', '校招与实习岗位的行业、城市、批次、企业性质分布统计，基于企业官方招聘公告整理。'],
     soe: ['央国企名录 · 校招信息查询', '央国企与事业单位官方招聘官网入口名录，可直接跳转企业官方招聘页面。'],
     events: ['高校宣讲会日历 · 校招信息查询', '汇总北京大学、北京航空航天大学、北京理工大学等高校就业网公开的宣讲会与招聘会信息，按时间与学校浏览。'],
-    docs: ['求职资料 · 校招信息查询', '使用说明、面试题库与面经分享，帮助应届生完成校招投递准备。'],
+    docs: ['求职资料 · 校招信息查询', '面试题库与面经分享，帮助应届生完成校招投递准备。'],
     apps: ['我的投递 · 校招信息查询', '在收藏基础上跟踪投递进度：已收藏 → 已投递 → 笔试/面试 → Offer → 已拒，记录投递时间与备注，按截止时间排序，数据仅保存在本机浏览器。'],
   };
 
@@ -1164,6 +1164,7 @@
   /* ---------- 资料 ---------- */
   async function renderDocs() {
     if (!cache.docs) cache.docs = await loadJSON('docs.json');
+    if (!cache.docs[state.doc]) state.doc = 'interview';
     const doc = cache.docs[state.doc];
     el.docBody.innerHTML = doc
       ? `<h2 class="doc-title">${esc(doc.title)}</h2><div class="doc-content">${doc.html}</div>`
