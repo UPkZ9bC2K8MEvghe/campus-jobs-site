@@ -1370,11 +1370,12 @@
       html += `<section class="detail-section"><h3>近期宣讲会<span class="section-source">${esc(cache.events?.today ? '数据更新于 ' + cache.events.today : '')}</span></h3><div class="rec-list">${items}</div></section>`;
     }
 
-    // F8 该企业常见面试题（基于岗位关键词推荐）
-    const qs = recommendQuestions(r);
-    if (qs.length) {
-      const list = qs.map((q) => `<div class="q-item"><div class="qq">${esc(q.q)}</div><div class="qa">${esc(q.a || '')}</div></div>`).join('');
-      html += `<section class="detail-section"><h3>该企业常见面试题<span class="section-source">${esc(cache.questions?.source || '')}</span></h3>${list}</section>`;
+    // F8 面试准备：题库是通用综合题，按岗位方向精选并明确标注非企业真题
+    const qRec = recommendQuestions(r);
+    if (qRec.list.length) {
+      const trackNote = qRec.track ? `${qRec.track.key}方向` : '综合方向';
+      const list = qRec.list.map((q) => `<div class="q-item"><div class="qq">${esc(q.q)}</div><div class="qa">${esc(q.a || '')}</div></div>`).join('');
+      html += `<section class="detail-section"><h3>面试准备 · 通用综合题<span class="section-source">通用题库 · 非该企业真题 · ${esc(trackNote)}</span></h3>${list}</section>`;
     }
 
     // F10 面经 / 待遇参考
@@ -1395,22 +1396,53 @@
       });
     }
   }
-  // F8：从题库里按公司岗位关键词挑出最相关的题
+  // F8：题库只有通用综合题，按岗位方向挑类别，并用公司名做稳定偏移，避免所有公司看到同样 3 道题
+  const INTERVIEW_TRACKS = [
+    { key: '产品', re: /产品经理|产品专员|产品运营|产品/, cats: ['🎯 个人能力类', '🔧 问题解决类', '👥 团队合作类'] },
+    { key: '设计', re: /设计|视觉|交互|美术|UI|UX/i, cats: ['🎯 个人能力类', '📚 学习成长类', '💬 其他常见问题'] },
+    { key: '技术', re: /开发|研发|算法|测试|运维|数据|后端|前端|客户端|嵌入式|硬件|电子|电气|机械|结构|工艺|仿真|网络安全/i, cats: ['🔧 问题解决类', '📚 学习成长类', '🎯 个人能力类'] },
+    { key: '运营', re: /运营|内容|新媒体|编辑|用户增长/, cats: ['💼 工作态度类', '👥 团队合作类', '🔧 问题解决类'] },
+    { key: '市场销售', re: /市场|销售|商务|客户|渠道|营销/, cats: ['🌟 价值观念类', '🎯 个人能力类', '💬 其他常见问题'] },
+    { key: '财务', re: /财务|会计|审计|税务|资金|金融|风控|理财|投资|证券|基金|银行|保险/, cats: ['💼 工作态度类', '🌟 价值观念类', '🔧 问题解决类'] },
+    { key: '人力行政', re: /人力资源|人力|人事|行政|法务/, cats: ['👥 团队合作类', '💼 工作态度类', '🌟 价值观念类'] },
+  ];
+  function hashStr(s) {
+    let h = 0;
+    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+    return h;
+  }
+  function interviewTrack(r) {
+    const pos = (r.positions || []).filter(Boolean);
+    if (!pos.length) return null;
+    let best = null;
+    let bestCount = 0;
+    for (const t of INTERVIEW_TRACKS) {
+      const cnt = pos.filter((p) => t.re.test(p)).length;
+      if (cnt > bestCount) { bestCount = cnt; best = t; }
+    }
+    // 该方向岗位占比不足 35% 时视为「综合」，不给多岗位企业乱贴方向标签
+    return best && bestCount / pos.length >= 0.35 ? best : null;
+  }
   function recommendQuestions(r) {
     const all = cache.questions?.questions || [];
-    if (!all.length) return [];
-    const kws = [...(r.positions || []), ...(r.industries || []), r.majors || '']
-      .flatMap((s) => String(s).split(/[\s,，、/／()（）]+/))
-      .filter((t) => t.length >= 2);
-    const scored = all.map((q) => {
-      const text = (q.q + q.a).toLowerCase();
-      let score = 0;
-      for (const k of kws) if (text.includes(k.toLowerCase())) score++;
-      return { q, score };
-    }).filter((o) => o.score > 0).sort((a, b) => b.score - a.score).slice(0, 4).map((o) => o.q);
-    if (scored.length) return scored;
-    // 无关键词命中时，给 4 道通用高频题（前 4 道基础题）
-    return all.slice(0, 4);
+    if (!all.length) return { list: [], track: null };
+    const track = interviewTrack(r);
+    const cats = track ? track.cats : ['📋 基础信息类', '🚀 职业规划类', '🎯 个人能力类'];
+    const byCat = new Map();
+    for (const q of all) {
+      if (!byCat.has(q.category)) byCat.set(q.category, []);
+      byCat.get(q.category).push(q);
+    }
+    const seed = hashStr(String(r.company || r.id || ''));
+    const list = [];
+    const seen = new Set();
+    cats.forEach((cat, i) => {
+      const pool = byCat.get(cat) || [];
+      if (!pool.length) return;
+      const q = pool[(seed + i) % pool.length];
+      if (q && !seen.has(q.id)) { seen.add(q.id); list.push(q); }
+    });
+    return { list, track };
   }
 
   /* ---- F11 批量日历 ICS ---- */

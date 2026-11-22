@@ -1,5 +1,5 @@
 /* 校招信息查询站 Service Worker：应用外壳缓存 + 数据网络优先 */
-const VERSION = 'v24';
+const VERSION = 'v25';
 const SHELL = `campus-jobs-shell-${VERSION}`;
 const DATA = `campus-jobs-data-${VERSION}`;
 const SHELL_FILES = [
