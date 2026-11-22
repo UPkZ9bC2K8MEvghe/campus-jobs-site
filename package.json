@@ -1,0 +1,30 @@
+{
+  "name": "campus-jobs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "fetch": "node scripts/fetch-official.mjs",
+    "fetch:events": "node scripts/fetch-events.mjs",
+    "fetch:reviews": "node scripts/fetch-reviews.mjs",
+    "fetch:questions": "node scripts/crawl-company-questions.mjs",
+    "fetch:questions:nowcoder": "node scripts/crawl-nowcoder-questions.mjs",
+    "merge": "node scripts/export-data.mjs --merge-only",
+    "validate": "node scripts/validate-data.mjs",
+    "build:feeds": "node scripts/build-feeds.mjs",
+    "build:questions": "node scripts/build-questions.mjs",
+    "build:icons": "node scripts/build-icons.mjs",
+    "build": "node scripts/validate-data.mjs && node scripts/build-feeds.mjs && node scripts/build-questions.mjs && node scripts/fetch-reviews.mjs && node scripts/build-static.mjs && node scripts/build-company-pages.mjs",
+    "preview": "node scripts/preview.mjs",
+    "deploy:check": "node scripts/validate-data.mjs",
+    "test": "node scripts/validate-data.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "cheerio": "^1.2.0",
+    "playwright": "^1.65.1"
+  }
+}

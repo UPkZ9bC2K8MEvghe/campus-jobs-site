@@ -1,0 +1,70 @@
+name: 每日更新并部署
+
+on:
+  schedule:
+    # 每天 09:00（北京时间 = UTC 01:00）跑一次
+    - cron: '0 1 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fetch-campus-jobs
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: 安装 Playwright 浏览器
+        run: npx playwright install --with-deps chromium
+
+      - name: 刷新求职资料两个文档
+        run: node scripts/export-data.mjs --docs-only
+        env:
+          FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
+          FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
+
+      - name: 抓取企业官网岗位
+        run: npm run fetch
+        env:
+          FETCH_ALERT_WEBHOOK: ${{ secrets.FETCH_ALERT_WEBHOOK }}
+
+      - name: 合并进站点数据
+        run: npm run merge
+
+      - name: 数据校验
+        run: npm run validate
+
+      - name: 构建站点
+        run: npm run build
+
+      - name: 部署到 Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name campus-jobs --branch master --commit-dirty=true
+
+      - name: 提交并推送数据
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data
+          if git diff --cached --quiet; then
+            echo "没有数据变化"
+          else
+            git commit -m "chore(data): 每日更新 $(date -u +%Y-%m-%d)"
+            git push
+          fi

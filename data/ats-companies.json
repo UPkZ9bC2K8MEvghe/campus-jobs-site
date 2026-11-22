@@ -1,0 +1,3822 @@
+[
+  {
+    "company": "金蝶",
+    "key": "moka-kingdee",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/kingdeehr/166565",
+    "ownership": "民企",
+    "industries": [
+      "IT/互联网/游戏"
+    ],
+    "pages": 8
+  },
+  {
+    "company": "华润置地",
+    "key": "moka-crland",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/crland/168540",
+    "ownership": "央国企",
+    "industries": [
+      "房地产/建筑"
+    ],
+    "pages": 8
+  },
+  {
+    "company": "科锐国际",
+    "key": "moka-careerintl",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/careerintlinc/46955",
+    "ownership": "民企",
+    "industries": [
+      "专业服务"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "云和恩墨",
+    "key": "moka-enmotech",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/enmotech/47098",
+    "ownership": "民企",
+    "industries": [
+      "IT/互联网/游戏"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "思谋科技",
+    "key": "moka-smartmore",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/smartmore/40506",
+    "ownership": "民企",
+    "industries": [
+      "IT/互联网/游戏",
+      "制造业"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "物产中大国际贸易",
+    "key": "moka-wzgroup",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/wzgroup/45879",
+    "ownership": "央国企",
+    "industries": [
+      "贸易/批发/零售"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "大族激光",
+    "key": "moka-hanslaser",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/hanslaser/46383",
+    "ownership": "民企",
+    "industries": [
+      "制造业"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "科华数据",
+    "key": "moka-kehua",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/kehua",
+    "ownership": "民企",
+    "industries": [
+      "电子/通信/半导体",
+      "能源/化工/环保"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "奇瑞汽车",
+    "key": "beisen-chery",
+    "ats": "beisen",
+    "url": "https://chery.zhiye.com/campus/jobs",
+    "host": "chery.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "制造业"
+    ],
+    "pages": 6
+  },
+  {
+    "company": "艾为电子",
+    "key": "beisen-awinic",
+    "ats": "beisen",
+    "url": "https://awinic1.zhiye.com/campus/jobs",
+    "host": "awinic1.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "电子/通信/半导体"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "麒麟软件",
+    "key": "beisen-kylinos",
+    "ats": "beisen",
+    "url": "https://kylinos.zhiye.com/campus/jobs",
+    "host": "kylinos.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "IT/互联网/游戏"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "智慧芽",
+    "key": "beisen-zhihuiya",
+    "ats": "beisen",
+    "url": "https://zhihuiya.zhiye.com/campus/jobs",
+    "host": "zhihuiya.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "IT/互联网/游戏",
+      "专业服务"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "中储智运",
+    "key": "beisen-zczy",
+    "ats": "beisen",
+    "url": "https://zczy.zhiye.com/campus/jobs",
+    "host": "zczy.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "交通/物流/仓储"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "作业帮",
+    "key": "moka-zuoyebang",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/zuoyebang/144908",
+    "ownership": "民企",
+    "industries": [
+      "教育/培训/科研"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "富途",
+    "key": "moka-futu",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/futu5/141186",
+    "ownership": "民企",
+    "industries": [
+      "金融业"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "Garena",
+    "key": "moka-garena",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/garena/148076",
+    "ownership": "外企",
+    "industries": [
+      "IT/互联网/游戏"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "58同城",
+    "key": "moka-58",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/58/150953",
+    "ownership": "民企",
+    "industries": [
+      "IT/互联网/游戏"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "经纬恒润",
+    "key": "moka-jingweihengrun",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/jingweihengrun/168294",
+    "ownership": "民企",
+    "industries": [
+      "制造业"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "海光信息",
+    "key": "moka-hygon",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/hygon/169939",
+    "ownership": "民企",
+    "industries": [
+      "电子/通信/半导体"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "三花控股",
+    "key": "moka-sanhua",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/zjshc/56209",
+    "ownership": "民企",
+    "industries": [
+      "制造业"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "华勤技术",
+    "key": "moka-hq",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/hq/44757",
+    "ownership": "民企",
+    "industries": [
+      "电子/通信/半导体"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "大参林",
+    "key": "moka-dslyy",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/dslyy/136052",
+    "ownership": "民企",
+    "industries": [
+      "医疗/医药/生物",
+      "贸易/批发/零售"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "巨一科技",
+    "key": "moka-ahjy",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/ahjy/168235",
+    "ownership": "民企",
+    "industries": [
+      "制造业"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "百丽时尚",
+    "key": "moka-belle",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/bellejt/164044",
+    "ownership": "民企",
+    "industries": [
+      "消费品"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "三一集团",
+    "key": "beisen-sany",
+    "ats": "beisen",
+    "url": "https://sany.zhiye.com/campus/jobs",
+    "host": "sany.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "制造业"
+    ],
+    "pages": 4
+  },
+  {
+    "company": "中国交建",
+    "key": "beisen-ccccltd",
+    "ats": "beisen",
+    "url": "https://ccccltd.zhiye.com/campus/jobs",
+    "host": "ccccltd.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "房地产/建筑",
+      "交通/物流/仓储"
+    ],
+    "pages": 20
+  },
+  {
+    "company": "招商局集团",
+    "key": "beisen-cmhk",
+    "ats": "beisen",
+    "url": "https://cmhk.zhiye.com/campus/jobs",
+    "host": "cmhk.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "金融业",
+      "交通/物流/仓储",
+      "房地产/建筑"
+    ],
+    "pages": 12
+  },
+  {
+    "company": "蒙牛",
+    "key": "beisen-mengniu",
+    "ats": "beisen",
+    "url": "https://mengniu.zhiye.com/campus/jobs",
+    "host": "mengniu.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "消费品"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "零跑汽车",
+    "key": "beisen-leapmotor",
+    "ats": "beisen",
+    "url": "https://leapmotor.zhiye.com/campus/jobs",
+    "host": "leapmotor.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "制造业"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "潍柴动力",
+    "key": "beisen-weichai",
+    "ats": "beisen",
+    "url": "https://weichai.zhiye.com/campus/jobs",
+    "host": "weichai.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "制造业"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "蜜雪冰城",
+    "key": "beisen-mxbc",
+    "ats": "beisen",
+    "url": "https://mxbc1997.zhiye.com/campus/jobs",
+    "host": "mxbc1997.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "消费品"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "星宸科技",
+    "key": "beisen-sigmastar",
+    "ats": "beisen",
+    "url": "https://sigmastar.zhiye.com/campus/jobs",
+    "host": "sigmastar.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "电子/通信/半导体"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "立信会计师事务所",
+    "key": "beisen-bdochina",
+    "ats": "beisen",
+    "url": "https://bdochina.zhiye.com/campus/jobs",
+    "host": "bdochina.zhiye.com",
+    "ownership": "其他",
+    "industries": [
+      "专业服务"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "迈瑞医疗",
+    "key": "beisen-mindray",
+    "ats": "beisen",
+    "url": "https://mindray.zhiye.com/campus/jobs",
+    "host": "mindray.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "医疗/医药/生物"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "中国中车株洲电机",
+    "key": "beisen-crrcgc",
+    "ats": "beisen",
+    "url": "https://crrcgc.zhiye.com/campus/jobs",
+    "host": "crrcgc.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "制造业"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "国信证券",
+    "key": "beisen-guosen",
+    "ats": "beisen",
+    "url": "https://guosen.zhiye.com/campus/jobs",
+    "host": "guosen.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "金融业"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "大华股份",
+    "key": "beisen-dahua",
+    "ats": "beisen",
+    "url": "https://dahua.zhiye.com/campus/jobs",
+    "host": "dahua.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "电子/通信/半导体"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "科大讯飞",
+    "key": "beisen-iflytek",
+    "ats": "beisen",
+    "url": "https://iflytek.zhiye.com/campus/jobs",
+    "host": "iflytek.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "IT/互联网/游戏"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "贝壳找房",
+    "key": "beisen-ke",
+    "ats": "beisen",
+    "url": "https://ke.zhiye.com/campus/jobs",
+    "host": "ke.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "IT/互联网/游戏",
+      "房地产/建筑"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "北森",
+    "key": "beisen-beisen",
+    "ats": "beisen",
+    "url": "https://beisen.zhiye.com/campus/jobs",
+    "host": "beisen.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "IT/互联网/游戏"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "万兴科技",
+    "key": "beisen-wondershare",
+    "ats": "beisen",
+    "url": "https://wondersharecampus.zhiye.com/campus/jobs",
+    "host": "wondersharecampus.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "IT/互联网/游戏"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "保利发展控股",
+    "key": "beisen-poly",
+    "ats": "beisen",
+    "url": "https://polynew.zhiye.com/campus/jobs",
+    "host": "polynew.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "房地产/建筑"
+    ],
+    "pages": 4
+  },
+  {
+    "company": "上海银行",
+    "key": "beisen-bosc",
+    "ats": "beisen",
+    "url": "https://bosc.zhiye.com/campus/jobs",
+    "host": "bosc.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "金融业"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "九元航空",
+    "key": "beisen-9air",
+    "ats": "beisen",
+    "url": "https://9air.zhiye.com/campus/jobs",
+    "host": "9air.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "交通/物流/仓储"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "湖北星辰",
+    "key": "beisen-hsingchen",
+    "ats": "beisen",
+    "url": "https://hsingchen.zhiye.com/campus/jobs",
+    "host": "hsingchen.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "电子/通信/半导体"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "中国南山集团",
+    "key": "beisen-cndi",
+    "ats": "beisen",
+    "url": "https://cndi.zhiye.com/campus/jobs",
+    "host": "cndi.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "房地产/建筑",
+      "交通/物流/仓储"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "360集团",
+    "key": "beisen-360",
+    "ats": "beisen",
+    "url": "https://360campus.zhiye.com/campus/jobs",
+    "host": "360campus.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "IT/互联网/游戏"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "春风动力",
+    "key": "beisen-cfmoto",
+    "ats": "beisen",
+    "url": "https://cfmoto.zhiye.com/campus/jobs",
+    "host": "cfmoto.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "制造业"
+    ],
+    "pages": 4
+  },
+  {
+    "company": "新易盛",
+    "key": "beisen-eoptolink",
+    "ats": "beisen",
+    "url": "https://eoptolink.zhiye.com/campus/jobs",
+    "host": "eoptolink.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "电子/通信/半导体"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "深南电路",
+    "key": "beisen-scc",
+    "ats": "beisen",
+    "url": "https://scc.zhiye.com/campus/jobs",
+    "host": "scc.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "电子/通信/半导体"
+    ],
+    "pages": 4
+  },
+  {
+    "company": "奕斯伟材料",
+    "key": "beisen-eswin",
+    "ats": "beisen",
+    "url": "https://eswin-si.zhiye.com/campus/jobs",
+    "host": "eswin-si.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "电子/通信/半导体"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "广东华兴银行",
+    "key": "beisen-ghbank",
+    "ats": "beisen",
+    "url": "https://ghbank.zhiye.com/campus/jobs",
+    "host": "ghbank.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "金融业"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "凯莱英",
+    "key": "beisen-asymchem",
+    "ats": "beisen",
+    "url": "https://asymchem.zhiye.com/campus/jobs",
+    "host": "asymchem.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "医疗/医药/生物"
+    ],
+    "pages": 4
+  },
+  {
+    "company": "信达生物",
+    "key": "beisen-innovent",
+    "ats": "beisen",
+    "url": "https://innoventbio.zhiye.com/campus/jobs",
+    "host": "innoventbio.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "医疗/医药/生物"
+    ],
+    "pages": 4
+  },
+  {
+    "company": "药明康德",
+    "key": "beisen-wuxi",
+    "ats": "beisen",
+    "url": "https://wuxiapptec.zhiye.com/campus/jobs",
+    "host": "wuxiapptec.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "医疗/医药/生物"
+    ],
+    "pages": 12
+  },
+  {
+    "company": "近岸蛋白",
+    "key": "beisen-novoprotein",
+    "ats": "beisen",
+    "url": "https://novoprotein.zhiye.com/campus/jobs",
+    "host": "novoprotein.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "医疗/医药/生物"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "中国网安",
+    "key": "moka-cetc30",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/cetc30/36270",
+    "ownership": "央国企",
+    "industries": [
+      "IT/互联网/游戏",
+      "电子/通信/半导体"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "全球购骑士特权",
+    "key": "moka-blackunique",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/black-unique/29232",
+    "ownership": "民企",
+    "industries": [
+      "IT/互联网/游戏"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "卓识私募",
+    "key": "moka-zsquant",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/zsquant/150292",
+    "ownership": "民企",
+    "industries": [
+      "金融业"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "景嘉微电子",
+    "key": "moka-jjw",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/jjw/143541",
+    "ownership": "民企",
+    "industries": [
+      "电子/通信/半导体"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "景旺电子",
+    "key": "moka-jingwang",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/jingwang/170520",
+    "ownership": "民企",
+    "industries": [
+      "电子/通信/半导体"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "税友软件",
+    "key": "moka-servyou",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/servyou/102033",
+    "ownership": "民企",
+    "industries": [
+      "IT/互联网/游戏"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "徕芬",
+    "key": "moka-laifen",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/laifen/146139",
+    "ownership": "民企",
+    "industries": [
+      "消费品"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "吉利控股",
+    "key": "moka-geely",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/geely/189977",
+    "ownership": "民企",
+    "industries": [
+      "制造业"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "力芯微电子",
+    "key": "moka-etek",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/etek/170559",
+    "ownership": "民企",
+    "industries": [
+      "电子/通信/半导体"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "全量全速",
+    "key": "moka-doublefs",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/doublefs/24370",
+    "ownership": "民企",
+    "industries": [
+      "IT/互联网/游戏"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "燧原科技",
+    "key": "moka-enflame",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/enflame/168420",
+    "ownership": "民企",
+    "industries": [
+      "电子/通信/半导体"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "富国基金",
+    "key": "moka-fullgoal",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/fullgoal/72198",
+    "ownership": "央国企",
+    "industries": [
+      "金融业"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "佳兆业集团",
+    "key": "moka-kaisa",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/kaisa/151009",
+    "ownership": "民企",
+    "industries": [
+      "房地产/建筑"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "珠海万达商管",
+    "key": "moka-wandacm",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/wandacm/164049",
+    "ownership": "民企",
+    "industries": [
+      "房地产/建筑"
+    ],
+    "pages": 6
+  },
+  {
+    "company": "申微智创",
+    "key": "beisen-swzc",
+    "ats": "beisen",
+    "url": "https://swzc-tech.zhiye.com/campus/jobs",
+    "host": "swzc-tech.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "电子/通信/半导体",
+      "制造业"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "先导智能",
+    "key": "beisen-leadchina",
+    "ats": "beisen",
+    "url": "https://leadchina.zhiye.com/campus/jobs",
+    "host": "leadchina.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "制造业"
+    ],
+    "pages": 4
+  },
+  {
+    "company": "中国外运",
+    "key": "beisen-sinotrans",
+    "ats": "beisen",
+    "url": "https://sinotrans.zhiye.com/campus/jobs",
+    "host": "sinotrans.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "交通/物流/仓储"
+    ],
+    "pages": 12
+  },
+  {
+    "company": "神驰机电",
+    "key": "beisen-senci",
+    "ats": "beisen",
+    "url": "https://senci.zhiye.com/campus/jobs",
+    "host": "senci.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "制造业"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "长安汽车",
+    "key": "beisen-changan",
+    "ats": "beisen",
+    "url": "https://changan.zhiye.com/campus/jobs",
+    "host": "changan.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "制造业"
+    ],
+    "pages": 12
+  },
+  {
+    "company": "中创新航",
+    "key": "beisen-calb",
+    "ats": "beisen",
+    "url": "https://calbjs.zhiye.com/campus/jobs",
+    "host": "calbjs.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "制造业",
+      "能源/化工/环保"
+    ],
+    "pages": 4
+  },
+  {
+    "company": "中电科芯片技术集团",
+    "key": "beisen-cetccq",
+    "ats": "beisen",
+    "url": "https://cetccq.zhiye.com/campus/jobs",
+    "host": "cetccq.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "电子/通信/半导体"
+    ],
+    "pages": 4
+  },
+  {
+    "company": "中国人民保险",
+    "key": "beisen-picc",
+    "ats": "beisen",
+    "url": "https://picc.zhiye.com/campus/jobs",
+    "host": "picc.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "金融业"
+    ],
+    "pages": 45
+  },
+  {
+    "company": "泰康保险集团",
+    "key": "beisen-taikang",
+    "ats": "beisen",
+    "url": "https://jobtaikang.zhiye.com/campus/jobs",
+    "host": "jobtaikang.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "金融业",
+      "医疗/医药/生物"
+    ],
+    "pages": 18
+  },
+  {
+    "company": "科远智慧",
+    "key": "beisen-sciyon",
+    "ats": "beisen",
+    "url": "https://sciyon.zhiye.com/campus/jobs",
+    "host": "sciyon.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "IT/互联网/游戏",
+      "制造业"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "国轩高科",
+    "key": "beisen-gotion",
+    "ats": "beisen",
+    "url": "https://gotion.zhiye.com/campus/jobs",
+    "host": "gotion.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "制造业",
+      "能源/化工/环保"
+    ],
+    "pages": 14
+  },
+  {
+    "company": "金风科技",
+    "key": "beisen-goldwind",
+    "ats": "beisen",
+    "url": "https://goldwind.zhiye.com/campus/jobs",
+    "host": "goldwind.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "能源/化工/环保",
+      "制造业"
+    ],
+    "pages": 4
+  },
+  {
+    "company": "华东勘测设计研究院",
+    "key": "beisen-hdec",
+    "ats": "beisen",
+    "url": "https://hdec.zhiye.com/campus/jobs",
+    "host": "hdec.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "房地产/建筑"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "移远通信",
+    "key": "moka-quectel",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/quectel/65934",
+    "ownership": "民企",
+    "industries": [
+      "电子/通信/半导体"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "佛吉亚",
+    "key": "moka-faurecia",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/faurecia/146093",
+    "ownership": "外企",
+    "industries": [
+      "制造业"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "中环领先",
+    "key": "moka-zhlx",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/zhlx/146852",
+    "ownership": "民企",
+    "industries": [
+      "电子/通信/半导体"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "科达制造",
+    "key": "moka-kedachina",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/kedachina/78371",
+    "ownership": "民企",
+    "industries": [
+      "制造业"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "中微公司",
+    "key": "moka-amec",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/amec/4362",
+    "ownership": "民企",
+    "industries": [
+      "电子/通信/半导体"
+    ],
+    "pages": 6
+  },
+  {
+    "company": "兆易创新",
+    "key": "moka-gigadevice",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/gigadevice/92215",
+    "ownership": "民企",
+    "industries": [
+      "电子/通信/半导体"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "阿吉豆",
+    "key": "moka-yunhonggroup",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/yunhonggroup/140309",
+    "ownership": "民企",
+    "industries": [
+      "消费品"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "安踏集团",
+    "key": "moka-antahr",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/antahr/142914",
+    "ownership": "民企",
+    "industries": [
+      "消费品"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "FMG时尚动势",
+    "key": "moka-ur",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/ur/45210",
+    "ownership": "民企",
+    "industries": [
+      "消费品"
+    ],
+    "pages": 6
+  },
+  {
+    "company": "巨人网络",
+    "key": "moka-ztgame",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/ztgame/92438",
+    "ownership": "民企",
+    "industries": [
+      "IT/互联网/游戏"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "乐元素",
+    "key": "moka-leyuansu",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/leyuansu/166186",
+    "ownership": "民企",
+    "industries": [
+      "IT/互联网/游戏"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "大寰机器人",
+    "key": "moka-dhrobotics",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/dhrobotics/168695",
+    "ownership": "民企",
+    "industries": [
+      "制造业"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "三七互娱",
+    "key": "moka-37",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus_apply/37/58016#/jobs",
+    "ownership": "民企",
+    "industries": [
+      "IT/互联网/游戏"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "江铃汽车",
+    "key": "beisen-jmc",
+    "ats": "beisen",
+    "url": "https://jmc.zhiye.com/campus/jobs",
+    "host": "jmc.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "制造业"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "电装（中国）",
+    "key": "beisen-denso",
+    "ats": "beisen",
+    "url": "https://denso.zhiye.com/campus/jobs",
+    "host": "denso.zhiye.com",
+    "ownership": "外企",
+    "industries": [
+      "制造业"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "北汽福田",
+    "key": "beisen-foton",
+    "ats": "beisen",
+    "url": "https://futurefoton.zhiye.com/campus/jobs",
+    "host": "futurefoton.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "制造业"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "威迈斯",
+    "key": "beisen-vmax",
+    "ats": "beisen",
+    "url": "https://vmax.zhiye.com/campus/jobs",
+    "host": "vmax.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "制造业"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "南芯科技",
+    "key": "beisen-nanxin",
+    "ats": "beisen",
+    "url": "https://nanxin.zhiye.com/campus/jobs",
+    "host": "nanxin.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "电子/通信/半导体"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "威高集团",
+    "key": "beisen-weigao",
+    "ats": "beisen",
+    "url": "https://weigao.zhiye.com/campus/jobs",
+    "host": "weigao.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "医疗/医药/生物"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "稳健医疗",
+    "key": "beisen-winnermedical",
+    "ats": "beisen",
+    "url": "https://winnermedical.zhiye.com/campus/jobs",
+    "host": "winnermedical.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "医疗/医药/生物",
+      "消费品"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "麦澜德",
+    "key": "beisen-medlander",
+    "ats": "beisen",
+    "url": "https://medlandercampus.zhiye.com/campus/jobs",
+    "host": "medlandercampus.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "医疗/医药/生物"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "国金证券",
+    "key": "beisen-gjzq",
+    "ats": "beisen",
+    "url": "https://gjzq.zhiye.com/campus/jobs",
+    "host": "gjzq.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "金融业"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "双汇",
+    "key": "beisen-shuanghui",
+    "ats": "beisen",
+    "url": "https://shuanghui.zhiye.com/campus/jobs",
+    "host": "shuanghui.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "消费品"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "君乐宝",
+    "key": "beisen-junlebao",
+    "ats": "beisen",
+    "url": "https://junlebaoruye.zhiye.com/campus/jobs",
+    "host": "junlebaoruye.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "消费品"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "李锦记",
+    "key": "beisen-lkk",
+    "ats": "beisen",
+    "url": "https://lkksh.zhiye.com/campus/jobs",
+    "host": "lkksh.zhiye.com",
+    "ownership": "外企",
+    "industries": [
+      "消费品"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "中核集团",
+    "key": "beisen-cnnc",
+    "ats": "beisen",
+    "url": "https://cnnc.zhiye.com/campus/jobs",
+    "host": "cnnc.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "能源/化工/环保"
+    ],
+    "pages": 24
+  },
+  {
+    "company": "TCL中环",
+    "key": "beisen-zhonghuan",
+    "ats": "beisen",
+    "url": "https://zhonghuan.zhiye.com/campus/jobs",
+    "host": "zhonghuan.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "电子/通信/半导体",
+      "能源/化工/环保"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "天华新能",
+    "key": "moka-canmax",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/canmax/140246",
+    "ownership": "民企",
+    "industries": [
+      "制造业",
+      "能源/化工/环保"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "宁德时代",
+    "key": "moka-catl",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/catlhr/142992",
+    "ownership": "民企",
+    "industries": [
+      "制造业",
+      "能源/化工/环保"
+    ],
+    "pages": 10
+  },
+  {
+    "company": "松下集团",
+    "key": "moka-panasonic",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/panasonic/41989",
+    "ownership": "外企",
+    "industries": [
+      "制造业",
+      "电子/通信/半导体"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "特步",
+    "key": "moka-xtep",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/xtep/148871",
+    "ownership": "民企",
+    "industries": [
+      "消费品"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "货拉拉",
+    "key": "moka-huolala",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/huolalahr/98660",
+    "ownership": "民企",
+    "industries": [
+      "交通/物流/仓储"
+    ],
+    "pages": 4
+  },
+  {
+    "company": "万科集团",
+    "key": "moka-vanke",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/vanke/172690",
+    "ownership": "民企",
+    "industries": [
+      "房地产/建筑"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "润泽园教育",
+    "key": "moka-runzeyuan",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/runzeyuan#/jobs",
+    "ownership": "民企",
+    "industries": [
+      "教育/培训/科研"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "好未来",
+    "key": "moka-tal",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/tal/169887",
+    "ownership": "民企",
+    "industries": [
+      "教育/培训/科研"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "豌豆思维",
+    "key": "moka-happyseed",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus_apply/happy-seed/36097#/jobs",
+    "ownership": "民企",
+    "industries": [
+      "教育/培训/科研"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "上汽安吉物流",
+    "key": "moka-anji",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/anji01/98946",
+    "ownership": "央国企",
+    "industries": [
+      "交通/物流/仓储"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "广东省建筑设计研究院",
+    "key": "beisen-gdadri",
+    "ats": "beisen",
+    "url": "https://gdadri.zhiye.com/campus/jobs",
+    "host": "gdadri.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "房地产/建筑"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "清华大学建筑设计研究院",
+    "key": "beisen-thad",
+    "ats": "beisen",
+    "url": "https://thad.zhiye.com/campus/jobs",
+    "host": "thad.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "房地产/建筑"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "中冶建筑研究总院",
+    "key": "beisen-zyjyy",
+    "ats": "beisen",
+    "url": "https://zyjyy.zhiye.com/campus/jobs",
+    "host": "zyjyy.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "房地产/建筑"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "中信科移动",
+    "key": "beisen-cictmobile",
+    "ats": "beisen",
+    "url": "https://cictmobile.zhiye.com/campus/jobs",
+    "host": "cictmobile.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "电子/通信/半导体"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "三维通信",
+    "key": "beisen-sunwave",
+    "ats": "beisen",
+    "url": "https://sunwave.zhiye.com/campus/jobs",
+    "host": "sunwave.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "电子/通信/半导体"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "北京神舟航天软件",
+    "key": "beisen-bjsasc",
+    "ats": "beisen",
+    "url": "https://bjsasc.zhiye.com/campus/jobs",
+    "host": "bjsasc.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "IT/互联网/游戏"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "圣农集团",
+    "key": "beisen-sunnergp",
+    "ats": "beisen",
+    "url": "https://sunnergp.zhiye.com/campus/jobs",
+    "host": "sunnergp.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "消费品"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "老乡鸡",
+    "key": "beisen-lxj",
+    "ats": "beisen",
+    "url": "https://lxjchina1.zhiye.com/campus/jobs",
+    "host": "lxjchina1.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "消费品"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "瑞普生物",
+    "key": "beisen-ringpu",
+    "ats": "beisen",
+    "url": "https://ringpu.zhiye.com/campus/jobs",
+    "host": "ringpu.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "医疗/医药/生物"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "国瓷材料",
+    "key": "beisen-sinocera",
+    "ats": "beisen",
+    "url": "https://sinocera1.zhiye.com/campus/jobs",
+    "host": "sinocera1.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "电子/通信/半导体"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "东方雨虹",
+    "key": "beisen-yuhong",
+    "ats": "beisen",
+    "url": "https://yuhongzp.zhiye.com/campus/jobs",
+    "host": "yuhongzp.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "房地产/建筑"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "金发科技",
+    "key": "beisen-kingfa",
+    "ats": "beisen",
+    "url": "https://kingfa.zhiye.com/campus/jobs",
+    "host": "kingfa.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "制造业",
+      "能源/化工/环保"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "天弘基金",
+    "key": "moka-thfund",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/thfund/46219",
+    "ownership": "民企",
+    "industries": [
+      "金融业"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "厦门银行",
+    "key": "moka-xmbank",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/xmbankonline/182209",
+    "ownership": "央国企",
+    "industries": [
+      "金融业"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "信也科技",
+    "key": "moka-paipaidai",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/paipaidai/168312",
+    "ownership": "民企",
+    "industries": [
+      "金融业",
+      "IT/互联网/游戏"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "佗道医疗",
+    "key": "moka-tudaomed",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/tudaomed/147414",
+    "ownership": "民企",
+    "industries": [
+      "医疗/医药/生物"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "恒瑞医疗",
+    "key": "moka-hrmedical",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/hrmedical/147473",
+    "ownership": "民企",
+    "industries": [
+      "医疗/医药/生物"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "博迈医疗",
+    "key": "moka-brosmed",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/brosmed/146155",
+    "ownership": "民企",
+    "industries": [
+      "医疗/医药/生物"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "源氏木语",
+    "key": "moka-yeswood",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/yeswood/142521",
+    "ownership": "民企",
+    "industries": [
+      "消费品"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "顾家家居",
+    "key": "moka-kuka",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/kuka/172508",
+    "ownership": "民企",
+    "industries": [
+      "消费品"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "欣贺股份",
+    "key": "moka-xinhee",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/xinhee/168514",
+    "ownership": "民企",
+    "industries": [
+      "消费品"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "中国葛洲坝",
+    "key": "moka-cggc",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/cggc/145102",
+    "ownership": "央国企",
+    "industries": [
+      "房地产/建筑",
+      "能源/化工/环保"
+    ],
+    "pages": 4
+  },
+  {
+    "company": "稀咖集团",
+    "key": "moka-tuiquan",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/tuiquan/67992",
+    "ownership": "民企",
+    "industries": [
+      "消费品"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "上海曼伦",
+    "key": "moka-manon",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/manon/168534",
+    "ownership": "民企",
+    "industries": [
+      "消费品"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "雀巢中国",
+    "key": "moka-nestle",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/nestlegcr#/jobs",
+    "ownership": "外企",
+    "industries": [
+      "消费品"
+    ],
+    "pages": 4
+  },
+  {
+    "company": "中国建筑西南设计研究院",
+    "key": "beisen-xnjz",
+    "ats": "beisen",
+    "url": "https://xnjz.zhiye.com/campus/jobs",
+    "host": "xnjz.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "房地产/建筑"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "基准方中",
+    "key": "beisen-jzfz",
+    "ats": "beisen",
+    "url": "https://jzfz.zhiye.com/campus/jobs",
+    "host": "jzfz.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "房地产/建筑"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "广州市设计院集团",
+    "key": "beisen-gzdi",
+    "ats": "beisen",
+    "url": "https://gzdi1.zhiye.com/campus/jobs",
+    "host": "gzdi1.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "房地产/建筑"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "上汽大通",
+    "key": "beisen-saicmaxus",
+    "ats": "beisen",
+    "url": "https://saicmaxus.zhiye.com/campus/jobs",
+    "host": "saicmaxus.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "制造业"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "北汽集团",
+    "key": "beisen-baicgroup",
+    "ats": "beisen",
+    "url": "https://baicgroup.zhiye.com/campus/jobs",
+    "host": "baicgroup.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "制造业"
+    ],
+    "pages": 10
+  },
+  {
+    "company": "赛力斯",
+    "key": "beisen-sokon",
+    "ats": "beisen",
+    "url": "https://sokon.zhiye.com/campus/jobs",
+    "host": "sokon.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "制造业"
+    ],
+    "pages": 8
+  },
+  {
+    "company": "华泰资产",
+    "key": "beisen-htam",
+    "ats": "beisen",
+    "url": "https://htam.zhiye.com/campus/jobs",
+    "host": "htam.zhiye.com",
+    "ownership": "其他",
+    "industries": [
+      "金融业"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "科林电气",
+    "key": "beisen-kechina",
+    "ats": "beisen",
+    "url": "https://kechina.zhiye.com/campus/jobs",
+    "host": "kechina.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "制造业",
+      "能源/化工/环保"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "国科微",
+    "key": "beisen-goke",
+    "ats": "beisen",
+    "url": "https://goke1.zhiye.com/campus/jobs",
+    "host": "goke1.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "电子/通信/半导体"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "当虹科技",
+    "key": "beisen-arcvideo",
+    "ats": "beisen",
+    "url": "https://arcvideo.zhiye.com/campus/jobs",
+    "host": "arcvideo.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "IT/互联网/游戏"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "晶合集成",
+    "key": "beisen-nexchip",
+    "ats": "beisen",
+    "url": "https://nexchip.zhiye.com/campus/jobs",
+    "host": "nexchip.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "电子/通信/半导体"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "金证科技",
+    "key": "beisen-szkingdom",
+    "ats": "beisen",
+    "url": "https://szkingdom.zhiye.com/campus/jobs",
+    "host": "szkingdom.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "IT/互联网/游戏",
+      "金融业"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "爱旭股份",
+    "key": "beisen-aikosolar",
+    "ats": "beisen",
+    "url": "https://aikosolar.zhiye.com/campus/jobs",
+    "host": "aikosolar.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "能源/化工/环保",
+      "制造业"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "帝迈生物",
+    "key": "beisen-dymind",
+    "ats": "beisen",
+    "url": "https://dymind.zhiye.com/campus/jobs",
+    "host": "dymind.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "医疗/医药/生物"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "芯联集成",
+    "key": "beisen-xlmec",
+    "ats": "beisen",
+    "url": "https://xlmec.zhiye.com/campus/jobs",
+    "host": "xlmec.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "电子/通信/半导体"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "第一医药",
+    "key": "beisen-dyyy",
+    "ats": "beisen",
+    "url": "https://dyyy.zhiye.com/campus/jobs",
+    "host": "dyyy.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "医疗/医药/生物",
+      "贸易/批发/零售"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "传音控股",
+    "key": "beisen-transsion",
+    "ats": "beisen",
+    "url": "https://transsion.zhiye.com/campus/jobs",
+    "host": "transsion.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "电子/通信/半导体"
+    ],
+    "pages": 6
+  },
+  {
+    "company": "扬翔集团",
+    "key": "beisen-yangxiang",
+    "ats": "beisen",
+    "url": "https://yangxiang.zhiye.com/campus/jobs",
+    "host": "yangxiang.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "农林牧渔"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "西南水泥",
+    "key": "beisen-scement",
+    "ats": "beisen",
+    "url": "https://scement1.zhiye.com/campus/jobs",
+    "host": "scement1.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "房地产/建筑",
+      "制造业"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "格兰仕",
+    "key": "beisen-galanz",
+    "ats": "beisen",
+    "url": "https://galanz.zhiye.com/campus/jobs",
+    "host": "galanz.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "制造业",
+      "消费品"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "蕉内",
+    "key": "beisen-bananain",
+    "ats": "beisen",
+    "url": "https://bananain.zhiye.com/campus/jobs",
+    "host": "bananain.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "消费品"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "卓胜微",
+    "key": "beisen-maxscend",
+    "ats": "beisen",
+    "url": "https://maxscend.zhiye.com/campus/jobs",
+    "host": "maxscend.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "电子/通信/半导体"
+    ],
+    "pages": 6
+  },
+  {
+    "company": "杰瑞集团",
+    "key": "beisen-jereh",
+    "ats": "beisen",
+    "url": "https://jereh.zhiye.com/campus/jobs",
+    "host": "jereh.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "能源/化工/环保",
+      "制造业"
+    ],
+    "pages": 6
+  },
+  {
+    "company": "得力集团",
+    "key": "moka-nbdeli",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/nbdeli/70019",
+    "ownership": "民企",
+    "industries": [
+      "消费品",
+      "贸易/批发/零售"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "瑞沃德",
+    "key": "beisen-rwdls",
+    "ats": "beisen",
+    "url": "https://rwdls.zhiye.com/campus/jobs",
+    "host": "rwdls.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "医疗/医药/生物"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "富芯半导体",
+    "key": "beisen-fullsemi",
+    "ats": "beisen",
+    "url": "https://fullsemi.zhiye.com/campus/jobs",
+    "host": "fullsemi.zhiye.com",
+    "ownership": "其他",
+    "industries": [
+      "电子/通信/半导体"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "青蛙王子",
+    "key": "beisen-qwwz",
+    "ats": "beisen",
+    "url": "https://qwwz.zhiye.com/campus/jobs",
+    "host": "qwwz.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "消费品"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "新产业生物",
+    "key": "beisen-snibe",
+    "ats": "beisen",
+    "url": "https://snibe.zhiye.com/campus/jobs",
+    "host": "snibe.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "医疗/医药/生物"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "四方股份",
+    "key": "beisen-sfauto",
+    "ats": "beisen",
+    "url": "https://sf-auto.zhiye.com/campus/jobs",
+    "host": "sf-auto.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "制造业",
+      "能源/化工/环保"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "高能环境",
+    "key": "beisen-bge",
+    "ats": "beisen",
+    "url": "https://bgechina1.zhiye.com/campus/jobs",
+    "host": "bgechina1.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "能源/化工/环保"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "VAMA",
+    "key": "beisen-vama",
+    "ats": "beisen",
+    "url": "https://vamachina.zhiye.com/campus/jobs",
+    "host": "vamachina.zhiye.com",
+    "ownership": "合资",
+    "industries": [
+      "制造业"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "海科集团",
+    "key": "beisen-haike",
+    "ats": "beisen",
+    "url": "https://haikegroup1.zhiye.com/campus/jobs",
+    "host": "haikegroup1.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "能源/化工/环保"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "长城基金",
+    "key": "beisen-greatwallfund",
+    "ats": "beisen",
+    "url": "https://greatwallfund.zhiye.com/campus/jobs",
+    "host": "greatwallfund.zhiye.com",
+    "ownership": "其他",
+    "industries": [
+      "金融业"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "振石控股",
+    "key": "beisen-zhenshi",
+    "ats": "beisen",
+    "url": "https://zhenshigroup.zhiye.com/campus/jobs",
+    "host": "zhenshigroup.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "制造业",
+      "能源/化工/环保"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "苏纳光电",
+    "key": "beisen-suna",
+    "ats": "beisen",
+    "url": "https://suna-opto.zhiye.com/campus/jobs",
+    "host": "suna-opto.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "电子/通信/半导体"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "纵横股份",
+    "key": "beisen-jouav",
+    "ats": "beisen",
+    "url": "https://jouav.zhiye.com/campus/jobs",
+    "host": "jouav.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "制造业"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "埃夫特",
+    "key": "beisen-efort",
+    "ats": "beisen",
+    "url": "https://efort.zhiye.com/campus/jobs",
+    "host": "efort.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "制造业"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "全友家居",
+    "key": "beisen-quanyou",
+    "ats": "beisen",
+    "url": "https://quanyouxs.zhiye.com/campus/jobs",
+    "host": "quanyouxs.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "消费品",
+      "制造业"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "深水咨询",
+    "key": "beisen-szsszx",
+    "ats": "beisen",
+    "url": "https://szsszx.zhiye.com/campus/jobs",
+    "host": "szsszx.zhiye.com",
+    "ownership": "其他",
+    "industries": [
+      "能源/化工/环保",
+      "房地产/建筑"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "东鹏控股",
+    "key": "beisen-dongpeng",
+    "ats": "beisen",
+    "url": "https://dongpeng.zhiye.com/campus/jobs",
+    "host": "dongpeng.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "房地产/建筑",
+      "制造业"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "石头科技",
+    "key": "beisen-roborock",
+    "ats": "beisen",
+    "url": "https://roborock.zhiye.com/campus/jobs",
+    "host": "roborock.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "电子/通信/半导体",
+      "消费品"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "追觅科技",
+    "key": "beisen-dreame",
+    "ats": "beisen",
+    "url": "https://dreame.zhiye.com/campus/jobs",
+    "host": "dreame.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "消费品",
+      "电子/通信/半导体"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "山推股份",
+    "key": "beisen-shantui",
+    "ownership": "央国企",
+    "industries": [
+      "制造业"
+    ],
+    "ats": "beisen",
+    "url": "https://shantui.zhiye.com/campus/jobs",
+    "host": "shantui.zhiye.com",
+    "pages": 1
+  },
+  {
+    "company": "泰格医药",
+    "key": "beisen-tigermed",
+    "ownership": "民企",
+    "industries": [
+      "医疗",
+      "医药",
+      "生物"
+    ],
+    "ats": "beisen",
+    "url": "https://tigermed.zhiye.com/campus/jobs",
+    "host": "tigermed.zhiye.com",
+    "pages": 5
+  },
+  {
+    "company": "博腾制药",
+    "key": "beisen-porton",
+    "ownership": "民企",
+    "industries": [
+      "医药",
+      "生物"
+    ],
+    "ats": "beisen",
+    "url": "https://porton.zhiye.com/campus/jobs",
+    "host": "porton.zhiye.com",
+    "pages": 2
+  },
+  {
+    "company": "普洛药业",
+    "key": "beisen-apeloa",
+    "ownership": "民企",
+    "industries": [
+      "医药",
+      "生物"
+    ],
+    "ats": "beisen",
+    "url": "https://apeloa.zhiye.com/campus/jobs",
+    "host": "apeloa.zhiye.com",
+    "pages": 1
+  },
+  {
+    "company": "振德医疗",
+    "key": "beisen-zhende",
+    "ownership": "民企",
+    "industries": [
+      "医疗"
+    ],
+    "ats": "beisen",
+    "url": "https://zhende.zhiye.com/campus/jobs",
+    "host": "zhende.zhiye.com",
+    "pages": 1
+  },
+  {
+    "company": "上海医药",
+    "key": "beisen-sph",
+    "ownership": "央国企",
+    "industries": [
+      "医疗",
+      "医药"
+    ],
+    "ats": "beisen",
+    "url": "https://sph.zhiye.com/campus/jobs",
+    "host": "sph.zhiye.com",
+    "pages": 3
+  },
+  {
+    "company": "以岭药业",
+    "key": "beisen-yiling",
+    "ownership": "民企",
+    "industries": [
+      "医药",
+      "生物"
+    ],
+    "ats": "beisen",
+    "url": "https://yiling.zhiye.com/campus/jobs",
+    "host": "yiling.zhiye.com",
+    "pages": 2
+  },
+  {
+    "company": "康缘药业",
+    "key": "beisen-kanion",
+    "ownership": "民企",
+    "industries": [
+      "医药",
+      "生物"
+    ],
+    "ats": "beisen",
+    "url": "https://kanion.zhiye.com/campus/jobs",
+    "host": "kanion.zhiye.com",
+    "pages": 2
+  },
+  {
+    "company": "马应龙",
+    "key": "beisen-mayinglong",
+    "ownership": "民企",
+    "industries": [
+      "医药"
+    ],
+    "ats": "beisen",
+    "url": "https://mayinglong.zhiye.com/campus/jobs",
+    "host": "mayinglong.zhiye.com",
+    "pages": 1
+  },
+  {
+    "company": "三元食品",
+    "key": "beisen-sanyuan",
+    "ownership": "央国企",
+    "industries": [
+      "消费品"
+    ],
+    "ats": "beisen",
+    "url": "https://sanyuan.zhiye.com/campus/jobs",
+    "host": "sanyuan.zhiye.com",
+    "pages": 1
+  },
+  {
+    "company": "旺旺",
+    "key": "beisen-wantwant",
+    "ownership": "外企",
+    "industries": [
+      "消费品"
+    ],
+    "ats": "beisen",
+    "url": "https://wantwant.zhiye.com/campus/jobs",
+    "host": "wantwant.zhiye.com",
+    "pages": 1
+  },
+  {
+    "company": "来伊份",
+    "key": "beisen-laiyifen",
+    "ownership": "民企",
+    "industries": [
+      "消费品",
+      "零售"
+    ],
+    "ats": "beisen",
+    "url": "https://laiyifen.zhiye.com/campus/jobs",
+    "host": "laiyifen.zhiye.com",
+    "pages": 1
+  },
+  {
+    "company": "芯海科技",
+    "key": "beisen-chipsea",
+    "ownership": "民企",
+    "industries": [
+      "电子",
+      "半导体"
+    ],
+    "ats": "beisen",
+    "url": "https://chipsea.zhiye.com/campus/jobs",
+    "host": "chipsea.zhiye.com",
+    "pages": 1
+  },
+  {
+    "company": "基本半导体",
+    "key": "beisen-basicsemi",
+    "ownership": "民企",
+    "industries": [
+      "电子",
+      "半导体"
+    ],
+    "ats": "beisen",
+    "url": "https://basicsemi.zhiye.com/campus/jobs",
+    "host": "basicsemi.zhiye.com",
+    "pages": 1
+  },
+  {
+    "company": "恒玄科技",
+    "key": "beisen-bestechnic",
+    "ownership": "民企",
+    "industries": [
+      "电子",
+      "半导体"
+    ],
+    "ats": "beisen",
+    "url": "https://bestechnic.zhiye.com/campus/jobs",
+    "host": "bestechnic.zhiye.com",
+    "pages": 2
+  },
+  {
+    "company": "鱼跃医疗",
+    "key": "beisen-yuwell",
+    "ownership": "民企",
+    "industries": [
+      "医疗"
+    ],
+    "ats": "beisen",
+    "url": "https://yuwellhr.zhiye.com/campus/jobs",
+    "host": "yuwellhr.zhiye.com",
+    "pages": 1
+  },
+  {
+    "company": "济川药业",
+    "key": "beisen-jumpcan",
+    "ownership": "民企",
+    "industries": [
+      "医药",
+      "生物"
+    ],
+    "ats": "beisen",
+    "url": "https://jumpcan1.zhiye.com/campus/jobs",
+    "host": "jumpcan1.zhiye.com",
+    "pages": 1
+  },
+  {
+    "company": "青铜剑技术",
+    "key": "beisen-bronzesword",
+    "ownership": "民企",
+    "industries": [
+      "电子",
+      "半导体"
+    ],
+    "ats": "beisen",
+    "url": "https://basicsemi1.zhiye.com/campus/jobs",
+    "host": "basicsemi1.zhiye.com",
+    "pages": 1
+  },
+  {
+    "company": "海信集团",
+    "key": "beisen-hisense",
+    "ats": "beisen",
+    "url": "https://jobs.hisense.com/jobs/",
+    "host": "jobs.hisense.com",
+    "ownership": "央国企",
+    "industries": [
+      "制造业",
+      "电子/通信/半导体"
+    ]
+  },
+  {
+    "company": "中兴通讯",
+    "key": "moka-zte",
+    "ats": "moka",
+    "url": "https://app.mokahr.com/campus-recruitment/zte/46903#/jobs?project=100022014&page=1",
+    "details": true,
+    "ownership": "其他",
+    "industries": [
+      "电子/通信/半导体"
+    ]
+  },
+  {
+    "company": "比亚迪",
+    "key": "custom-byd",
+    "ats": "byd",
+    "url": "https://job.byd.com/portal/pc/#/school/home",
+    "ownership": "民企",
+    "industries": [
+      "制造业"
+    ],
+    "degree": [
+      "本科",
+      "硕士",
+      "博士"
+    ]
+  },
+  {
+    "company": "拼多多集团",
+    "key": "custom-pdd",
+    "ats": "pdd",
+    "url": "https://careers.pddglobalhr.com/campus/grad",
+    "ownership": "民企",
+    "industries": [
+      "IT/互联网/游戏",
+      "生活服务业"
+    ]
+  },
+  {
+    "company": "青岛啤酒",
+    "key": "beisen-tsingtao",
+    "ats": "beisen",
+    "url": "https://tsingtao.zhiye.com/campus/jobs",
+    "host": "tsingtao.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "消费品"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "名创优品",
+    "key": "beisen-miniso",
+    "ats": "beisen",
+    "url": "https://miniso.zhiye.com/campus/jobs",
+    "host": "miniso.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "消费品",
+      "贸易/批发/零售"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "斯凯奇中国",
+    "key": "beisen-skechers",
+    "ats": "beisen",
+    "url": "https://skechers.zhiye.com/campus/jobs",
+    "host": "skechers.zhiye.com",
+    "ownership": "外企",
+    "industries": [
+      "消费品"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "东方日升",
+    "key": "beisen-risen",
+    "ats": "beisen",
+    "url": "https://risen.zhiye.com/campus/jobs",
+    "host": "risen.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "能源/化工/环保",
+      "制造业"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "拓荆科技",
+    "key": "beisen-piotech",
+    "ats": "beisen",
+    "url": "https://piotech.zhiye.com/campus/jobs",
+    "host": "piotech.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "电子/通信/半导体",
+      "制造业"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "亿联网络",
+    "key": "beisen-yealink",
+    "ats": "beisen",
+    "url": "https://yealink.zhiye.com/campus/jobs",
+    "host": "yealink.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "电子/通信/半导体"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "新华三",
+    "key": "beisen-h3c",
+    "ats": "beisen",
+    "url": "https://h3c.zhiye.com/campus/jobs",
+    "host": "h3c.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "IT/互联网/游戏",
+      "电子/通信/半导体"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "新东方",
+    "key": "beisen-xdf",
+    "ats": "beisen",
+    "url": "https://xdf.zhiye.com/campus/jobs",
+    "host": "xdf.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "教育/培训/科研"
+    ],
+    "pages": 10
+  },
+  {
+    "company": "正大天晴",
+    "key": "beisen-cttq",
+    "ats": "beisen",
+    "url": "https://cttq.zhiye.com/campus/jobs",
+    "host": "cttq.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "医疗/医药/生物"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "复宏汉霖",
+    "key": "beisen-henlius",
+    "ats": "beisen",
+    "url": "https://henlius.zhiye.com/campus/jobs",
+    "host": "henlius.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "医疗/医药/生物"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "人福医药",
+    "key": "beisen-renfu",
+    "ats": "beisen",
+    "url": "https://renfu.zhiye.com/campus/jobs",
+    "host": "renfu.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "医疗/医药/生物"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "联影医疗",
+    "key": "beisen-united-imaging",
+    "ats": "beisen",
+    "url": "https://united-imaging.zhiye.com/campus/jobs",
+    "host": "united-imaging.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "医疗/医药/生物",
+      "制造业"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "德邦快递",
+    "key": "beisen-deppon",
+    "ats": "beisen",
+    "url": "https://deppon.zhiye.com/campus/jobs",
+    "host": "deppon.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "交通/物流/仓储"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "中海企业发展集团",
+    "key": "beisen-cohl",
+    "ats": "beisen",
+    "url": "https://cohl.zhiye.com/campus/jobs",
+    "host": "cohl.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "房地产/建筑"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "厦门象屿集团",
+    "key": "beisen-xiangyu",
+    "ats": "beisen",
+    "url": "https://xiangyu.zhiye.com/campus/jobs",
+    "host": "xiangyu.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "交通/物流/仓储",
+      "贸易/批发/零售"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "天职国际",
+    "key": "beisen-tzcpa",
+    "ats": "beisen",
+    "url": "https://tzcpa.zhiye.com/campus/jobs",
+    "host": "tzcpa.zhiye.com",
+    "ownership": "其他",
+    "industries": [
+      "专业服务"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "中汇会计师事务所",
+    "key": "beisen-zhcpa",
+    "ats": "beisen",
+    "url": "https://zhcpa.zhiye.com/campus/jobs",
+    "host": "zhcpa.zhiye.com",
+    "ownership": "其他",
+    "industries": [
+      "专业服务"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "泡泡玛特",
+    "key": "beisen-popmart",
+    "ats": "beisen",
+    "url": "https://popmart.zhiye.com/campus/jobs",
+    "host": "popmart.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "消费品",
+      "贸易/批发/零售"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "安凯客车",
+    "key": "beisen-ankai",
+    "ats": "beisen",
+    "url": "https://ankai.zhiye.com/campus/jobs",
+    "host": "ankai.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "制造业"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "统一企业",
+    "key": "beisen-uni-president",
+    "ats": "beisen",
+    "url": "https://uni-president.zhiye.com/campus/jobs",
+    "host": "uni-president.zhiye.com",
+    "ownership": "外企",
+    "industries": [
+      "消费品"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "齐鲁制药",
+    "key": "beisen-qilu-pharma",
+    "ats": "beisen",
+    "url": "https://qilu-pharma.zhiye.com/campus/jobs",
+    "host": "qilu-pharma.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "医疗/医药/生物"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "康弘药业",
+    "key": "beisen-kanghong",
+    "ats": "beisen",
+    "url": "https://kanghong.zhiye.com/campus/jobs",
+    "host": "kanghong.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "医疗/医药/生物"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "华海清科",
+    "key": "beisen-hwatsing",
+    "ats": "beisen",
+    "url": "https://hwatsing.zhiye.com/campus/jobs",
+    "host": "hwatsing.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "电子/通信/半导体",
+      "制造业"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "中国电科36所",
+    "key": "beisen-cetc36",
+    "ats": "beisen",
+    "url": "https://cetc36.zhiye.com/campus/jobs",
+    "host": "cetc36.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "电子/通信/半导体"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "中色股份",
+    "key": "beisen-cnfc",
+    "ats": "beisen",
+    "url": "https://cnfc.zhiye.com/campus/jobs",
+    "host": "cnfc.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "能源/化工/环保",
+      "房地产/建筑"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "通用技术集团",
+    "key": "beisen-genertec",
+    "ats": "beisen",
+    "url": "https://genertec.zhiye.com/campus/jobs",
+    "host": "genertec.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "制造业",
+      "医疗/医药/生物",
+      "贸易/批发/零售"
+    ],
+    "pages": 10
+  },
+  {
+    "company": "国联民生证券",
+    "key": "beisen-glsc",
+    "ats": "beisen",
+    "url": "https://glsc.zhiye.com/campus/jobs",
+    "host": "glsc.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "金融业"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "正大集团",
+    "key": "beisen-cpgroup",
+    "ats": "beisen",
+    "url": "https://cpgroup.zhiye.com/campus/jobs",
+    "host": "cpgroup.zhiye.com",
+    "ownership": "外企",
+    "industries": [
+      "农林牧渔",
+      "消费品"
+    ],
+    "pages": 8
+  },
+  {
+    "company": "阳光保险集团",
+    "key": "beisen-sinosig",
+    "ats": "beisen",
+    "url": "https://sinosigcampus.zhiye.com/campus/jobs",
+    "host": "sinosigcampus.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "金融业"
+    ],
+    "pages": 6
+  },
+  {
+    "company": "海马体",
+    "key": "beisen-mainto",
+    "ats": "beisen",
+    "url": "https://mainto.zhiye.com/campus/jobs",
+    "host": "mainto.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "生活服务业"
+    ],
+    "pages": 4
+  },
+  {
+    "company": "申能集团",
+    "key": "beisen-shenergy",
+    "ats": "beisen",
+    "url": "https://shenergy.zhiye.com/campus/jobs",
+    "host": "shenergy.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "能源/化工/环保"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "佰维存储",
+    "key": "beisen-biwin",
+    "ats": "beisen",
+    "url": "https://biwin1.zhiye.com/campus/jobs",
+    "host": "biwin1.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "电子/通信/半导体"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "上海启源芯动力",
+    "key": "beisen-spicqyxdl",
+    "ats": "beisen",
+    "url": "https://spicqyxdl.zhiye.com/campus/jobs",
+    "host": "spicqyxdl.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "能源/化工/环保",
+      "制造业"
+    ],
+    "pages": 3
+  },
+  {
+    "company": "赛轮集团",
+    "key": "beisen-sailun",
+    "ats": "beisen",
+    "url": "https://sailuntire.zhiye.com/campus/jobs",
+    "host": "sailuntire.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "制造业"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "延锋彼欧",
+    "key": "beisen-yfpo",
+    "ats": "beisen",
+    "url": "https://yfpo.zhiye.com/campus/jobs",
+    "host": "yfpo.zhiye.com",
+    "ownership": "合资",
+    "industries": [
+      "制造业"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "新宙邦",
+    "key": "beisen-capchem",
+    "ats": "beisen",
+    "url": "https://capchem.zhiye.com/campus/jobs",
+    "host": "capchem.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "能源/化工/环保"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "中冶京诚",
+    "key": "beisen-ceri",
+    "ats": "beisen",
+    "url": "https://ceri.zhiye.com/campus/jobs",
+    "host": "ceri.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "房地产/建筑",
+      "制造业"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "隧道股份",
+    "key": "beisen-stec",
+    "ats": "beisen",
+    "url": "https://stec-sucg.zhiye.com/campus/jobs",
+    "host": "stec-sucg.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "房地产/建筑"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "联宝科技",
+    "key": "beisen-lcfc",
+    "ats": "beisen",
+    "url": "https://lcfc.zhiye.com/campus/jobs",
+    "host": "lcfc.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "电子/通信/半导体"
+    ],
+    "pages": 2
+  },
+  {
+    "company": "三生制药",
+    "key": "beisen-3sbio",
+    "ats": "beisen",
+    "url": "https://3sbio.zhiye.com/campus/jobs",
+    "host": "3sbio.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "医疗/医药/生物"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "鼎桥技术",
+    "key": "beisen-tdtech",
+    "ats": "beisen",
+    "url": "https://td-tech.zhiye.com/campus/jobs",
+    "host": "td-tech.zhiye.com",
+    "ownership": "合资",
+    "industries": [
+      "电子/通信/半导体"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "中国瑞林",
+    "key": "beisen-nerin",
+    "ats": "beisen",
+    "url": "https://nerin.zhiye.com/campus/jobs",
+    "host": "nerin.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "房地产/建筑",
+      "制造业"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "联友科技",
+    "key": "beisen-szly",
+    "ats": "beisen",
+    "url": "https://szly.zhiye.com/campus/jobs",
+    "host": "szly.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "IT/互联网/游戏",
+      "制造业"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "中曼石油",
+    "key": "beisen-zpec",
+    "ats": "beisen",
+    "url": "https://zpec.zhiye.com/campus/jobs",
+    "host": "zpec.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "能源/化工/环保"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "中国航空综合技术研究所",
+    "key": "beisen-avic301",
+    "ats": "beisen",
+    "url": "https://avichr.zhiye.com/campus/jobs",
+    "host": "avichr.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "电子/通信/半导体",
+      "专业服务"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "雪川农业",
+    "key": "beisen-snowvalley",
+    "ats": "beisen",
+    "url": "https://snowvalleyfood.zhiye.com/campus/jobs",
+    "host": "snowvalleyfood.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "农林牧渔",
+      "消费品"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "劲牌",
+    "key": "beisen-jingpai",
+    "ats": "beisen",
+    "url": "https://jingpai.zhiye.com/campus/jobs",
+    "host": "jingpai.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "消费品"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "长江证券",
+    "key": "beisen-cjzq",
+    "ats": "beisen",
+    "url": "https://cjzq1.zhiye.com/campus/jobs",
+    "host": "cjzq1.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "金融业"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "交控科技",
+    "key": "beisen-bjtct",
+    "ats": "beisen",
+    "url": "https://bj-tct.zhiye.com/campus/jobs",
+    "host": "bj-tct.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "交通/物流/仓储",
+      "IT/互联网/游戏"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "51WORLD",
+    "key": "beisen-51world",
+    "ats": "beisen",
+    "url": "https://51world.zhiye.com/campus/jobs",
+    "host": "51world.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "IT/互联网/游戏"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "SIA国际艺术教育",
+    "key": "beisen-siaedu",
+    "ats": "beisen",
+    "url": "https://siaedu.zhiye.com/campus/jobs",
+    "host": "siaedu.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "教育/培训/科研"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "平行线教育",
+    "key": "beisen-zzpxx",
+    "ats": "beisen",
+    "url": "https://zzpxx.zhiye.com/campus/jobs",
+    "host": "zzpxx.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "教育/培训/科研"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "良福制药",
+    "key": "beisen-liangfu",
+    "ats": "beisen",
+    "url": "https://liangfu.zhiye.com/campus/jobs",
+    "host": "liangfu.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "医疗/医药/生物"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "新微半导体",
+    "key": "beisen-simic",
+    "ats": "beisen",
+    "url": "https://simic.zhiye.com/campus/jobs",
+    "host": "simic.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "电子/通信/半导体"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "汉王科技",
+    "key": "beisen-hanwang",
+    "ats": "beisen",
+    "url": "https://hanwang.zhiye.com/campus/jobs",
+    "host": "hanwang.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "IT/互联网/游戏",
+      "电子/通信/半导体"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "奥克斯集团",
+    "key": "beisen-aux",
+    "ats": "beisen",
+    "url": "https://auxgroup.zhiye.com/campus/jobs",
+    "host": "auxgroup.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "制造业"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "华域视觉",
+    "key": "beisen-skoito",
+    "ats": "beisen",
+    "url": "https://skoito.zhiye.com/campus/jobs",
+    "host": "skoito.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "制造业"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "建投国际",
+    "key": "beisen-cscihk",
+    "ats": "beisen",
+    "url": "https://cscihk.zhiye.com/campus/jobs",
+    "host": "cscihk.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "金融业"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "合盛硅业",
+    "key": "beisen-hoshine",
+    "ats": "beisen",
+    "url": "https://hoshine.zhiye.com/campus/jobs",
+    "host": "hoshine.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "能源/化工/环保"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "宸芯科技",
+    "key": "beisen-morningcore",
+    "ats": "beisen",
+    "url": "https://morningcore.zhiye.com/campus/jobs",
+    "host": "morningcore.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "电子/通信/半导体"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "洲明科技",
+    "key": "beisen-unilumin",
+    "ats": "beisen",
+    "url": "https://unilumin.zhiye.com/campus/jobs",
+    "host": "unilumin.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "电子/通信/半导体"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "真味生物",
+    "key": "beisen-zinwi",
+    "ats": "beisen",
+    "url": "https://zinwi.zhiye.com/campus/jobs",
+    "host": "zinwi.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "制造业",
+      "消费品"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "志邦家居",
+    "key": "beisen-zbom",
+    "ats": "beisen",
+    "url": "https://zbom.zhiye.com/campus/jobs",
+    "host": "zbom.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "消费品",
+      "制造业"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "集创北方",
+    "key": "beisen-chipone",
+    "ats": "beisen",
+    "url": "https://chipone.zhiye.com/campus/jobs",
+    "host": "chipone.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "电子/通信/半导体"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "镁伽科技",
+    "key": "beisen-megarobo",
+    "ats": "beisen",
+    "url": "https://megarobo.zhiye.com/campus/jobs",
+    "host": "megarobo.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "制造业",
+      "医疗/医药/生物"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "中国科学院自动化研究所",
+    "key": "beisen-casia",
+    "ats": "beisen",
+    "url": "https://casia.zhiye.com/campus/jobs",
+    "host": "casia.zhiye.com",
+    "ownership": "事业单位",
+    "industries": [
+      "教育/培训/科研"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "合合信息",
+    "key": "beisen-intsig",
+    "ats": "beisen",
+    "url": "https://intsig.zhiye.com/campus/jobs",
+    "host": "intsig.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "IT/互联网/游戏"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "高松电子",
+    "key": "beisen-degson",
+    "ats": "beisen",
+    "url": "https://degson.zhiye.com/campus/jobs",
+    "host": "degson.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "电子/通信/半导体"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "数坤科技",
+    "key": "beisen-shukun",
+    "ats": "beisen",
+    "url": "https://shukun.zhiye.com/campus/jobs",
+    "host": "shukun.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "医疗/医药/生物",
+      "IT/互联网/游戏"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "奥尼电子",
+    "key": "beisen-aoni",
+    "ats": "beisen",
+    "url": "https://aoni.zhiye.com/campus/jobs",
+    "host": "aoni.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "电子/通信/半导体"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "乐禾食品",
+    "key": "beisen-lehe",
+    "ats": "beisen",
+    "url": "https://lehe.zhiye.com/campus/jobs",
+    "host": "lehe.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "消费品",
+      "贸易/批发/零售"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "华鑫证券",
+    "key": "beisen-cfsc",
+    "ats": "beisen",
+    "url": "https://cfsc.zhiye.com/campus/jobs",
+    "host": "cfsc.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "金融业"
+    ],
+    "pages": 1,
+    "batches": [
+      "实习"
+    ]
+  },
+  {
+    "company": "建华控股",
+    "key": "beisen-jianhua",
+    "ats": "beisen",
+    "url": "https://jianhuabm.zhiye.com/campus/jobs",
+    "host": "jianhuabm.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "房地产/建筑"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "纽威阀门",
+    "key": "beisen-neway",
+    "ats": "beisen",
+    "url": "https://neway.zhiye.com/campus/jobs",
+    "host": "neway.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "制造业"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "洽洽食品",
+    "key": "beisen-qiaqia",
+    "ats": "beisen",
+    "url": "https://qiaqiafood.zhiye.com/campus/jobs",
+    "host": "qiaqiafood.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "消费品"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "华康医疗",
+    "key": "beisen-hkyl",
+    "ats": "beisen",
+    "url": "https://hkyl.zhiye.com/campus/jobs",
+    "host": "hkyl.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "医疗/医药/生物",
+      "房地产/建筑"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "灵明光子",
+    "key": "beisen-adaps",
+    "ats": "beisen",
+    "url": "https://adaps-ph.zhiye.com/campus/jobs",
+    "host": "adaps-ph.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "电子/通信/半导体"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "华中数控",
+    "key": "beisen-hzncc",
+    "ats": "beisen",
+    "url": "https://hzncc.zhiye.com/campus/jobs",
+    "host": "hzncc.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "制造业",
+      "IT/互联网/游戏"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "深圳城安院",
+    "key": "beisen-szsti",
+    "ats": "beisen",
+    "url": "https://szsti1.zhiye.com/campus/jobs",
+    "host": "szsti1.zhiye.com",
+    "ownership": "事业单位",
+    "industries": [
+      "政府/事业单位/社会组织",
+      "专业服务"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "庆安集团",
+    "key": "beisen-qingan",
+    "ats": "beisen",
+    "url": "https://qingan.zhiye.com/campus/jobs",
+    "host": "qingan.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "制造业"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "绿色家园",
+    "key": "beisen-lsjy",
+    "ats": "beisen",
+    "url": "https://lsjyzp.zhiye.com/campus/jobs",
+    "host": "lsjyzp.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "能源/化工/环保"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "禾望电气",
+    "key": "beisen-hopewind",
+    "ats": "beisen",
+    "url": "https://hopewind.zhiye.com/campus/jobs",
+    "host": "hopewind.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "电子/通信/半导体",
+      "能源/化工/环保"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "集萃药康",
+    "key": "beisen-gempharm",
+    "ats": "beisen",
+    "url": "https://gempharmatech1.zhiye.com/campus/jobs",
+    "host": "gempharmatech1.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "医疗/医药/生物"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "民生医药控股",
+    "key": "beisen-mspharm",
+    "ats": "beisen",
+    "url": "https://mspharm.zhiye.com/campus/jobs",
+    "host": "mspharm.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "医疗/医药/生物"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "享道出行",
+    "key": "beisen-saicmobility",
+    "ats": "beisen",
+    "url": "https://saicmobility.zhiye.com/campus/jobs",
+    "host": "saicmobility.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "交通/物流/仓储",
+      "IT/互联网/游戏"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "佳士科技",
+    "key": "beisen-jasic",
+    "ats": "beisen",
+    "url": "https://jasic.zhiye.com/campus/jobs",
+    "host": "jasic.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "制造业"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "中达集团",
+    "key": "beisen-xmzoda",
+    "ats": "beisen",
+    "url": "https://xmzoda.zhiye.com/campus/jobs",
+    "host": "xmzoda.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "贸易/批发/零售",
+      "消费品"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "奥拓电子",
+    "key": "beisen-aoto",
+    "ats": "beisen",
+    "url": "https://aoto.zhiye.com/campus/jobs",
+    "host": "aoto.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "电子/通信/半导体"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "新意互动",
+    "key": "beisen-cig",
+    "ats": "beisen",
+    "url": "https://cig.zhiye.com/campus/jobs",
+    "host": "cig.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "文化/传媒/广告/体育"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "锐明技术",
+    "key": "beisen-streamax",
+    "ats": "beisen",
+    "url": "https://streamax.zhiye.com/campus/jobs",
+    "host": "streamax.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "电子/通信/半导体"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "临工重机",
+    "key": "beisen-lgmg",
+    "ats": "beisen",
+    "url": "https://lgmg.zhiye.com/campus/jobs",
+    "host": "lgmg.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "制造业"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "华宝集团",
+    "key": "beisen-hbglobal",
+    "ats": "beisen",
+    "url": "https://hbglobal.zhiye.com/campus/jobs",
+    "host": "hbglobal.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "制造业"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "碧橙数字",
+    "key": "beisen-bicheng",
+    "ats": "beisen",
+    "url": "https://bicheng.zhiye.com/campus/jobs",
+    "host": "bicheng.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "IT/互联网/游戏",
+      "贸易/批发/零售"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "礼意久久",
+    "key": "beisen-liyi99",
+    "ats": "beisen",
+    "url": "https://liyi99.zhiye.com/campus/jobs",
+    "host": "liyi99.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "消费品"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "维达国际",
+    "key": "beisen-vinda",
+    "ats": "beisen",
+    "url": "https://vinda.zhiye.com/campus/jobs",
+    "host": "vinda.zhiye.com",
+    "ownership": "外企",
+    "industries": [
+      "消费品"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "汉德车桥",
+    "key": "beisen-hdcq",
+    "ats": "beisen",
+    "url": "https://hdcq.zhiye.com/campus/jobs",
+    "host": "hdcq.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "制造业"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "震坤行",
+    "key": "beisen-imart360",
+    "ats": "beisen",
+    "url": "https://imart360.zhiye.com/campus/jobs",
+    "host": "imart360.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "贸易/批发/零售",
+      "IT/互联网/游戏"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "润丰股份",
+    "key": "beisen-rainbowchem",
+    "ats": "beisen",
+    "url": "https://rainbowchem.zhiye.com/campus/jobs",
+    "host": "rainbowchem.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "能源/化工/环保"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "昆仑联通",
+    "key": "beisen-comlan",
+    "ats": "beisen",
+    "url": "https://comlan.zhiye.com/campus/jobs",
+    "host": "comlan.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "IT/互联网/游戏"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "燃石医学",
+    "key": "beisen-brbiotech",
+    "ats": "beisen",
+    "url": "https://brbiotech1.zhiye.com/campus/jobs",
+    "host": "brbiotech1.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "医疗/医药/生物"
+    ],
+    "pages": 1,
+    "batches": [
+      "实习"
+    ]
+  },
+  {
+    "company": "嘉环科技",
+    "key": "beisen-bestlink",
+    "ats": "beisen",
+    "url": "https://bestlink.zhiye.com/campus/jobs",
+    "host": "bestlink.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "IT/互联网/游戏",
+      "专业服务"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "高阳",
+    "key": "beisen-kaoyoung",
+    "ats": "beisen",
+    "url": "https://kaoyoung.zhiye.com/campus/jobs",
+    "host": "kaoyoung.zhiye.com",
+    "ownership": "民企",
+    "industries": [
+      "交通/物流/仓储"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "中国航空工业集团",
+    "key": "beisen-avic",
+    "ats": "beisen",
+    "url": "https://avic-hr.zhiye.com/campus/jobs",
+    "host": "avic-hr.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "制造业",
+      "电子/通信/半导体"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "中国船舶712所",
+    "key": "beisen-cssc712",
+    "ats": "beisen",
+    "url": "https://cssc712.zhiye.com/campus/jobs",
+    "host": "cssc712.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "制造业",
+      "能源/化工/环保"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "中国船舶717所",
+    "key": "beisen-cssc717",
+    "ats": "beisen",
+    "url": "https://cssc717.zhiye.com/campus/jobs",
+    "host": "cssc717.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "电子/通信/半导体",
+      "制造业"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "中国空间技术研究院",
+    "key": "beisen-cast",
+    "ats": "beisen",
+    "url": "https://cast.zhiye.com/campus/jobs",
+    "host": "cast.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "制造业",
+      "电子/通信/半导体"
+    ],
+    "pages": 1
+  },
+  {
+    "company": "中国电科18所",
+    "key": "beisen-cetc18",
+    "ats": "beisen",
+    "url": "https://cetc18.zhiye.com/campus/jobs",
+    "host": "cetc18.zhiye.com",
+    "ownership": "央国企",
+    "industries": [
+      "电子/通信/半导体",
+      "能源/化工/环保"
+    ],
+    "pages": 1
+  }
+]
