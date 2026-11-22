@@ -7,6 +7,7 @@
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { mkdtemp, readFile, writeFile, mkdir, unlink } from 'node:fs/promises';
+import { readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -45,12 +46,37 @@ async function loadSupplement() {
   }
 }
 
+// 已接入 ATS/官网直抓的企业：对应飞书汇总行不再展示，改用官网明细
+let _atsNames = null;
+function atsCompanyNames() {
+  if (_atsNames) return _atsNames;
+  try {
+    _atsNames = JSON.parse(readFileSync(path.join(DATA_DIR, 'ats-companies.json'), 'utf8'))
+      .map((c) => baseName(c.company));
+  } catch {
+    _atsNames = [];
+  }
+  return _atsNames;
+}
+
 // 先去重再统计，保证 facets / dashboard 与列表口径一致
 function mergeSupplement(jobs, supplement) {
-  const base = jobs.filter((r) => r.source !== 'official');
+  const ats = new Set(atsCompanyNames());
+  const coveredAts = new Set(
+    supplement.map((r) => baseName(r.company)).filter((n) => ats.has(n))
+  );
+  // ATS 已覆盖的企业：丢弃飞书汇总行；其余企业保留飞书数据兜底
+  const base = jobs.filter((r) => r.source !== 'official' && !coveredAts.has(baseName(r.company)));
   const seen = new Set(base.map(jobKey));
+  // 同 id 的旧行（如公共招聘网）用最新抓取结果覆盖，避免城市等字段修复后仍留旧值
+  const byId = new Map(base.map((r, i) => [r.id, i]));
   let added = 0;
   for (const row of supplement) {
+    const idx = byId.get(row.id);
+    if (idx != null) {
+      base[idx] = { ...row, sm: (row.positions || []).join(' ').toLowerCase() };
+      continue;
+    }
     const key = jobKey(row);
     if (seen.has(key)) continue;
     seen.add(key);
@@ -102,6 +128,32 @@ function pushUnique(target, values) {
   for (const v of values || []) if (v != null && v !== '' && !target.includes(v)) target.push(v);
 }
 
+// 备注统一带上岗位名称：备注来自具体岗位的 JD，缺少岗位名就无法对应
+function withPosLabel(note, positions) {
+  if (!note) return note;
+  let text = String(note).trim();
+  if (!text) return note;
+  const list = (positions || []).map((p) => String(p || '').trim()).filter(Boolean);
+  if (!list.length) return note;
+  const first = list[0];
+  // 岗位过多时只展示前 3 个，避免前缀比正文还长
+  let label = list.slice(0, 3).join(' / ');
+  if (list.length > 3) label += ` 等${list.length}个岗位`;
+  if (label.length > 44) label = `${label.slice(0, 44)}…`;
+  // 已带岗位名前缀（含历史合并结果）不重复叠加
+  const head = /^【([^】]*)】[ \t]*\r?\n?/.exec(text);
+  if (head) {
+    const matched = list.some((p) => head[1] === p || head[1].includes(p) || p.includes(head[1]));
+    if (matched) {
+      if (head[1].length <= 60) return note;
+      // 旧版超长前缀压缩成规范格式
+      return `【${label}】\n${text.slice(head[0].length).trimStart()}`;
+    }
+  }
+  if (text.startsWith(first)) return note;
+  return `【${label}】\n${text}`;
+}
+
 // 把同一家公司的多条岗位合并成一条：岗位、专业、城市、批次取并集，截止时间取最近一个
 function collapseByCompany(rows, details = {}) {
   const groups = new Map();
@@ -118,8 +170,14 @@ function collapseByCompany(rows, details = {}) {
 
   for (const members of groups.values()) {
     if (members.length === 1) {
-      outRows.push(members[0]);
-      if (details[members[0].id]) outDetails[members[0].id] = details[members[0].id];
+      const row = members[0];
+      outRows.push(row);
+      const detail = { ...(details[row.id] || {}) };
+      // 单岗位官网企业也必须把正文留在详情分片，列表编码时再移除重复正文。
+      // 备注统一补上岗位名称（幂等，重复合并不会叠加）
+      const singleNote = withPosLabel(detail.note || row.note, row.positions);
+      if (singleNote) detail.note = singleNote;
+      if (Object.keys(detail).length) outDetails[row.id] = detail;
       continue;
     }
     mergedGroups += 1;
@@ -165,7 +223,10 @@ function collapseByCompany(rows, details = {}) {
       else if (m.writtenTest === false && writtenTest == null) writtenTest = false;
       if (String(m.updatedAt || '') > updatedAt) updatedAt = String(m.updatedAt || '');
       if (m.sm && !smParts.includes(m.sm)) smParts.push(m.sm);
-      if (m.note && !notes.includes(m.note)) notes.push(m.note);
+      if (m.note) {
+        const block = withPosLabel(m.note, m.positions);
+        if (block && !notes.includes(block)) notes.push(block);
+      }
       if (/尽快/.test(m.deadlineText || '')) asap = true;
       if (!sourceText && m.source) sourceText = m.source;
       if (!apply && m.apply) apply = m.apply;
@@ -280,7 +341,8 @@ function encodeRows(rows) {
       x.sourceName || '',
       x.sourceUrl || '',
       (x.apply && x.apply.url) || '',
-      x.note || '',
+      // 官网正文只存详情分片，避免大公司数千条 JD 在列表中重复占用体积。
+      x.source === 'official' ? '' : (x.note || ''),
       x.majors || '',
     ];
     // 可选列从第 16 列开始，尾部空值直接裁掉
@@ -545,7 +607,7 @@ function normalizeJob(r) {
   const detail = {};
   if (announce) detail.announce = announce;
   if (apply) detail.apply = apply;
-  if (note.text) detail.note = note.text;
+  if (note.text) detail.note = withPosLabel(note.text, positions);
   if (note.links && note.links.length) detail.noteLinks = note.links;
   const majors = cleanLabel(r['专业要求'] || '');
   if (majors) detail.majors = majors;

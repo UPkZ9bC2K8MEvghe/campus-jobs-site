@@ -8,7 +8,10 @@
 <meta name="keywords" content="校招,校园招聘,2027届校招,2026届校招,实习,春招,秋招,央国企招聘,校招岗位,应届生求职">
 <link rel="canonical" href="https://campus-jobs.pages.dev/">
 <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large">
-<meta name="theme-color" content="#4f46e5">
+<meta name="theme-color" content="#2b59ff">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="alternate" type="application/rss+xml" title="校招信息查询 · 每日新增岗位" href="feeds.xml">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="校招信息查询">
 <meta property="og:title" content="校招信息查询 · 26/27 届校招与实习岗位筛选">
@@ -123,6 +126,8 @@
     <nav class="tabs" role="tablist" aria-label="主导航">
       <button class="tab" role="tab" data-view="jobs" aria-selected="true">校招汇总<span class="tab-count" id="countJobs"></span></button>
       <button class="tab" role="tab" data-view="internships" aria-selected="false">实习汇总<span class="tab-count" id="countInternships"></span></button>
+      <button class="tab" role="tab" data-view="apps" aria-selected="false">我的投递<span class="tab-count" id="countApps"></span></button>
+      <button class="tab" role="tab" data-view="events" aria-selected="false">宣讲会日历<span class="tab-count" id="countEvents"></span></button>
       <button class="tab" role="tab" data-view="dashboard" aria-selected="false">数据看板</button>
       <button class="tab" role="tab" data-view="soe" aria-selected="false">央国企名录</button>
       <button class="tab" role="tab" data-view="docs" aria-selected="false">求职资料</button>
@@ -137,7 +142,7 @@
 
 <section class="seo-summary" aria-labelledby="seoSummaryTitle">
   <h2 id="seoSummaryTitle">26/27 届校招与实习岗位汇总</h2>
-  <p>本站整理近 <b>8000 家</b>企业官方招聘公告中的校招与实习岗位，覆盖互联网、金融、制造、能源、医药、央国企与事业单位。支持按<b>城市、届次、批次、行业、企业性质、学历</b>组合筛选，并按公司名、岗位、专业关键词搜索；默认只显示<b>未截止投递</b>的岗位，每家企业汇总为一个入口，数据每日更新。</p>
+  <p>本站整理近 <b>8000 家</b>企业官方招聘公告中的校招与实习岗位，覆盖互联网、金融、制造、能源、医药、央国企与事业单位。支持按<b>城市、届次、批次、行业、企业性质、学历</b>组合筛选，并按公司名、岗位、专业关键词搜索；默认只显示<b>未截止投递</b>的岗位，每家企业汇总为一个入口。另设<b>高校宣讲会日历</b>，汇总北大、北航、北理工等高校就业网公开的宣讲会信息，数据每日更新。</p>
   <p class="seo-more"><a href="companies/">按企业浏览全部岗位 →</a></p>
 </section>
 
@@ -148,6 +153,12 @@
       <strong>筛选条件</strong>
       <button class="reset-btn" id="resetFilters">重置全部</button>
     </div>
+    <section class="filter-group"><div class="filter-title">我的专业 <span class="hint">标注匹配度</span></div>
+      <div class="major-box">
+        <input id="majorInput" type="text" placeholder="如：计算机科学与技术" autocomplete="off" aria-label="我的专业">
+        <label class="major-toggle"><input type="checkbox" id="majorOnly"> 只看匹配</label>
+      </div>
+    </section>
     <section class="filter-group"><div class="filter-title">届次</div><div class="chips" id="filter-years"></div></section>
     <section class="filter-group"><div class="filter-title">工作地点 <span class="hint">包含即命中</span></div><div class="chips" id="filter-cities"></div><div class="city-list" id="cityMoreList"></div></section>
     <section class="filter-group"><div class="filter-title">批次</div><div class="chips" id="filter-batches"></div></section>
@@ -167,6 +178,7 @@
     <div class="results-head">
       <div class="result-count" id="resultCount"><b>0</b> 条</div>
       <div class="active-filters" id="activeFilters"></div>
+      <button class="copy-btn share-btn" id="shareBtn" type="button" title="把当前筛选条件复制为可分享链接">复制筛选链接</button>
       <select class="sort-select" id="sortSelect" aria-label="排序方式">
         <option value="updated">按更新时间</option>
         <option value="deadline">按截止时间</option>
@@ -193,12 +205,51 @@
   <div class="soe-grid" id="soeGrid"></div>
 </section>
 
+<!-- 宣讲会视图 -->
+<section class="page-pane" id="eventsPane" hidden>
+  <div class="events-head">
+    <h2>高校宣讲会日历</h2>
+    <p class="muted">汇总 <span id="eventsSchools">0</span> 所高校就业网公开的宣讲会与招聘会，共 <span id="eventsTotal">0</span> 场，按开始时间排序。</p>
+    <div class="chips" id="eventsSchoolChips"></div>
+  </div>
+  <div id="eventsList"><div class="loading">正在加载宣讲会…</div></div>
+</section>
+
 <!-- 资料视图 -->
 <section class="page-pane" id="docsPane" hidden>
   <article class="doc-body" id="docBody"><div class="loading">正在加载…</div></article>
 </section>
 
+<!-- 我的投递视图 -->
+<section class="page-pane" id="appsPane" hidden>
+  <div class="apps-head">
+    <h2>我的投递</h2>
+    <p class="muted">收藏岗位后可在此跟踪投递进度：<b>已收藏 → 已投递 → 笔试 / 面试 → Offer → 已拒</b>。记录投递时间与备注，按截止时间排序，数据仅保存在本机浏览器。</p>
+    <div class="apps-tools">
+      <button class="copy-btn" id="exportFavIcs" type="button">导出收藏日历 (.ics)</button>
+      <button class="copy-btn" id="exportEventsIcs" type="button">导出宣讲会日历 (.ics)</button>
+      <button class="copy-btn danger" id="clearApps" type="button">清空投递记录</button>
+    </div>
+  </div>
+  <div class="apps-stats" id="appsStats"></div>
+  <div id="appsList"><div class="loading">正在加载…</div></div>
+</section>
+
 <p class="footer-note">信息整理自各企业官方招聘公告，仅供参考；投递前请以企业官方最新公告为准。数据共 <span id="footerTotal">—</span> 条 · 最后更新 <span id="lastUpdated">—</span><span id="changelogNote"></span>。</p>
+
+<div class="compare-bar" id="compareBar" hidden>
+  <span>已选 <b id="compareCount">0</b> 个岗位（最多 4 个）</span>
+  <div class="compare-bar-actions">
+    <button class="copy-btn primary" id="compareOpen" type="button">开始对比</button>
+    <button class="copy-btn" id="compareClear" type="button">清空</button>
+  </div>
+</div>
+<div class="install-banner" id="installBanner" hidden>
+  <span>添加到主屏幕，离线也能查看已收藏岗位</span>
+  <button class="copy-btn primary" id="installBtn" type="button">添加到主屏幕</button>
+  <button class="copy-btn" id="installDismiss" type="button" aria-label="关闭">×</button>
+</div>
+<div class="toast" id="toast" hidden></div>
 
 <div class="drawer-mask" id="drawerMask"></div>
 <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="岗位详情">

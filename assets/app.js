@@ -9,17 +9,32 @@
   const STORAGE_KEY = 'campus-jobs-state-v2';
   const FAV_KEY = 'campus-jobs-favorites';
   const LIST_VIEWS = new Set(['jobs', 'internships']);
+  const ALL_VIEWS = new Set(['jobs', 'internships', 'apps', 'events', 'dashboard', 'soe', 'docs']);
   const QUICK_FILTERS = [
     { key: 'open', label: '未截止' },
     { key: 'official', label: '官网直招' },
     { key: 'soe', label: '央国企' },
+    { key: 'private', label: '民企' },
     { key: 'fav', label: '我的收藏' },
   ];
   const STATUS_LABELS = {
     urgent: '7 天内截止', asap: '尽快投递', test: '有笔试', over: '已截止',
-    open: '只看未截止', official: '只看官网', soe: '只看央国企', fav: '只看收藏',
+    open: '只看未截止', official: '只看官网', soe: '只看央国企', private: '只看民企', fav: '只看收藏',
   };
   const FILTER_GROUPS = ['years', 'cities', 'batches', 'industries', 'ownership', 'degrees'];
+  // F1 投递进度：本地状态机（仅存本机 localStorage）
+  const APPS_KEY = 'campus-jobs-apps';
+  const PROFILE_KEY = 'campus-jobs-profile';
+  const APP_STATUSES = [
+    { key: 'saved', label: '已收藏' },
+    { key: 'applied', label: '已投递' },
+    { key: 'test', label: '笔试' },
+    { key: 'interview', label: '面试' },
+    { key: 'offer', label: 'Offer' },
+    { key: 'rejected', label: '已拒' },
+  ];
+  const APP_STATUS_LABELS = Object.fromEntries(APP_STATUSES.map((s) => [s.key, s.label]));
+  const COMPARE_MAX = 4; // F3 岗位对比上限
 
   const state = {
     view: 'jobs',
@@ -38,10 +53,18 @@
   const cache = {
     jobs: null, internships: null,
     detail: { jobs: [], internships: [] },
-    facets: null, dashboard: null, soe: null, docs: null, changelog: null,
+    facets: null, dashboard: null, soe: null, docs: null, changelog: null, events: null,
+    reviews: null, questions: null,
   };
-  const ui = { filtered: [], rendered: 0, observer: null, current: null, soeFiltered: [], filtersView: null };
+  const ui = {
+    filtered: [], rendered: 0, observer: null, current: null, soeFiltered: [],
+    filtersView: null, eventSchool: '',
+    compare: new Set(),       // F3 对比集合（内存态）
+    deferredPrompt: null,     // F12 PWA 安装提示
+  };
   const favorites = new Set();
+  const apps = {};            // F1 { id: {status, appliedAt, note, updatedAt} }
+  const profile = { major: '', majorOnly: false }; // F9
 
   const $ = (id) => document.getElementById(id);
   const el = {
@@ -54,6 +77,8 @@
     countJobs: $('countJobs'), countInternships: $('countInternships'),
     listPane: $('listPane'),
     dashboardPane: $('dashboardPane'), soePane: $('soePane'), docsPane: $('docsPane'),
+    eventsPane: $('eventsPane'), eventsList: $('eventsList'), eventsTotal: $('eventsTotal'),
+    eventsSchools: $('eventsSchools'), eventsSchoolChips: $('eventsSchoolChips'), countEvents: $('countEvents'),
     sidebar: $('sidebar'), filterToggle: $('filterToggle'), activeCount: $('activeCount'),
     mobileCount: $('mobileCount'), sidebarDone: $('sidebarDone'), resetFilters: $('resetFilters'),
     resultCount: $('resultCount'), activeFilters: $('activeFilters'), sortSelect: $('sortSelect'),
@@ -66,6 +91,14 @@
     batches: $('filter-batches'), industries: $('filter-industries'),
     ownership: $('filter-ownership'), degrees: $('filter-degree'), status: $('filter-status'),
     soeGrid: $('soeGrid'), soeTotal: $('soeTotal'), docBody: $('docBody'),
+    // 新增功能元素（F1/F3/F5/F9/F11/F12）
+    appsPane: $('appsPane'), appsList: $('appsList'), appsStats: $('appsStats'), countApps: $('countApps'),
+    exportFavIcs: $('exportFavIcs'), exportEventsIcs: $('exportEventsIcs'), clearApps: $('clearApps'),
+    majorInput: $('majorInput'), majorOnly: $('majorOnly'),
+    shareBtn: $('shareBtn'),
+    compareBar: $('compareBar'), compareCount: $('compareCount'), compareOpen: $('compareOpen'), compareClear: $('compareClear'),
+    installBanner: $('installBanner'), installBtn: $('installBtn'), installDismiss: $('installDismiss'),
+    toast: $('toast'),
   };
 
   /* ---------- 工具 ---------- */
@@ -144,6 +177,32 @@
     return row.__s;
   }
 
+  /* ---------- 通用辅助 ---------- */
+  let toastTimer = null;
+  function toast(msg) {
+    if (!el.toast) return;
+    el.toast.textContent = msg;
+    el.toast.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { el.toast.hidden = true; }, 1800);
+  }
+  // 公司名归一化：去掉括号附注、股份/集团/有限公司等后缀，用于宣讲会↔岗位、面经匹配
+  function companyKey(name) {
+    return String(name || '')
+      .replace(/[（(].*?[)）]/g, '')
+      .replace(/(股份有限公司|有限责任公司|有限公司|集团公司|集团|控股|公司|总公司)$/g, '')
+      .replace(/\s+/g, '').trim();
+  }
+  function allRows() { return [...(cache.jobs || []), ...(cache.internships || [])]; }
+  // 在两个列表里按公司名查找（先精确，后归一化包含）
+  function findRowsByCompany(company) {
+    if (!company) return [];
+    const key = companyKey(company);
+    const exact = allRows().filter((r) => r.company === company);
+    if (exact.length) return exact;
+    return allRows().filter((r) => companyKey(r.company) === key || (key && companyKey(r.company).includes(key)));
+  }
+
   /* ---------- 状态持久化 ---------- */
   function loadFavorites() {
     try { for (const id of JSON.parse(localStorage.getItem(FAV_KEY) || '[]')) favorites.add(id); } catch { /* ignore */ }
@@ -152,6 +211,76 @@
   function saveFavorites() {
     try { localStorage.setItem(FAV_KEY, JSON.stringify([...favorites])); } catch { /* ignore */ }
   }
+
+  /* F1 投递进度（本机存储） */
+  function loadApps() {
+    try { Object.assign(apps, JSON.parse(localStorage.getItem(APPS_KEY) || '{}')); } catch { /* ignore */ }
+  }
+  function saveApps() { try { localStorage.setItem(APPS_KEY, JSON.stringify(apps)); } catch { /* ignore */ } }
+  function getApp(id) { return apps[id] || null; }
+  function appStatusOf(id) { return apps[id]?.status || (favorites.has(id) ? 'saved' : ''); }
+  function setAppStatus(id, status) {
+    const rec = apps[id] || { status: 'saved', appliedAt: '', note: '', updatedAt: '' };
+    rec.status = status;
+    rec.updatedAt = new Date().toISOString();
+    if (status === 'applied' && !rec.appliedAt) rec.appliedAt = todayStr();
+    apps[id] = rec;
+    saveApps();
+    updateAppsCount();
+  }
+  function setAppNote(id, note) {
+    const rec = apps[id] || { status: 'saved', appliedAt: '', note: '', updatedAt: '' };
+    rec.note = note; rec.updatedAt = new Date().toISOString();
+    apps[id] = rec; saveApps();
+  }
+  const NOTE_PLACEHOLDER = '点击添加备注（笔试时间 / 面试轮次 / HR 联系方式等）';
+  // 统一备注字段绑定：聚焦清空占位符、输入防抖保存、失焦兜底保存
+  function bindNoteField(note, id) {
+    if (!note) return;
+    let timer = null;
+    const flush = () => {
+      if (timer) { clearTimeout(timer); timer = null; }
+      setAppNote(id, note.textContent.trim());
+    };
+    note.addEventListener('focus', () => {
+      if (note.dataset.empty === 'true') { note.textContent = ''; note.dataset.empty = 'false'; }
+    });
+    note.addEventListener('input', () => {
+      note.dataset.empty = note.textContent.trim() ? 'false' : 'true';
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(flush, 400);
+    });
+    note.addEventListener('blur', () => {
+      if (timer) { clearTimeout(timer); timer = null; }
+      const v = note.textContent.trim();
+      if (!v) { note.textContent = NOTE_PLACEHOLDER; note.dataset.empty = 'true'; }
+      setAppNote(id, v);
+    });
+  }
+  // 刷新/关闭页面前，把正在编辑（未失焦）的备注同步落盘，避免丢失
+  function flushActiveNote() {
+    const el0 = document.activeElement;
+    if (el0 && el0.classList && el0.classList.contains('app-note')) {
+      setAppNote(el0.dataset.note, el0.textContent.trim());
+    }
+  }
+  function clearApps() {
+    for (const k of Object.keys(apps)) delete apps[k];
+    saveApps(); updateAppsCount();
+    if (state.view === 'apps') renderApps();
+  }
+  function updateAppsCount() {
+    if (el.countApps) el.countApps.textContent = Object.keys(apps).length || '';
+  }
+
+  /* F9 我的专业（本机存储） */
+  function loadProfile() {
+    try {
+      const p = JSON.parse(localStorage.getItem(PROFILE_KEY) || 'null');
+      if (p) { profile.major = p.major || ''; profile.majorOnly = !!p.majorOnly; }
+    } catch { /* ignore */ }
+  }
+  function saveProfile() { try { localStorage.setItem(PROFILE_KEY, JSON.stringify(profile)); } catch { /* ignore */ } }
 
   // 收藏 / 深链共用的 job 参数，避免整段 URL 重建时丢失
   function syncJobParam(id) {
@@ -192,7 +321,7 @@
 
   function parseUrlState() {
     const p = new URLSearchParams(location.search);
-    state.view = ['jobs', 'internships', 'dashboard', 'soe', 'docs'].includes(p.get('view')) ? p.get('view') : 'jobs';
+    state.view = ALL_VIEWS.has(p.get('view')) ? p.get('view') : 'jobs';
     state.doc = ['usage', 'interview', 'experience'].includes(p.get('doc')) ? p.get('doc') : 'interview';
     state.q = p.get('q') || '';
     state.years = new Set((p.get('y') || '').split(',').filter(Boolean));
@@ -229,7 +358,9 @@
     el.listPane.hidden = !isList;
     el.dashboardPane.hidden = state.view !== 'dashboard';
     el.soePane.hidden = state.view !== 'soe';
+    el.eventsPane.hidden = state.view !== 'events';
     el.docsPane.hidden = state.view !== 'docs';
+    el.appsPane.hidden = state.view !== 'apps';
     el.docsSubTabs.hidden = state.view !== 'docs';
     el.searchBox.style.display = (isList || state.view === 'soe') ? '' : 'none';
 
@@ -246,7 +377,9 @@
     internships: ['实习岗位汇总 · 校招信息查询', '近 2000 家企业的实习岗位，按城市、届次、行业、学历筛选，默认只显示未截止投递的岗位。'],
     dashboard: ['数据看板 · 校招信息查询', '校招与实习岗位的行业、城市、批次、企业性质分布统计，基于企业官方招聘公告整理。'],
     soe: ['央国企名录 · 校招信息查询', '央国企与事业单位官方招聘官网入口名录，可直接跳转企业官方招聘页面。'],
+    events: ['高校宣讲会日历 · 校招信息查询', '汇总北京大学、北京航空航天大学、北京理工大学等高校就业网公开的宣讲会与招聘会信息，按时间与学校浏览。'],
     docs: ['求职资料 · 校招信息查询', '使用说明、面试题库与面经分享，帮助应届生完成校招投递准备。'],
+    apps: ['我的投递 · 校招信息查询', '在收藏基础上跟踪投递进度：已收藏 → 已投递 → 笔试/面试 → Offer → 已拒，记录投递时间与备注，按截止时间排序，数据仅保存在本机浏览器。'],
   };
 
   function syncMeta() {
@@ -265,7 +398,9 @@
     writeState(true);
     if (view === 'dashboard') await renderDashboard();
     else if (view === 'soe') await renderSOE();
+    else if (view === 'events') await renderEvents();
     else if (view === 'docs') renderDocs();
+    else if (view === 'apps') await renderApps();
     else {
       await loadTab(view);
       renderFilters();
@@ -497,6 +632,7 @@
     if (state.status.has('open') && meta.days != null && meta.days < 0) return false;
     if (state.status.has('official') && row.source !== 'official') return false;
     if (state.status.has('soe') && row.ownership !== '央国企') return false;
+    if (state.status.has('private') && row.ownership !== '民企') return false;
     if (state.status.has('fav') && !favorites.has(row.id)) return false;
 
     const includeStatus = ['urgent', 'over', 'asap', 'test'].filter((k) => state.status.has(k));
@@ -518,6 +654,8 @@
       const tokens = q.split(/\s+/).filter(Boolean);
       if (!tokens.every((t) => text.includes(t))) return false;
     }
+    // F9 只看专业匹配：输入专业后只保留有命中的岗位
+    if (profile.majorOnly && !matchScore(row)) return false;
     return true;
   }
 
@@ -557,14 +695,19 @@
         ? `${row.positions.slice(0, 4).join(' / ')} 等 ${row.positions.length} 个岗位`
         : row.positions.join(' / '))
       : '岗位信息详见公告';
+    const score = matchScore(row);
+    const appSt = appStatusOf(row.id);
     return `<article class="job-card" data-id="${esc(row.id)}" tabindex="0">
       <div class="job-card-top">
         <span class="job-company">${highlight(row.company)}</span>
         ${row.source === 'official' ? '<span class="badge official">官网</span>' : ''}
         <span class="badge ownership">${esc(row.ownership)}</span>
+        ${score ? matchBadge(score) : ''}
+        ${appSt && appSt !== 'saved' ? `<span class="badge st-${appSt}">${APP_STATUS_LABELS[appSt]}</span>` : ''}
         ${row.positions.length > 1 ? `<span class="badge positions">${row.positions.length} 个岗位</span>` : ''}
         ${yearLabels ? `<span class="badge year">${esc(yearLabels)}</span>` : ''}
         <span class="deadline ${meta.cls}">${esc(meta.text)}</span>
+        <button class="compare-toggle${ui.compare.has(row.id) ? ' active' : ''}" data-compare="${esc(row.id)}" aria-label="加入对比" title="加入对比">⇄</button>
         <button class="fav-btn${favorites.has(row.id) ? ' active' : ''}" data-fav="${esc(row.id)}" aria-pressed="${favorites.has(row.id)}" aria-label="收藏岗位" title="${favorites.has(row.id) ? '取消收藏' : '收藏'}">★</button>
       </div>
       <div class="job-positions">${highlight(positionText)}</div>
@@ -642,8 +785,17 @@
   }
 
   function toggleFavorite(id) {
-    if (favorites.has(id)) favorites.delete(id); else favorites.add(id);
+    if (!favorites.has(id)) {
+      favorites.add(id);
+      // F1：收藏即建立投递记录（状态“已收藏”），记录与备注独立于收藏保留
+      if (!apps[id]) { apps[id] = { status: 'saved', appliedAt: '', note: '', updatedAt: new Date().toISOString() }; saveApps(); }
+      // F2：首次收藏时请求通知权限，用于截止提醒
+      if (!sessionStorage.getItem('notif-asked')) { sessionStorage.setItem('notif-asked', '1'); ensureNotificationPermission(); }
+    } else {
+      favorites.delete(id);
+    }
     saveFavorites();
+    updateAppsCount();
     for (const btn of document.querySelectorAll(`.fav-btn[data-fav="${id}"]`)) {
       const active = favorites.has(id);
       btn.classList.toggle('active', active);
@@ -653,6 +805,7 @@
     if (ui.current && ui.current.id === id) syncDrawerFav();
     renderQuickFilters();
     if (state.status.has('fav')) renderResults();
+    if (state.view === 'apps') renderApps();
   }
 
   function syncDrawerFav() {
@@ -678,12 +831,9 @@
     if (historyMode) syncJobParam(row.id);
 
     try {
-      if (row.source === 'official') {
-        renderDrawerBody(row, tab);
-      } else {
-        const detail = await loadDetail(tab, row.id);
-        renderDrawerBody({ ...row, ...detail }, tab);
-      }
+      // 官网正文也已移到详情分片，所有来源统一按需加载。
+      const detail = await loadDetail(tab, row.id);
+      renderDrawerBody({ ...row, ...detail }, tab);
     } catch (e) {
       const msg = /Failed to fetch|NetworkError|503/.test(e.message) ? '网络请求失败，请检查网络后重试' : e.message;
       el.drawerBody.innerHTML = `<div class="empty">详情加载失败：${esc(msg)}<button class="retry-btn" type="button">重试</button></div>`;
@@ -739,8 +889,21 @@
     const row = (label, value) => value ? `<div class="detail-row"><dt>${esc(label)}</dt><dd>${value}</dd></div>` : '';
     const tags = (list) => list.length ? `<span class="detail-tags">${list.map((x) => `<span class="badge">${esc(x)}</span>`).join('')}</span>` : '—';
     const icsBtn = r.deadline ? '<button class="copy-btn" id="exportIcs">导出日历 (.ics)</button>' : '';
+    const positions = r.positions || [];
+    const POSITION_PAGE_SIZE = 50;
+    const positionPageHtml = (page) => positions
+      .slice(page * POSITION_PAGE_SIZE, (page + 1) * POSITION_PAGE_SIZE)
+      .map((p) => `<div>· ${esc(p)}</div>`).join('');
+    const positionPager = positions.length > POSITION_PAGE_SIZE
+      ? `<div style="display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap">
+          <button class="copy-btn" type="button" id="positionPrev">上一页</button>
+          <span id="positionPage" class="muted"></span>
+          <button class="copy-btn" type="button" id="positionNext">下一页</button>
+        </div>`
+      : '';
 
     el.drawerBody.innerHTML = `
+      ${appStatusSectionHtml(r)}
       <section class="detail-section"><h3>投递入口</h3>${links.length || icsBtn ? `${links.join('')}${icsBtn}` : '<span style="color:#7a8293;font-size:13px">公告未提供直接链接</span>'}</section>
       <section class="detail-section"><h3>基本信息</h3><dl class="detail-rows">
         ${row('企业性质', esc(r.ownership))}
@@ -752,7 +915,7 @@
         ${row('是否笔试', r.writtenTest === true ? '有笔试' : r.writtenTest === false ? '无笔试' : '未注明')}
       </dl></section>
       <section class="detail-section"><h3>岗位与地点</h3><dl class="detail-rows">
-        ${row('招聘岗位', (r.positions || []).length ? r.positions.map((p) => `<div>· ${esc(p)}</div>`).join('') : '—')}
+        ${row('招聘岗位', positions.length ? `<div id="positionList">${positionPageHtml(0)}</div>${positionPager}` : '—')}
         ${row('工作地点', `${esc((r.cities || []).join(' / ') || '未注明')}${r.nationwide ? ' <span class="badge">含全国多地</span>' : ''}`)}
         ${row('截止时间', `${esc(r.deadline || r.deadlineText || '未注明')} <span class="deadline ${meta.cls}">${esc(meta.text)}</span>`)}
         ${row('更新时间', esc(r.updatedAt || '—'))}
@@ -760,6 +923,23 @@
       </dl></section>
       ${r.note ? `<section class="detail-section"><h3>备注</h3><div class="note-box">${esc(r.note)}</div>${noteLinks ? `<div style="margin-top:8px">${noteLinks}</div>` : ''}</section>` : ''}
     `;
+    if (positions.length > POSITION_PAGE_SIZE) {
+      let currentPage = 0;
+      const pageCount = Math.ceil(positions.length / POSITION_PAGE_SIZE);
+      const updatePositions = () => {
+        $('positionList').innerHTML = positionPageHtml(currentPage);
+        $('positionPage').textContent = `第 ${currentPage + 1} / ${pageCount} 页 · 共 ${positions.length} 个岗位`;
+        $('positionPrev').disabled = currentPage === 0;
+        $('positionNext').disabled = currentPage === pageCount - 1;
+      };
+      $('positionPrev').addEventListener('click', () => {
+        if (currentPage > 0) { currentPage -= 1; updatePositions(); }
+      });
+      $('positionNext').addEventListener('click', () => {
+        if (currentPage < pageCount - 1) { currentPage += 1; updatePositions(); }
+      });
+      updatePositions();
+    }
     $('copyEmail')?.addEventListener('click', async () => {
       try { await navigator.clipboard.writeText(r.apply.email); $('copyEmail').textContent = '已复制'; }
       catch { $('copyEmail').textContent = '复制失败，请手动选择'; }
@@ -767,6 +947,10 @@
     $('exportIcs')?.addEventListener('click', () => {
       downloadFile(`${r.company}-投递截止.ics`, buildIcs(r), 'text/calendar;charset=utf-8');
     });
+    // F1 投递进度区交互
+    bindDrawerAppStatus(r);
+    // F4/F7/F8/F10 异步加载并追加：相似推荐 / 近期宣讲会 / 面试题 / 面经
+    renderDrawerExtras(r, tab);
   }
 
   function closeDrawer() {
@@ -797,6 +981,87 @@
       } catch { /* 忽略，继续找下个列表 */ }
     }
     closeDrawer();
+  }
+
+  /* ---------- 宣讲会日历 ---------- */
+  const EVENT_WEEK = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+
+  function eventDayLabel(date, today) {
+    const d = new Date(`${date}T00:00:00`);
+    const diff = Math.round((d - new Date(`${today}T00:00:00`)) / 86400000);
+    const base = `${d.getMonth() + 1}月${d.getDate()}日 ${EVENT_WEEK[d.getDay()]}`;
+    if (diff === 0) return `${base} · 今天`;
+    if (diff === 1) return `${base} · 明天`;
+    return diff > 1 ? `${base} · 还有 ${diff} 天` : base;
+  }
+
+  async function renderEvents() {
+    try {
+      if (!cache.events) cache.events = await loadJSON('events.json');
+    } catch (err) {
+      el.eventsList.innerHTML = `<div class="empty"><strong>宣讲会加载失败</strong>${esc(err.message)}</div>`;
+      return;
+    }
+    const data = cache.events;
+    const all = data.events || [];
+    el.countEvents.textContent = all.length || '';
+    el.eventsTotal.textContent = all.length;
+    el.eventsSchools.textContent = new Set(all.map((e) => e.schoolKey)).size;
+    // F7 宣讲会 ↔ 岗位联动：预加载岗位列表以统计同企业岗位数
+    await Promise.all([loadTab('jobs').catch(() => {}), loadTab('internships').catch(() => {})]);
+
+    el.eventsSchoolChips.innerHTML = '';
+    const mk = (label, key, count) => chip(label, count, ui.eventSchool === key, () => {
+      ui.eventSchool = ui.eventSchool === key ? '' : key;
+      renderEvents();
+    }, 'chip-sm');
+    el.eventsSchoolChips.appendChild(mk('全部高校', '', all.length));
+    for (const s of data.schools || []) {
+      const n = all.filter((e) => e.schoolKey === s.key).length;
+      if (n) el.eventsSchoolChips.appendChild(mk(s.name, s.key, n));
+    }
+
+    const rows = ui.eventSchool ? all.filter((e) => e.schoolKey === ui.eventSchool) : all;
+    if (!rows.length) {
+      el.eventsList.innerHTML = '<div class="empty">近期暂无宣讲会，秋招结束后会逐步更新。</div>';
+      return;
+    }
+    const today = data.today || new Date().toISOString().slice(0, 10);
+    const groups = new Map();
+    for (const e of rows) {
+      if (!groups.has(e.date)) groups.set(e.date, []);
+      groups.get(e.date).push(e);
+    }
+    el.eventsList.innerHTML = [...groups.entries()].map(([date, list]) => `
+      <section class="event-day">
+        <h3>${esc(eventDayLabel(date, today))}<span>${list.length} 场</span></h3>
+        <div class="event-items">
+          ${list.map((e) => {
+            const n = findRowsByCompany(e.company).length;
+            return `<a class="event-item" href="${esc(e.url)}" target="_blank" rel="noopener">
+            <div class="event-time">${esc(e.start.slice(11, 16))}${e.end ? `–${esc(e.end.slice(11, 16))}` : ''}</div>
+            <div class="event-main">
+              <div class="event-title">${esc(e.title)}</div>
+              <div class="event-meta">${esc(e.company || '—')} · ${esc(e.place || (e.online ? '线上' : '地点待定'))}</div>
+              ${n ? `<div class="event-link-badge"><button type="button" data-company="${esc(e.company)}">该企业 ${n} 个校招岗位 →</button></div>` : ''}
+            </div>
+            <span class="event-school">${esc(e.school)}</span>
+          </a>`;
+          }).join('')}
+        </div>
+      </section>
+    `).join('');
+    // F7：点击徽章跳转到岗位列表并按企业名筛选
+    el.eventsList.querySelectorAll('.event-link-badge button').forEach((btn) => {
+      btn.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        ev.stopPropagation();
+        state.q = btn.dataset.company;
+        el.searchInput.value = state.q;
+        el.searchClear.style.display = state.q ? 'block' : 'none';
+        switchView('jobs');
+      });
+    });
   }
 
   /* ---------- 看板 ---------- */
@@ -836,6 +1101,12 @@
       return `<div class="cd-row" data-id="${esc(u.id)}"><span class="cd-company">${esc(u.company)}</span><span class="deadline ${meta.cls}">${esc(meta.text)}</span><span class="cd-date">${esc(u.deadline)}</span></div>`;
     }).join('');
 
+    // F6 今日新发布：来自 changelog 的新增记录，点击可打开岗位详情
+    const addedList = (cache.changelog.added || []).slice(0, 40).map((it) => {
+      const meta = it.deadline ? deadlineMeta({ deadline: it.deadline }) : { text: '', cls: '' };
+      return `<div class="rec-item" data-added="${esc(it.id)}"><span>${esc(it.company)} <span class="rec-sub">${esc((it.positions || []).slice(0, 2).join('/') || '')}</span></span>${it.deadline ? `<span class="deadline ${meta.cls}">${esc(meta.text)}</span>` : ''}</div>`;
+    }).join('');
+
     el.dashboardPane.innerHTML = `
       <div class="dash-grid">
         ${cards.map(([label, val, color]) => `<div class="stat-card" style="--accent:${color}"><div class="stat-val">${val.toLocaleString('zh-CN')}</div><div class="stat-label">${esc(label)}</div></div>`).join('')}
@@ -845,6 +1116,7 @@
         <div class="dash-card"><h3>岗位词云</h3><div class="wordcloud">${wc(d.positions)}</div></div>
         <div class="dash-card"><h3>城市词云</h3><div class="wordcloud">${wc(d.cities)}</div></div>
       </div>
+      ${addedList ? `<div class="dash-card" style="margin-top:16px"><h3>本次新发布岗位（${addedN} 条）<span class="section-source">点击查看详情 · 订阅 feeds.xml 可每日自动获取</span></h3><div class="rec-list">${addedList}</div></div>` : ''}
       <p class="muted dash-tip">提示：点击「即将截止」的公司可直接打开岗位详情。数据生成于 ${esc(el.lastUpdated.textContent)}。</p>
     `;
     el.dashboardPane.querySelectorAll('.cd-row').forEach((row) => {
@@ -852,6 +1124,9 @@
         const found = findRowById(row.dataset.id);
         if (found) openDrawer(found.row, found.tab);
       });
+    });
+    el.dashboardPane.querySelectorAll('.rec-item[data-added]').forEach((it) => {
+      it.addEventListener('click', () => openJobById(it.dataset.added));
     });
   }
 
@@ -878,6 +1153,380 @@
       : '<div class="empty">文档加载失败</div>';
   }
 
+  /* ---------- 新增功能：投递 / 对比 / 推荐 / 匹配 / 面经 / 日历 / PWA ---------- */
+
+  /* ---- F9 专业匹配 ---- */
+  function majorTokens() {
+    return (profile.major || '').toLowerCase().split(/[\s,，、/／]+/).filter((t) => t.length >= 2);
+  }
+  function matchScore(row) {
+    const tokens = majorTokens();
+    if (!tokens.length) return 0;
+    const hay = [row.majors || '', (row.positions || []).join(' '), row.note || '', (row.industries || []).join(' '), row.sm || '']
+      .join(' ').toLowerCase();
+    let hit = 0;
+    for (const t of tokens) if (hay.includes(t)) hit++;
+    return Math.round((hit / tokens.length) * 100);
+  }
+  function matchBadge(score) {
+    if (!score) return '';
+    const cls = score >= 70 ? 'match-high' : score >= 40 ? 'match-mid' : 'match-low';
+    return `<span class="badge ${cls}">匹配 ${score}%</span>`;
+  }
+
+  /* ---- F1 我的投递视图 ---- */
+  async function renderApps() {
+    await Promise.all([loadTab('jobs').catch(() => {}), loadTab('internships').catch(() => {})]);
+    const rows = Object.keys(apps).map((id) => findRowById(id)?.row).filter(Boolean);
+    const rank = (r) => { const d = daysUntil(r.deadline); if (d == null) return 2; return d < 0 ? 3 : d <= 7 ? 0 : 1; };
+    rows.sort((a, b) => {
+      const ra = rank(a), rb = rank(b);
+      if (ra !== rb) return ra - rb;
+      const da = daysUntil(a.deadline), db = daysUntil(b.deadline);
+      if (da != null && db != null) return da - db;
+      return (b.updatedAt || '').localeCompare(a.updatedAt || '');
+    });
+    const counts = Object.fromEntries(APP_STATUSES.map((s) => [s.key, 0]));
+    for (const r of rows) { const st = appStatusOf(r.id); if (counts[st] != null) counts[st]++; }
+    if (el.appsStats) el.appsStats.innerHTML = APP_STATUSES.map((s) => `<span class="app-stat"><b>${counts[s.key]}</b>${s.label}</span>`).join('');
+    if (!rows.length) {
+      el.appsList.innerHTML = `<div class="empty"><strong>还没有投递记录</strong>先在「校招汇总 / 实习汇总」里收藏感兴趣的岗位，再来这里跟踪进度。<div style="margin-top:10px"><button class="copy-btn primary" id="goJobsBtn">去看看岗位</button></div></div>`;
+      const g = document.getElementById('goJobsBtn');
+      if (g) g.addEventListener('click', () => switchView('jobs'));
+      return;
+    }
+    el.appsList.innerHTML = `<div class="app-list">${rows.map(appCardHtml).join('')}</div>`;
+    bindAppCards();
+  }
+  function appCardHtml(row) {
+    const st = appStatusOf(row.id);
+    const rec = getApp(row.id);
+    const meta = deadlineMeta(row);
+    const positions = (row.positions || []).slice(0, 4).join(' / ') || '岗位详见公告';
+    const statusPick = APP_STATUSES.map((s) => `<button type="button" data-status="${s.key}" class="${s.key === st ? 'active' : ''}">${s.label}</button>`).join('');
+    const cityText = (row.cities || []).slice(0, 3).join('/') || (row.nationwide ? '全国多地' : '—');
+    return `<div class="app-card" data-id="${esc(row.id)}" tabindex="0">
+      <div class="app-card-top">
+        <span class="company">${esc(row.company)}</span>
+        <span class="badge ownership">${esc(row.ownership)}</span>
+        ${st ? `<span class="badge st-${st}">${APP_STATUS_LABELS[st]}</span>` : ''}
+        <span class="deadline ${meta.cls}">${esc(meta.text)}</span>
+      </div>
+      <div class="job-positions" style="margin:0">${esc(positions)}</div>
+      <div class="app-card-meta">
+        <span>城市 <b>${esc(cityText)}</b></span>
+        <span>学历 <b>${esc((row.degree || []).join('/') || '—')}</b></span>
+        ${rec?.appliedAt ? `<span>投递于 <b>${rec.appliedAt}</b></span>` : ''}
+      </div>
+      <div class="app-status-pick">${statusPick}</div>
+      <div class="app-note" contenteditable="true" data-note="${esc(row.id)}" data-empty="${rec?.note ? 'false' : 'true'}">${esc(rec?.note || NOTE_PLACEHOLDER)}</div>
+    </div>`;
+  }
+  function bindAppCards() {
+    el.appsList.querySelectorAll('.app-card').forEach((card) => {
+      card.addEventListener('click', (e) => {
+        if (e.target.closest('.app-status-pick') || e.target.closest('.app-note')) return;
+        const found = findRowById(card.dataset.id);
+        if (found) openDrawer(found.row, found.tab);
+      });
+      card.querySelectorAll('.app-status-pick button').forEach((btn) => {
+        btn.addEventListener('click', (e) => { e.stopPropagation(); setAppStatus(card.dataset.id, btn.dataset.status); renderApps(); });
+      });
+      const note = card.querySelector('.app-note');
+      if (note) bindNoteField(note, note.dataset.note);
+    });
+  }
+
+  /* ---- F1 详情抽屉内的投递进度区 ---- */
+  function appStatusSectionHtml(r) {
+    const st = appStatusOf(r.id);
+    const rec = getApp(r.id);
+    const pick = APP_STATUSES.map((s) => `<button type="button" class="app-pick ${s.key === st ? 'active' : ''}" data-status="${s.key}">${s.label}</button>`).join('');
+    return `<section class="detail-section" style="background:#f8f9fb;border-radius:10px;padding:10px 12px">
+      <h3 style="margin:0 0 6px">投递进度</h3>
+      <div class="app-status-pick">${pick}</div>
+      <div class="app-note" contenteditable="true" data-note="${esc(r.id)}" data-empty="${rec?.note ? 'false' : 'true'}" style="margin-top:6px">${esc(rec?.note || NOTE_PLACEHOLDER)}</div>
+    </section>`;
+  }
+  function bindDrawerAppStatus(r) {
+    el.drawerBody.querySelectorAll('.app-pick').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        setAppStatus(r.id, btn.dataset.status);
+        el.drawerBody.querySelectorAll('.app-pick').forEach((b) => b.classList.toggle('active', b.dataset.status === btn.dataset.status));
+        updateAppsCount();
+        if (state.view === 'apps') renderApps();
+      });
+    });
+    const note = el.drawerBody.querySelector(`.app-note[data-note="${CSS.escape ? CSS.escape(r.id) : r.id}"]`);
+    if (note) bindNoteField(note, r.id);
+  }
+
+  /* ---- F3 岗位对比 ---- */
+  function toggleCompare(id) {
+    if (ui.compare.has(id)) ui.compare.delete(id);
+    else {
+      if (ui.compare.size >= COMPARE_MAX) { toast(`最多对比 ${COMPARE_MAX} 个岗位`); return; }
+      ui.compare.add(id);
+    }
+    renderCompareBar();
+    document.querySelectorAll(`.compare-toggle[data-compare="${CSS.escape ? CSS.escape(id) : id}"]`).forEach((b) => b.classList.toggle('active', ui.compare.has(id)));
+  }
+  function renderCompareBar() {
+    if (!el.compareBar) return;
+    const n = ui.compare.size;
+    el.compareBar.hidden = n === 0;
+    if (el.compareCount) el.compareCount.textContent = n;
+  }
+  function openCompareModal() {
+    if (ui.compare.size < 2) { toast('至少勾选 2 个岗位'); return; }
+    const rows = [...ui.compare].map((id) => findRowById(id)?.row).filter(Boolean);
+    if (rows.length < 2) { toast('请先加载岗位列表'); return; }
+    const cols = Math.min(4, rows.length);
+    const cells = rows.map((r) => {
+      const meta = deadlineMeta(r);
+      return `<div class="compare-cell">
+        <h4>${esc(r.company)}</h4>
+        <div class="cc-meta">
+          <span>地点：${esc((r.cities || []).join(' / ') || (r.nationwide ? '全国多地' : '—'))}</span>
+          <span>学历：${esc((r.degree || []).join('/') || '—')}</span>
+          <span>届次：${esc((r.gradYears || []).map((y) => y + '届').join('/') || (r.gradUnlimited ? '不限届' : '—'))}</span>
+          <span>行业：${esc((r.industries || []).join('/') || '—')}</span>
+          <span>截止：${esc(r.deadline || r.deadlineText || '—')} · ${esc(meta.text)}</span>
+          ${r.writtenTest ? '<span>有笔试</span>' : ''}
+        </div>
+        <div class="cc-positions">${esc((r.positions || []).slice(0, 30).join('\n') || '岗位详见公告')}</div>
+        <div class="cc-actions">
+          <button class="copy-btn primary" data-open="${esc(r.id)}">查看详情</button>
+          <button class="copy-btn" data-rm="${esc(r.id)}">移出对比</button>
+        </div>
+      </div>`;
+    }).join('');
+    const overlay = document.createElement('div');
+    overlay.className = 'compare-overlay';
+    overlay.innerHTML = `<div class="compare-modal" role="dialog" aria-modal="true">
+      <div class="compare-head"><h3>岗位对比（${rows.length} 个）</h3><button class="drawer-close" id="cmpClose" aria-label="关闭">×</button></div>
+      <div class="compare-body"><div class="compare-grid cols-${cols}">${cells}</div></div>
+    </div>`;
+    document.body.appendChild(overlay);
+    document.body.style.overflow = 'hidden';
+    const close = () => { overlay.remove(); document.body.style.overflow = ''; };
+    overlay.querySelector('#cmpClose').addEventListener('click', close);
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+    overlay.querySelectorAll('[data-open]').forEach((b) => b.addEventListener('click', () => { const f = findRowById(b.dataset.open); if (f) { close(); openDrawer(f.row, f.tab); } }));
+    overlay.querySelectorAll('[data-rm]').forEach((b) => b.addEventListener('click', () => { toggleCompare(b.dataset.rm); close(); }));
+  }
+
+  /* ---- F4 相似推荐 + F7 宣讲会 + F8 面试题 + F10 面经（详情抽屉扩展） ---- */
+  function recSectionHtml(title, rows) {
+    const items = rows.map((r) => {
+      const meta = deadlineMeta(r);
+      return `<div class="rec-item" data-rec="${esc(r.id)}"><span>${esc(r.company)} <span class="rec-sub">${esc((r.positions || []).slice(0, 2).join('/') || '')}</span></span><span class="deadline ${meta.cls}">${esc(meta.text)}</span></div>`;
+    }).join('');
+    return `<section class="detail-section"><h3>${esc(title)}</h3><div class="rec-list">${items}</div></section>`;
+  }
+  function appendDrawerSection(html, bindFn) {
+    const tpl = document.createElement('template');
+    tpl.innerHTML = html;
+    el.drawerBody.appendChild(tpl.content);
+    if (bindFn) bindFn();
+  }
+  async function renderDrawerExtras(r, tab) {
+    await Promise.all([
+      loadTab('jobs').catch(() => {}), loadTab('internships').catch(() => {}),
+      loadJSON('events.json').then((d) => { cache.events = d; }).catch(() => {}),
+      loadJSON('questions.json').then((d) => { cache.questions = d; }).catch(() => {}),
+      loadJSON('reviews.json').then((d) => { cache.reviews = d; }).catch(() => {}),
+    ]);
+    // 异步返回时若用户已切换到其它岗位，则放弃追加，避免内容串抽屉
+    if (!ui.current || ui.current.id !== r.id) return;
+    const all = allRows();
+
+    // F4 同企业其他岗位
+    const rk = companyKey(r.company);
+    const sameCompany = all.filter((x) => x.id !== r.id && companyKey(x.company) && companyKey(x.company) === rk).slice(0, 6);
+    // F4 相似岗位：同行业 + 同城市 + 同学历 + 同届次加权
+    const sim = all.filter((x) => x.id !== r.id && companyKey(x.company) !== rk)
+      .map((x) => {
+        let score = 0;
+        if ((r.industries || []).some((i) => x.industries.includes(i))) score += 2;
+        if ((r.cities || []).some((c) => x.cities.includes(c)) || (r.nationwide && x.nationwide)) score += 2;
+        if ((r.degree || []).some((d) => x.degree.includes(d))) score += 1;
+        if ((r.gradYears || []).some((y) => x.gradYears.includes(y))) score += 1;
+        return { x, score };
+      })
+      .filter((o) => o.score >= 3)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 5)
+      .map((o) => o.x);
+
+    let html = '';
+    if (sameCompany.length) html += recSectionHtml('同企业其他岗位', sameCompany);
+    if (sim.length) html += recSectionHtml('相似岗位推荐', sim);
+
+    // F7 近期宣讲会（同企业）
+    const evs = (cache.events?.events || []).filter((e) => companyKey(e.company) && (companyKey(e.company) === rk || e.company.includes(r.company) || r.company.includes(e.company))).slice(0, 4);
+    if (evs.length) {
+      const items = evs.map((e) => `<div class="rec-item" data-ev="${esc(e.url || '')}"><span>${esc(e.title)} <span class="rec-sub">${esc(e.school || '')} · ${esc(e.start ? e.start.slice(5, 16).replace('T', ' ') : e.date)}</span></span><span class="rec-sub">${esc(e.place || (e.online ? '线上' : ''))}</span></div>`).join('');
+      html += `<section class="detail-section"><h3>近期宣讲会<span class="section-source">${esc(cache.events?.today ? '数据更新于 ' + cache.events.today : '')}</span></h3><div class="rec-list">${items}</div></section>`;
+    }
+
+    // F8 该企业常见面试题（基于岗位关键词推荐）
+    const qs = recommendQuestions(r);
+    if (qs.length) {
+      const list = qs.map((q) => `<div class="q-item"><div class="qq">${esc(q.q)}</div><div class="qa">${esc(q.a || '')}</div></div>`).join('');
+      html += `<section class="detail-section"><h3>该企业常见面试题<span class="section-source">${esc(cache.questions?.source || '')}</span></h3>${list}</section>`;
+    }
+
+    // F10 面经 / 待遇参考
+    const reviews = cache.reviews?.reviews?.[r.company] || [];
+    if (reviews.length) {
+      const list = reviews.map((rv) => `<div class="review-item"><div class="rv-title">${esc(rv.title)}</div>${rv.snippet ? `<div class="rv-snippet">${esc(rv.snippet)}</div>` : ''}<div class="rv-source">${esc(rv.source || cache.reviews.source || '')}</div></div>`).join('');
+      html += `<section class="detail-section"><h3>面经 / 待遇参考<span class="section-source">${esc(cache.reviews?.source || '')}</span></h3>${list}</section>`;
+    }
+
+    if (html) {
+      appendDrawerSection(html, () => {
+        el.drawerBody.querySelectorAll('.rec-item[data-rec]').forEach((it) => {
+          it.addEventListener('click', () => { const f = findRowById(it.dataset.rec); if (f) openDrawer(f.row, f.tab, { history: false }); });
+        });
+        el.drawerBody.querySelectorAll('.rec-item[data-ev]').forEach((it) => {
+          it.addEventListener('click', () => { if (it.dataset.ev) window.open(it.dataset.ev, '_blank', 'noopener'); });
+        });
+      });
+    }
+  }
+  // F8：从题库里按公司岗位关键词挑出最相关的题
+  function recommendQuestions(r) {
+    const all = cache.questions?.questions || [];
+    if (!all.length) return [];
+    const kws = [...(r.positions || []), ...(r.industries || []), r.majors || '']
+      .flatMap((s) => String(s).split(/[\s,，、/／()（）]+/))
+      .filter((t) => t.length >= 2);
+    const scored = all.map((q) => {
+      const text = (q.q + q.a).toLowerCase();
+      let score = 0;
+      for (const k of kws) if (text.includes(k.toLowerCase())) score++;
+      return { q, score };
+    }).filter((o) => o.score > 0).sort((a, b) => b.score - a.score).slice(0, 4).map((o) => o.q);
+    if (scored.length) return scored;
+    // 无关键词命中时，给 4 道通用高频题（前 4 道基础题）
+    return all.slice(0, 4);
+  }
+
+  /* ---- F11 批量日历 ICS ---- */
+  function icsVEvent(row) {
+    if (!row.deadline) return null;
+    const [y, m, d] = row.deadline.split('-').map(Number);
+    const start = `${y}${pad2(m)}${pad2(d)}`;
+    const next = new Date(y, m - 1, d + 1);
+    const end = `${next.getFullYear()}${pad2(next.getMonth() + 1)}${pad2(next.getDate())}`;
+    const stamp = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+    const desc = [...(row.positions || []).slice(0, 6), row.apply && row.apply.url].filter(Boolean).join('\n');
+    return [
+      'BEGIN:VEVENT',
+      `UID:${row.id}@campus-jobs`,
+      `DTSTAMP:${stamp}`,
+      `DTSTART;VALUE=DATE:${start}`,
+      `DTEND;VALUE=DATE:${end}`,
+      `SUMMARY:${icsEsc(`${row.company} 投递截止`)}`,
+      `DESCRIPTION:${icsEsc(desc)}`,
+      'BEGIN:VALARM', 'TRIGGER:-P3D', 'ACTION:DISPLAY', `DESCRIPTION:${icsEsc('还有 3 天截止')}`, 'END:VALARM',
+      'END:VEVENT',
+    ];
+  }
+  function icsEsc(s) { return String(s || '').replace(/\\/g, '\\\\').replace(/\n/g, '\\n').replace(/,/g, '\\,').replace(/;/g, '\\;'); }
+  function wrapCalendar(events, prodName) {
+    return ['BEGIN:VCALENDAR', 'VERSION:2.0', `PRODID:-//campus-jobs//${prodName}//CN`, 'CALSCALE:GREGORIAN', ...events, 'END:VCALENDAR'].join('\r\n');
+  }
+  function buildBulkIcs(rows, prodName) {
+    const events = rows.map(icsVEvent).filter(Boolean);
+    return events.length ? wrapCalendar(events, prodName) : '';
+  }
+  function buildEventsIcs(list) {
+    const stamp = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+    const dt = (s) => { const m = /(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})/.exec(s || ''); return m ? `${m[1]}${m[2]}${m[3]}T${m[4]}${m[5]}00` : ''; };
+    const evs = list.flatMap((e, i) => {
+      const ds = dt(e.start), de = dt(e.end);
+      const lines = ['BEGIN:VEVENT', `UID:ev${i}@campus-jobs`, `DTSTAMP:${stamp}`];
+      if (ds) lines.push(`DTSTART:${ds}`);
+      if (de) lines.push(`DTEND:${de}`);
+      lines.push(`SUMMARY:${icsEsc(e.title || '宣讲会')}`);
+      lines.push(`DESCRIPTION:${icsEsc([e.company, e.place, e.school].filter(Boolean).join(' · '))}`);
+      if (e.url) lines.push(`URL:${icsEsc(e.url)}`);
+      lines.push('END:VEVENT');
+      return lines;
+    });
+    return evs.length ? wrapCalendar(evs, 'EVENTS') : '';
+  }
+  function exportFavoriteIcs() {
+    const rows = [...favorites].map((id) => findRowById(id)?.row).filter(Boolean);
+    const ics = buildBulkIcs(rows, 'FAVORITES');
+    if (!ics) { toast('暂无可导出的截止日期'); return; }
+    downloadFile(`校招投递截止_${todayStr()}.ics`, ics, 'text/calendar;charset=utf-8');
+    toast('已导出收藏岗位日历');
+  }
+  function exportEventsIcsFile() {
+    if (!cache.events) { toast('宣讲会数据未加载'); return; }
+    const ics = buildEventsIcs(cache.events.events || []);
+    if (!ics) { toast('暂无可导出的宣讲会'); return; }
+    downloadFile(`宣讲会日历_${todayStr()}.ics`, ics, 'text/calendar;charset=utf-8');
+    toast('已导出宣讲会日历');
+  }
+
+  /* ---- F2 截止提醒 ---- */
+  async function ensureNotificationPermission() {
+    if (!('Notification' in window)) return false;
+    if (Notification.permission === 'granted') return true;
+    if (Notification.permission === 'denied') return false;
+    try { const res = await Notification.requestPermission(); return res === 'granted'; } catch { return false; }
+  }
+  async function checkDeadlineReminders() {
+    if (!('Notification' in window) || Notification.permission !== 'granted') return;
+    await Promise.all([loadTab('jobs').catch(() => {}), loadTab('internships').catch(() => {})]);
+    const today = todayStr();
+    const done = new Set(JSON.parse(sessionStorage.getItem(`notified-${today}`) || '[]'));
+    const due = allRows().filter((r) => favorites.has(r.id) && !r.expired && (() => { const d = daysUntil(r.deadline); return d != null && d >= 0 && d <= 3; })());
+    for (const r of due) {
+      if (done.has(r.id)) continue;
+      done.add(r.id);
+      try { new Notification(`${r.company} 即将截止`, { body: `${daysUntil(r.deadline)} 天后截止（${r.deadline}），点击查看`, tag: r.id }); } catch { /* ignore */ }
+    }
+    sessionStorage.setItem(`notified-${today}`, JSON.stringify([...done]));
+  }
+
+  /* ---- F12 PWA ---- */
+  async function prefetchFavoriteDetails() {
+    try {
+      await Promise.all([loadTab('jobs').catch(() => {}), loadTab('internships').catch(() => {})]);
+      const shards = new Set();
+      for (const id of favorites) shards.add(shardOf(id));
+      for (const shard of shards) {
+        try { await loadJSON(`jobs-detail-${shard}.json`); } catch { /* ignore */ }
+        try { await loadJSON(`internships-detail-${shard}.json`); } catch { /* ignore */ }
+      }
+    } catch { /* ignore */ }
+  }
+  function setupInstallPrompt() {
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      ui.deferredPrompt = e;
+      if (el.installBanner && !sessionStorage.getItem('install-dismissed')) el.installBanner.hidden = false;
+    });
+    el.installBtn?.addEventListener('click', async () => {
+      const p = ui.deferredPrompt;
+      if (!p) return;
+      p.prompt();
+      await p.userChoice;
+      ui.deferredPrompt = null;
+      if (el.installBanner) el.installBanner.hidden = true;
+    });
+    el.installDismiss?.addEventListener('click', () => {
+      sessionStorage.setItem('install-dismissed', '1');
+      if (el.installBanner) el.installBanner.hidden = true;
+    });
+    window.addEventListener('appinstalled', () => { if (el.installBanner) el.installBanner.hidden = true; });
+  }
+
   /* ---------- 事件 ---------- */
   let searchTimer = null;
 
@@ -894,7 +1543,9 @@
         renderResults();
       } else if (state.view === 'dashboard') await renderDashboard();
       else if (state.view === 'soe') await renderSOE();
+      else if (state.view === 'events') await renderEvents();
       else if (state.view === 'docs') renderDocs();
+      else if (state.view === 'apps') await renderApps();
     } catch (err) {
       el.cardList.innerHTML = `<div class="empty"><strong>数据加载失败</strong>${esc(err.message)}</div>`;
     }
@@ -941,6 +1592,8 @@
     el.sortSelect.addEventListener('change', () => { state.sort = el.sortSelect.value; writeState(); renderResults(); });
 
     el.cardList.addEventListener('click', (e) => {
+      const cmpBtn = e.target.closest('.compare-toggle');
+      if (cmpBtn) { e.stopPropagation(); toggleCompare(cmpBtn.dataset.compare); return; }
       const favBtn = e.target.closest('.fav-btn');
       if (favBtn) { e.stopPropagation(); toggleFavorite(favBtn.dataset.fav); return; }
       const card = e.target.closest('.job-card');
@@ -950,7 +1603,7 @@
     });
     el.cardList.addEventListener('keydown', (e) => {
       if (e.key !== 'Enter' && e.key !== ' ') return;
-      if (e.target.closest('.fav-btn')) return;
+      if (e.target.closest('.fav-btn') || e.target.closest('.compare-toggle')) return;
       const card = e.target.closest('.job-card');
       if (!card) return;
       e.preventDefault();
@@ -973,6 +1626,32 @@
 
     ui.observer = new IntersectionObserver((entries) => { if (entries.some((e) => e.isIntersecting)) renderPage(); }, { rootMargin: '600px 0px' });
     ui.observer.observe(el.sentinel);
+
+    // F5 复制当前筛选链接
+    el.shareBtn?.addEventListener('click', async () => {
+      try { await navigator.clipboard.writeText(location.href); toast('筛选链接已复制'); }
+      catch { toast('复制失败，请手动复制地址栏'); }
+    });
+    // F3 岗位对比栏
+    el.compareOpen?.addEventListener('click', openCompareModal);
+    el.compareClear?.addEventListener('click', () => {
+      ui.compare.clear();
+      renderCompareBar();
+      document.querySelectorAll('.compare-toggle').forEach((b) => b.classList.remove('active'));
+    });
+    // F1 / F11 我的投递工具
+    el.exportFavIcs?.addEventListener('click', exportFavoriteIcs);
+    el.exportEventsIcs?.addEventListener('click', exportEventsIcsFile);
+    el.clearApps?.addEventListener('click', () => { if (window.confirm('确定清空全部投递记录？此操作不可恢复。')) clearApps(); });
+    // F9 我的专业
+    el.majorInput?.addEventListener('input', () => {
+      profile.major = el.majorInput.value; saveProfile();
+      if (LIST_VIEWS.has(state.view)) renderResults();
+    });
+    el.majorOnly?.addEventListener('change', () => {
+      profile.majorOnly = el.majorOnly.checked; saveProfile();
+      if (LIST_VIEWS.has(state.view)) renderResults();
+    });
   }
 
   function closeSidebar() { el.sidebar.classList.remove('open'); el.drawerMask.classList.remove('open'); document.body.style.overflow = ''; }
@@ -992,25 +1671,44 @@
     catch (err) { el.listPane.innerHTML = `<div class="empty"><strong>数据加载失败</strong>${esc(err.message)}<br>请通过本地服务器打开页面。</div>`; return; }
 
     loadFavorites();
+    loadApps();
+    loadProfile();
+    updateAppsCount();
+    // F1：刷新/关页前把正在编辑的备注落盘，避免未失焦就丢失
+    window.addEventListener('beforeunload', flushActiveNote);
+    if (el.majorInput) el.majorInput.value = profile.major;
+    if (el.majorOnly) el.majorOnly.checked = profile.majorOnly;
     readState();
     el.searchInput.value = state.q;
     el.searchClear.style.display = state.q ? 'block' : 'none';
     el.sortSelect.value = state.sort;
     bindEvents();
     applyView();
+    loadJSON('events.json')
+      .then((d) => { cache.events = d; el.countEvents.textContent = (d.events || []).length || ''; })
+      .catch(() => { /* 宣讲会为增量模块，失败不影响主列表 */ });
 
     if (LIST_VIEWS.has(state.view)) {
       try { await loadTab(state.view); renderFilters(); renderResults(); }
       catch (err) { el.cardList.innerHTML = `<div class="empty"><strong>数据加载失败</strong>${esc(err.message)}</div>`; el.loading.textContent = ''; }
     } else if (state.view === 'dashboard') await renderDashboard();
     else if (state.view === 'soe') await renderSOE();
+    else if (state.view === 'events') await renderEvents();
     else if (state.view === 'docs') renderDocs();
+    else if (state.view === 'apps') await renderApps();
 
     const jobId = new URLSearchParams(location.search).get('job');
     if (jobId) await openJobById(jobId, { history: false });
 
     writeState();
     loadChangelog();
+
+    // F12 离线可用：预取已收藏岗位的详情分片，断网时也能查看收藏详情
+    prefetchFavoriteDetails();
+    // F2 截止提醒：对临近截止的收藏岗位弹出浏览器通知
+    checkDeadlineReminders();
+    // F12 PWA：监听安装提示
+    setupInstallPrompt();
 
     if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
       const hadController = !!navigator.serviceWorker.controller;

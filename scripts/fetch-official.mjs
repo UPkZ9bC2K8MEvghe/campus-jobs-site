@@ -103,7 +103,7 @@ function makeRow(src, o) {
     gradYears: src.gradYears,
     gradUnlimited: false,
     batches: src.batches,
-    degree: src.degree,
+    degree: o.degree || src.degree,
     writtenTest: null, // 官网列表不提供笔试信息，避免伪造“无笔试”
     deadline: o.deadline && /^\d{4}-\d{2}-\d{2}$/.test(o.deadline) ? o.deadline : '',
     deadlineText: '',
@@ -434,10 +434,13 @@ async function zhiyePost(host, pathname, body) {
   return res.json();
 }
 
+/* ATS 只设防死循环的保险上限；触及上限必须报错，不能静默截断。 */
+const ATS_PAGE_LIMIT = 200;
+
 /* 拉取一页/全部职位；locId 为地区码数组，null 表示不过滤 */
-async function zhiyeList(host, portalId, locId) {
+async function zhiyeList(host, portalId, locId, maxPages = 20, strict = false) {
   const out = [];
-  for (let p = 0; p < 20; p++) {
+  for (let p = 0; p < maxPages; p++) {
     const body = {
       PageIndex: p,
       PageSize: 50,
@@ -452,6 +455,9 @@ async function zhiyeList(host, portalId, locId) {
     const arr = j.Data || [];
     out.push(...arr);
     if (arr.length < 50) break;
+    if (strict && p + 1 >= maxPages) {
+      throw new Error(`${host} 北森岗位超过 ${maxPages} 页，已停止以避免静默截断`);
+    }
   }
   return out;
 }
@@ -471,8 +477,8 @@ async function collectZhiye(src) {
   const nameOf = new Map(tree.map((t) => [String(t.Code), cleanCity((t.Name && t.Name[0]) || '')]));
   const parentOf = new Map(tree.map((t) => [String(t.Code), String(t.ParentCode || '')]));
 
-  /* 全量岗位（保证无城市岗位也不丢） */
-  const all = await zhiyeList(host, src.portalId, null);
+  /* 自动翻到短页，企业配置中的 pages 不再决定抓取完整性。 */
+  const all = await zhiyeList(host, src.portalId, null, ATS_PAGE_LIMIT, true);
 
   /* 按地区计数，只查有岗位的叶子地区，给岗位补城市 */
   const cityByJob = new Map();
@@ -487,14 +493,19 @@ async function collectZhiye(src) {
       counts = cj.Data || {};
     } catch {}
   }
-  const active = Object.entries(counts).filter(([, n]) => Number(n) > 0).map(([c]) => c);
-  const leaf = active.filter((c) => !active.some((o) => parentOf.get(o) === c));
+  const active = Object.entries(counts)
+    .filter(([, n]) => Number(n) > 0)
+    .sort((a, b) => Number(b[1]) - Number(a[1]))
+    .map(([c]) => c);
+  const leaf = active
+    .filter((c) => !active.some((o) => parentOf.get(o) === c))
+    .slice(0, src.cityLimit || 24); // 大城市优先，避免长尾地区拖慢抓取
   for (const code of leaf) {
     if (code === '1') continue; // 全国：不作为城市
     const nm = /^2$/.test(code) ? '海外' : nameOf.get(code) || '';
     if (!nm) continue;
     try {
-      const arr = await zhiyeList(host, src.portalId, [Number(code)]);
+      const arr = await zhiyeList(host, src.portalId, [Number(code)], 1);
       for (const it of arr) {
         if (!cityByJob.has(it.Id)) cityByJob.set(it.Id, new Set());
         cityByJob.get(it.Id).add(nm);
@@ -512,16 +523,226 @@ async function collectZhiye(src) {
     const position = stripJobCode(raw.replace(/^【[^】]*】/, '')) || stripJobCode(raw);
     const duty = String(it.Duty || '').trim();
     const require = String(it.Require || '').trim();
+    const directCities = Array.isArray(it.LocNames)
+      ? [...new Set(it.LocNames.flatMap((s) => splitCities(String(s).replace(/·/g, '-'))))]
+      : [];
     rows.push(makeRow(src, {
       code: `z${idx}`,
       position,
-      cities: [...(cityByJob.get(it.Id) || [])],
+      cities: directCities.length ? directCities : [...(cityByJob.get(it.Id) || [])],
       updatedAt: toISODate(it.PostDate),
+      deadline: toISODate(it.EndTime),
       content: [duty, require].filter(Boolean).join(' '),
       note: [duty, require ? `任职要求：\n${require}` : ''].filter(Boolean).join('\n\n'),
     }));
   });
   return rows;
+}
+
+/* ---------- Moka：通用校招官网（浏览器渲染） ----------
+ * Moka 的职位接口已加密（data 为密文），改为解析渲染后的职位卡。
+ * 卡片结构：标题 / 信息行（部门|职能|学历|城市）/ 完整 JD。
+ */
+
+const MOKA_DEGREE_RE = /^(大专|本科|硕士|博士|不限)$/;
+
+function parseMokaInfo(raw) {
+  const segs = String(raw || '')
+    .split('|')
+    .map((s) => [...new Set(s.trim().split(/\s+/).filter(Boolean))].join(' '))
+    .filter(Boolean);
+  const degree = segs.find((s) => MOKA_DEGREE_RE.test(s)) || '';
+  const cityRaw = segs[segs.length - 1] || '';
+  const cities = cityRaw
+    .split(/\s+/)
+    .map((s) => s.replace(/等\d+个地点$/, ''))
+    .filter((s) => s.includes('·') || /市$/.test(s))
+    .map((s) => normalizeCity(s.split('·').pop()))
+    .filter(Boolean);
+  return { degree, cities: [...new Set(cities)], info: segs.join(' · ') };
+}
+
+async function collectMoka(src) {
+  const browser = await getBrowser();
+  const page = await browser.newPage({
+    userAgent: UA,
+    locale: 'zh-CN',
+    viewport: { width: 1440, height: 900 },
+  });
+  try {
+    const url = /#/.test(src.url) ? src.url : `${src.url.replace(/\/$/, '')}#/jobs`;
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
+    await page.waitForTimeout(5000);
+    const cookieAccept = page.getByRole('button', { name: '好的', exact: true });
+    if (await cookieAccept.count()) {
+      await cookieAccept.click({ timeout: 8000 });
+      await page.waitForTimeout(1000);
+    }
+    if (!(await page.locator('[class*="card-content-"]').count())) {
+      const tab = page.locator('text=职位列表').first();
+      if (await tab.count()) {
+        await tab.click().catch(() => {});
+        await page.waitForTimeout(3000);
+      }
+    }
+
+    const seen = new Set();
+    const rows = [];
+    const maxPages = ATS_PAGE_LIMIT;
+    for (let p = 1; p <= maxPages; p++) {
+      const items = await page.evaluate(() =>
+        [...document.querySelectorAll('[class*="card-content-"]')].map((el) => ({
+          title: (el.querySelector('[class*="title-"]')?.innerText || '').trim().split('\n')[0],
+          infoRaw: (el.querySelector('[class*="info-"]')?.innerText || '').replace(/\s+/g, ' ').trim(),
+          desc: (el.querySelector('[class*="job-description-"]')?.innerText || '').trim(),
+        }))
+      );
+      if (!items.length) {
+        if (p === 1) break;
+        throw new Error(`${src.company} Moka 翻页后岗位列表为空，已停止以避免静默截断`);
+      }
+      for (let i = 0; i < items.length; i++) {
+        const it = items[i];
+        if (!it.title) continue;
+        // 校招官网常把实习岗混在同一列表，实习由独立板块承载，这里跳过
+        if (/实习/.test(it.title)) continue;
+        const info = parseMokaInfo(it.infoRaw);
+        const key = `${it.title}|${info.cities.join(',')}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        let cities = info.cities;
+        let note = it.desc;
+        if (src.details) {
+          await page.locator('[class*="card-content-"]').nth(i).click();
+          await page.waitForURL(/#\/job\//, { timeout: 15000 });
+          await page.waitForTimeout(800);
+          const detail = await page.evaluate(() => {
+            const body = document.body.innerText;
+            const start = body.indexOf('职位描述');
+            const end = body.lastIndexOf('职位信息');
+            const location = body.match(/工作地点\s*\n工作地点\s*\n([^\n]+)/);
+            return {
+              note: start >= 0 && end > start ? body.slice(start + '职位描述'.length, end).trim() : '',
+              cityRaw: location ? location[1].trim() : '',
+            };
+          });
+          if (!detail.note || !detail.cityRaw) throw new Error(`${src.company}「${it.title}」详情正文或工作地点为空`);
+          note = detail.note;
+          cities = parseMokaInfo(detail.cityRaw).cities;
+          await page.goBack({ waitUntil: 'domcontentloaded' });
+          await page.waitForSelector('[class*="card-content-"]', { timeout: 15000 });
+        }
+        rows.push(makeRow(src, {
+          code: `mk${rows.length}`,
+          position: it.title,
+          cities,
+          degree: info.degree ? [info.degree] : src.degree,
+          note,
+        }));
+      }
+      const firstTitle = items[0].title;
+      const next = page.locator('[class*="Pagination-icon"]').last();
+      if (!(await next.count())) break;
+      const disabled = (await next.isDisabled()) || await next.evaluate((el) => {
+        let n = el;
+        for (let i = 0; i < 6 && n; i++) {
+          const className = typeof n.className === 'string' ? n.className : (n.className?.baseVal || '');
+          if (
+            n.hasAttribute?.('disabled') ||
+            n.getAttribute?.('aria-disabled') === 'true' ||
+            n.disabled === true ||
+            /disabled/i.test(className)
+          ) return true;
+          n = n.parentElement;
+        }
+        return false;
+      });
+      if (disabled) break;
+      if (p === maxPages) {
+        throw new Error(`${src.company} Moka 岗位超过 ${maxPages} 页，已停止以避免静默截断`);
+      }
+      try { await next.click({ timeout: 8000 }); }
+      catch (e) { throw new Error(`${src.company} Moka 下一页点击失败：${e.message}`); }
+      await page.waitForTimeout(2500);
+      const after = await page.evaluate(() =>
+        (document.querySelector('[class*="card-content-"] [class*="title-"]')?.innerText || '').trim().split('\n')[0]
+      );
+      if (!after || after === firstTitle) {
+        throw new Error(`${src.company} Moka 下一页未出现新岗位，已停止以避免静默截断`);
+      }
+    }
+    return rows;
+  } finally {
+    await page.close();
+  }
+}
+
+/* ---------- 比亚迪 / 拼多多：官方公开职位接口 ---------- */
+
+async function collectByd(src) {
+  const items = [];
+  let totalPage = 1;
+  let totalCount = null;
+  for (let p = 1; p <= totalPage; p++) {
+    if (p > ATS_PAGE_LIMIT) throw new Error(`${src.company} 职位超过 ${ATS_PAGE_LIMIT} 页，已停止以避免静默截断`);
+    const j = await postJSON('https://job.byd.com/portal/api/portal-api/schoolPortal/queryPositionList', {
+      topicCode: '', batch: '2027', campusNature: '008501', abroad: '', degree: '',
+      jobType: [], researchDirection: [], workPlace: [], keywords: '', pageSize: 100, pageIndex: p,
+    }, { Referer: 'https://job.byd.com/portal/pc/#/school/home' });
+    if (j.code !== 0 || !Array.isArray(j.data)) throw new Error(`${src.company} 职位接口异常：${j.msg || '未知错误'}`);
+    items.push(...j.data);
+    totalPage = Number(j.page?.totalPage) || p;
+    totalCount = Number(j.page?.totalCount);
+    if (!j.data.length && p < totalPage) throw new Error(`${src.company} 第 ${p} 页为空，已停止以避免静默截断`);
+  }
+  if (totalCount != null && items.length !== totalCount) {
+    throw new Error(`${src.company} 岗位数 ${items.length} 与官网总数 ${totalCount} 不一致`);
+  }
+  return items.map((it) => makeRow(src, {
+    code: it.id,
+    position: it.jobName,
+    cities: splitCities(it.workPlace),
+    updatedAt: toISODate(it.updateTime),
+    content: it.jobType || '',
+    note: it.jobType ? `职位类别：${it.jobType}` : '',
+  }));
+}
+
+async function collectPdd(src) {
+  const items = [];
+  const pageSize = 10; // 官网服务端固定每页最多返回 10 条
+  let total = null;
+  for (let p = 1; p <= ATS_PAGE_LIMIT; p++) {
+    const j = await postJSON('https://careers.pddglobalhr.com/api/careers/api/recruit/position/list', {
+      page: p, pageSize, t: null,
+    }, { Referer: 'https://careers.pddglobalhr.com/campus/grad' });
+    const list = j.result?.list;
+    if (!j.success || !Array.isArray(list)) throw new Error(`${src.company} 职位接口异常：${j.errorMsg || '未知错误'}`);
+    items.push(...list);
+    total = Number(j.result.total);
+    if (items.length >= total || list.length < pageSize) break;
+    if (p === ATS_PAGE_LIMIT) throw new Error(`${src.company} 职位超过 ${ATS_PAGE_LIMIT} 页，已停止以避免静默截断`);
+  }
+  if (total != null && items.length !== total) {
+    throw new Error(`${src.company} 岗位数 ${items.length} 与官网总数 ${total} 不一致`);
+  }
+  return items.map((it) => {
+    const meta = [it.recruitTypeName, it.jobName, it.graduationYear ? `${it.graduationYear}届` : ''].filter(Boolean).join(' · ');
+    const rawLocation = String(it.workLocationName || it.workLocation || '').trim();
+    const explicitCities = rawLocation.match(/^广东[（(]([^）)]+)[）)]$/);
+    const cityRaw = rawLocation === '全国多省区' ? '全国'
+      : rawLocation.startsWith('广东省（如') ? '广东'
+        : explicitCities ? explicitCities[1] : rawLocation;
+    const cities = splitCities(cityRaw).map((c) => c.replace(/^广东(?=肇庆$)/, '').replace(/^河北(?=雄安$)/, ''));
+    return makeRow(src, {
+      code: it.id,
+      position: it.name,
+      cities,
+      updatedAt: it.releaseTime ? toISODate(new Date(Number(it.releaseTime)).toISOString()) : '',
+      content: [meta, it.jobDuty].filter(Boolean).join(' '),
+      note: [meta, it.jobDuty].filter(Boolean).join('\n\n'),
+    });
+  });
 }
 
 /* ---------- 通用小工具：HTML 转文本 / 并发映射 ---------- */
@@ -724,6 +945,102 @@ async function collectYonyou(src) {
 
 /* ---------- 数据源配置 ---------- */
 
+/* ---------- 中国公共招聘网（人社部）：补充应届岗位 ----------
+ * 页面把当页岗位以 JSON 塞在隐藏域 #findjoblist 中，服务端渲染、无需登录。
+ * 用「应届生/毕业生/校园招聘」等关键词过滤，再按岗位 id 去重。
+ */
+
+function cityFromAddress(addr, fallback) {
+  // 先去掉省级前缀，避免把“江苏省扬州”整段当成城市
+  const s = String(addr || '').replace(/^[\u4e00-\u9fa5]{2,8}?(?:省|自治区)/, '');
+  const m = s.match(/^([\u4e00-\u9fa5]{2,4})市/) || s.match(/([\u4e00-\u9fa5]{2,4})市/) ||
+    s.match(/^([\u4e00-\u9fa5]{2,6}?(?:自治州|地区|盟))/) || s.match(/([\u4e00-\u9fa5]{2,6}?(?:自治州|地区|盟))/);
+  if (m) return cleanCity(m[1]);
+  return cleanCity(String(fallback || ''));
+}
+
+function publicRow(it) {
+  const company = String(it.aab004 || '').trim();
+  const position = String(it.aca112 || it.aac112 || '').trim();
+  if (!company || !position) return null;
+  const jd = String(it.acb22a || '').trim();
+  const salary = it.acb241 && it.acb242 ? `${it.acb241}-${it.acb242} 元/月` : '';
+  const degree = /博士/.test(jd)
+    ? ['博士']
+    : /硕士/.test(jd)
+      ? ['硕士', '博士']
+      : /本科/.test(jd)
+        ? ['本科', '硕士', '博士']
+        : ['大专', '本科'];
+  const url = `http://job.mohrss.gov.cn/cjobs/jobinfolist/cb21/showwlzpgw?id=${it.acb200}`;
+  return {
+    id: `pub_${it.acb200}`,
+    company,
+    ownership: '其他',
+    industries: ['其他'],
+    positions: [position],
+    cities: [cityFromAddress(it.acb202 || it.aae006, it.aab302)].filter(Boolean),
+    nationwide: false,
+    gradYears: [2027],
+    gradUnlimited: true,
+    batches: ['秋招'],
+    degree,
+    writtenTest: null,
+    deadline: toISODate(it.s_aae398),
+    deadlineText: '',
+    updatedAt: toISODate(it.s_aae397) || todayStr(),
+    sm: position.toLowerCase(),
+    source: 'public',
+    sourceName: '中国公共招聘网',
+    sourceUrl: url,
+    apply: { url },
+    note: [salary ? `薪资：${salary}` : '', jd].filter(Boolean).join('\n'),
+    majors: '',
+  };
+}
+
+async function collectPublic(src) {
+  const rows = [];
+  const seen = new Set();
+  // 公共招聘网以中小企业为主，只保留规模企业/事业单位，避免稀释校招岗位质量
+  const INSTITUTION_RE = /(集团|股份|研究院|设计院|医院|大学|学院|学校|银行|证券|保险|电网|电力|烟草|铁路|航空|航天|船舶|中建|中铁|中交|中冶|中化|中电|中核|中粮|中材|国药|中国|国家|事务所)/;
+  const keywords = src.keywords || ['应届生', '毕业生', '校园招聘'];
+  for (const kw of keywords) {
+    for (let page = 1; page <= (src.pages || 4); page++) {
+      const url = `http://job.mohrss.gov.cn/cjobs/jobinfolist/listJobinfolist?pageNo=${page}&orderType=score&textfield=${encodeURIComponent(kw)}`;
+      let html;
+      try {
+        html = await fetchText(url, 30000);
+      } catch {
+        break;
+      }
+      const $ = cheerio.load(html);
+      const raw = $('#findjoblist').attr('value') || '';
+      if (!raw) break;
+      let list;
+      try {
+        list = JSON.parse(cheerio.load(raw).text() || raw);
+      } catch {
+        break;
+      }
+      if (!Array.isArray(list) || !list.length) break;
+      let fresh = 0;
+      for (const it of list) {
+        const row = publicRow(it);
+        if (!row || seen.has(row.id)) continue;
+        if (row.company.includes('\uFFFD') || !INSTITUTION_RE.test(row.company)) continue;
+        if (!/应届|毕业生|校园|储备干部|管培/.test(`${it.acb22a || ''}${row.positions[0]}`)) continue;
+        seen.add(row.id);
+        rows.push(row);
+        fresh += 1;
+      }
+      if (!fresh) break;
+      await sleep(400);
+    }
+  }
+  return rows;
+}
+
 const SOURCES = [
   {
     key: 'baidu',
@@ -882,7 +1199,55 @@ const SOURCES = [
     applyUrl: 'https://career.yonyou.com/SU67ac41886202cc7916ae3029/pb/school.html',
     collect: collectYonyou,
   },
+  {
+    key: 'public-mohrss',
+    mode: 'http',
+    company: '中国公共招聘网',
+    ownership: '其他',
+    industries: ['其他'],
+    degree: ['本科', '硕士'],
+    gradYears: [2027],
+    batches: ['秋招'],
+    url: 'http://job.mohrss.gov.cn/cjobs/jobinfolist/listJobinfolist',
+    applyUrl: 'http://job.mohrss.gov.cn/',
+    pages: 4,
+    keywords: ['应届生', '毕业生', '校园招聘', '储备干部', '管培生'],
+    collect: collectPublic,
+  },
 ];
+
+/* ---------- ATS 企业在册表（data/ats-companies.json） ----------
+ * 新增企业只需往 JSON 里加一行，不用改代码。
+ */
+const ATS_COLLECTORS = { moka: collectMoka, beisen: collectZhiye, byd: collectByd, pdd: collectPdd };
+const ATS_DEFAULTS = { degree: ['本科', '硕士'], gradYears: [2027], batches: ['秋招'], pages: 3 };
+try {
+  const cfg = JSON.parse(await readFile(path.join(DATA_DIR, 'ats-companies.json'), 'utf8'));
+  for (const c of Array.isArray(cfg) ? cfg : []) {
+    if (!c.key || !c.company || !c.url || !ATS_COLLECTORS[c.ats]) continue;
+    SOURCES.push({
+      key: c.key,
+      mode: c.ats === 'moka' ? 'browser' : 'http',
+      usesBrowser: c.ats === 'moka',
+      company: c.company,
+      ownership: c.ownership || '其他',
+      industries: c.industries || ['其他'],
+      degree: c.degree || ATS_DEFAULTS.degree,
+      gradYears: c.gradYears || ATS_DEFAULTS.gradYears,
+      batches: c.batches || ATS_DEFAULTS.batches,
+      url: c.url,
+      applyUrl: c.url,
+      host: c.host,
+      portalId: c.portalId,
+      pages: c.pages || ATS_DEFAULTS.pages,
+      details: c.details === true,
+      collect: ATS_COLLECTORS[c.ats],
+      optional: c.optional === true,
+    });
+  }
+} catch (e) {
+  if (e.code !== 'ENOENT') console.warn(`ATS 在册表读取失败：${e.message}`);
+}
 
 /* ---------- 主流程 ---------- */
 
@@ -919,6 +1284,15 @@ async function fetchSource(src) {
 
 async function run() {
   const startedAt = Date.now();
+  // 增量抓取：node scripts/fetch-official.mjs --only=moka-xxx,beisen-yyy
+  const onlyArg = process.argv.find((a) => a.startsWith('--only='));
+  const onlyKeys = onlyArg ? new Set(onlyArg.slice(7).split(',').map((s) => s.trim()).filter(Boolean)) : null;
+  const activeSources = onlyKeys ? SOURCES.filter((s) => onlyKeys.has(s.key)) : SOURCES;
+  if (onlyKeys && !activeSources.length) {
+    console.error('✗ --only 未匹配到任何来源，请检查 key');
+    process.exitCode = 1;
+    return;
+  }
   const prevRows = await readJSONSafe(path.join(DATA_DIR, 'supplement.json'), []);
   const prevHealth = await readJSONSafe(path.join(DATA_DIR, 'fetch-health.json'), { sources: [] });
   const prevByCompany = new Map();
@@ -955,8 +1329,9 @@ async function run() {
   };
 
   // collect/http 源并发 3；浏览器源单独并发 2，避免同时开太多页面
-  const fast = SOURCES.filter((s) => s.collect || s.mode !== 'browser');
-  const browser = SOURCES.filter((s) => !s.collect && s.mode === 'browser');
+  const isBrowserSource = (s) => s.mode === 'browser' || s.usesBrowser === true;
+  const fast = activeSources.filter((s) => !isBrowserSource(s));
+  const browser = activeSources.filter(isBrowserSource);
   let results;
   try {
     const [fastResults, browserResults] = await Promise.all([
@@ -968,23 +1343,26 @@ async function run() {
     await closeBrowser();
   }
 
-  const all = SOURCES.flatMap((src) => results.get(src.key).rows);
+  const all = activeSources.flatMap((src) => results.get(src.key).rows);
+  // 增量模式：保留未参与本次抓取的企业数据
+  const pickedCompanies = new Set(activeSources.map((s) => s.company));
+  const baseRows = onlyKeys ? prevRows.filter((r) => !pickedCompanies.has(r.company)) : [];
   const seen = new Set();
   const uniq = [];
-  for (const r of all) {
+  for (const r of [...baseRows, ...all]) {
     if (!seen.has(r.id)) { seen.add(r.id); uniq.push(r); }
   }
 
   const now = new Date().toISOString();
   const prevSources = new Map((prevHealth.sources || []).map((s) => [s.key, s]));
-  const sources = SOURCES.map((src) => {
+  const updatedByKey = new Map(activeSources.map((src) => {
     const h = results.get(src.key);
     const prev = prevSources.get(src.key);
     const failed = h.status !== 'ok';
-    return {
+    return [src.key, {
       key: src.key,
       company: src.company,
-      mode: src.collect ? 'collect' : (src.mode || 'http'),
+      mode: src.usesBrowser ? 'browser' : (src.collect ? 'collect' : (src.mode || 'http')),
       optional: src.optional === true,
       status: h.status,
       count: h.rows.length,
@@ -995,9 +1373,12 @@ async function run() {
       consecutiveFailures: failed ? (Number(prev?.consecutiveFailures) || 0) + 1 : 0,
       lastSuccessAt: h.status === 'ok' ? now : (prev?.lastSuccessAt || null),
       lastFailureAt: failed ? now : (prev?.lastFailureAt || null),
-    };
-  });
-  const warnings = sources
+    }];
+  }));
+  const sources = onlyKeys
+    ? SOURCES.map((src) => updatedByKey.get(src.key) || prevSources.get(src.key)).filter(Boolean)
+    : [...updatedByKey.values()];
+  const warnings = [...updatedByKey.values()]
     .filter((s) => s.status !== 'ok' && !(s.optional && s.status === 'empty' && s.count === 0))
     .map((s) => `${s.company}: ${s.status}（${s.count} 条${s.error ? `，${s.error}` : ''}）`);
   const history = [

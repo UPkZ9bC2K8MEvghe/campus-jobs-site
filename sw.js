@@ -1,8 +1,11 @@
 /* 校招信息查询站 Service Worker：应用外壳缓存 + 数据网络优先 */
-const VERSION = 'v8';
+const VERSION = 'v24';
 const SHELL = `campus-jobs-shell-${VERSION}`;
 const DATA = `campus-jobs-data-${VERSION}`;
-const SHELL_FILES = ['./', './index.html', './assets/app.js', './assets/styles.css'];
+const SHELL_FILES = [
+  './', './index.html', './assets/app.js', './assets/styles.css',
+  './manifest.webmanifest', './icon.svg', './icon-192.png', './icon-512.png',
+];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -30,6 +33,9 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(networkFirst(req, DATA));
   } else if (url.pathname.includes('/assets/')) {
     // 静态资源也走网络优先：部署后刷新一次就能拿到新 JS/CSS，断网时回退缓存
+    event.respondWith(networkFirst(req, SHELL));
+  } else {
+    // 根路径静态文件（manifest / 图标 / feeds.xml 等）：网络优先并缓存，保证离线可安装 PWA
     event.respondWith(networkFirst(req, SHELL));
   }
 });
