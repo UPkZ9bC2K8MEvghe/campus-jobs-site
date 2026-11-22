@@ -9,6 +9,9 @@ const FILES = ['index.html', 'sw.js', 'manifest.webmanifest', 'feeds.xml', 'icon
 await rm(DIST, { recursive: true, force: true });
 await mkdir(DIST, { recursive: true });
 
+// 只在构建期使用的源数据，不随站点发布（Cloudflare Pages 单文件上限 25 MiB）
+const SKIP = ['data/supplement.json'];
+
 for (const name of FILES) {
   const from = path.join(ROOT, name);
   try {
@@ -18,5 +21,7 @@ for (const name of FILES) {
   }
   await cp(from, path.join(DIST, name), { recursive: true });
 }
+
+for (const name of SKIP) await rm(path.join(DIST, name), { force: true });
 
 console.log(`构建完成：${FILES.join(' / ')} → dist/`);

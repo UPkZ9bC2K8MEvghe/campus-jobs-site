@@ -7,14 +7,25 @@
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { mkdtemp, readFile, writeFile, mkdir, unlink } from 'node:fs/promises';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const execFileAsync = promisify(execFile);
 
-const LARK_CLI = 'C:\\Users\\pc\\.trae-cn\\plugins\\trae-remote-official\\lark\\1.0.7\\bin\\lark-cli.exe';
+// 优先用插件目录里最新版本的 lark-cli，避免写死版本号后插件升级导致路径失效
+function resolveLarkCli() {
+  const base = 'C:\\Users\\pc\\.trae-cn\\plugins\\trae-remote-official\\lark';
+  try {
+    for (const d of readdirSync(base).sort().reverse()) {
+      const p = path.join(base, d, 'bin', 'lark-cli.exe');
+      try { readFileSync(p); return p; } catch { /* 继续找 */ }
+    }
+  } catch { /* 回退到 PATH */ }
+  return 'lark-cli.exe';
+}
+const LARK_CLI = process.env.LARK_CLI || resolveLarkCli();
 const BASE_TOKEN = 'GtSLbyyR3aCENOsJYC6cdlsVnih';
 const TABLES = [
   { key: 'jobs', tableId: 'tblH4au5rnBcqHgJ', expected: 9161 },
@@ -876,6 +887,108 @@ async function fetchDocHtml(token) {
   return data.data.document.content;
 }
 
+/* ---------- 飞书自建应用直读文档（CI 无 lark-cli 时使用） ---------- */
+
+async function feishuAppCredentials() {
+  const env = { ...process.env };
+  try {
+    const text = readFileSync(path.resolve(__dirname, '..', '.env.local'), 'utf8');
+    for (const line of text.split(/\r?\n/)) {
+      const i = line.indexOf('=');
+      if (i > 0 && !line.trim().startsWith('#')) env[line.slice(0, i).trim()] ??= line.slice(i + 1).trim();
+    }
+  } catch { /* 没有 .env.local 就只用进程环境变量 */ }
+  if (!env.FEISHU_APP_ID || !env.FEISHU_APP_SECRET) return null;
+  return { id: env.FEISHU_APP_ID, secret: env.FEISHU_APP_SECRET };
+}
+
+async function feishuTenantToken() {
+  const cred = await feishuAppCredentials();
+  if (!cred) return null;
+  const res = await fetch('https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json; charset=utf-8' },
+    body: JSON.stringify({ app_id: cred.id, app_secret: cred.secret }),
+    signal: AbortSignal.timeout(20000),
+  });
+  const j = await res.json();
+  if (j.code !== 0) throw new Error(`tenant_access_token: ${j.msg || j.code}`);
+  return j.tenant_access_token;
+}
+
+function blockText(block) {
+  for (const v of Object.values(block)) {
+    if (v && Array.isArray(v.elements)) {
+      return v.elements.map((e) => e.text_run?.content ?? e.mention_doc?.title ?? '').join('').trim();
+    }
+  }
+  return '';
+}
+
+async function fetchDocMarkdownViaApp(docToken, appToken) {
+  const blocks = [];
+  let pageToken = '';
+  do {
+    const qs = new URLSearchParams({ page_size: '500', document_revision_id: '-1' });
+    if (pageToken) qs.set('page_token', pageToken);
+    const res = await fetch(`https://open.feishu.cn/open-apis/docx/v1/documents/${docToken}/blocks?${qs}`, {
+      headers: { Authorization: `Bearer ${appToken}` }, signal: AbortSignal.timeout(30000),
+    });
+    const j = await res.json();
+    if (j.code !== 0) throw new Error(`blocks: ${j.msg || j.code}`);
+    blocks.push(...(j.data.items || []));
+    pageToken = j.data.has_more ? j.data.page_token : '';
+  } while (pageToken);
+
+  const byId = new Map(blocks.map((b) => [b.block_id, b]));
+  const root = blocks.find((b) => b.block_type === 1) || blocks[0];
+  const lines = [];
+  const walk = (id) => {
+    const b = byId.get(id);
+    if (!b) return;
+    const text = blockText(b);
+    const t = b.block_type;
+    if (t >= 3 && t <= 11) lines.push(`${'#'.repeat(t - 2)} ${text}`);
+    else if (t === 12) lines.push(`- ${text}`);
+    else if (t === 13) lines.push(`1. ${text}`);
+    else if (t === 15) lines.push(`> ${text}`);
+    else if (t === 22) lines.push('---');
+    else if (text) lines.push(text);
+    for (const c of b.children || []) walk(c);
+  };
+  for (const c of root.children || []) walk(c);
+  return lines.join('\n');
+}
+
+async function exportDocs() {
+  let docs = {};
+  try { docs = JSON.parse(await readFile(path.join(DATA_DIR, 'docs.json'), 'utf8')); } catch { /* 首次导出 */ }
+
+  let appToken = null;
+  try { appToken = await feishuTenantToken(); } catch (e) {
+    process.stdout.write(`  ⚠ 应用凭证获取失败，改用 lark-cli：${e.message}\n`);
+  }
+  if (!appToken) process.stdout.write('  · 未配置 FEISHU_APP_ID / FEISHU_APP_SECRET，使用 lark-cli 导出\n');
+
+  for (const d of DOCS) {
+    try {
+      let md = '';
+      if (appToken) {
+        try { md = await fetchDocMarkdownViaApp(d.token, appToken); } catch (e) {
+          process.stdout.write(`  ⚠ 应用读取「${d.title}」失败，改用 lark-cli：${e.message}\n`);
+        }
+      }
+      if (!md) md = await fetchDocHtml(d.token);
+      docs[d.key] = { title: d.title, html: stripDocPromo(mdToHtml(md)) };
+      process.stdout.write(`  ✓ ${d.title}\n`);
+    } catch (e) {
+      process.stdout.write(`  ⚠ ${d.title} 导出失败: ${e.message}\n`);
+    }
+  }
+  await writeFile(path.join(DATA_DIR, 'docs.json'), JSON.stringify(docs), 'utf8');
+  process.stdout.write('  → docs.json\n');
+}
+
 async function mergeOnly() {
   // 先把已有数据按公司合并，保证重复执行也不会把合并结果拆回去
   const prevJobsCollapsed = collapseByCompany(
@@ -914,6 +1027,7 @@ const stripDocPromo = (html) => html.replace(DOC_PROMO_RE, '').replace(/\n{3,}/g
 async function main() {
   await mkdir(DATA_DIR, { recursive: true });
   if (process.argv.includes('--merge-only')) return mergeOnly();
+  if (process.argv.includes('--docs-only')) return exportDocs();
 
   const prevJobs = await readPreviousJobs();
   const facets = {};
@@ -953,18 +1067,8 @@ async function main() {
   process.stdout.write(`  → soe.json (${soe.length} 条)\n`);
 
   process.stdout.write(`导出文档栏目…\n`);
-  const docs = {};
-  for (const d of DOCS) {
-    try {
-      const md = await fetchDocHtml(d.token);
-      docs[d.key] = { title: d.title, html: stripDocPromo(mdToHtml(md)) };
-      process.stdout.write(`  ✓ ${d.title}\n`);
-    } catch (e) {
-      process.stdout.write(`  ⚠ ${d.title} 导出失败: ${e.message}\n`);
-    }
-  }
-  await writeFile(path.join(DATA_DIR, 'docs.json'), JSON.stringify(docs), 'utf8');
-  process.stdout.write(`  → docs.json\n全部完成\n`);
+  await exportDocs();
+  process.stdout.write('全部完成\n');
 }
 
 const isMain = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
