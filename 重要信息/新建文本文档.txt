@@ -1,0 +1,10 @@
+当前进展（等待首次全流程跑完）：
+
+- Cloudflare Pages 已上线 ： https://campus-jobs.pages.dev （首页、数据、企业页均 200）
+- GitHub 仓库已建好并推送 ：`UPkZ9bC2K8MEvghe/campus-jobs` （私有，默认分支 master）
+- Secrets 已配置 ：`CLOUDFLARE_API_TOKEN` 、`CLOUDFLARE_ACCOUNT_ID` 、`FEISHU_APP_ID` 、`FEISHU_APP_SECRET`
+- 工作流已改为每天 09:00（北京时间） ：刷新飞书文档 → 抓取官网岗位 → 合并 → 校验 → 构建 → 部署 → 回写数据
+- 首次运行已触发 ，前 6 步全部成功（含飞书两个文档刷新），当前卡在「抓取企业官网岗位」（这一步通常要 20–40 分钟）
+线上已验证：求职资料只剩「面试题库」「面经分享」两个栏目，面经分享正文正常渲染、无控制台报错。
+
+等这次运行结束后我会确认部署与回写结果，失败的话直接修。

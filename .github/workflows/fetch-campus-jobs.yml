@@ -27,6 +27,14 @@ jobs:
 
       - run: npm ci
 
+      - name: 缓存 Playwright 浏览器
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+
       - name: 安装 Playwright 浏览器
         run: npx playwright install --with-deps chromium
 
@@ -40,6 +48,8 @@ jobs:
         run: npm run fetch
         env:
           FETCH_ALERT_WEBHOOK: ${{ secrets.FETCH_ALERT_WEBHOOK }}
+          # Moka 等浏览器源并发；增量探针命中后多数源秒级完成，可适当提高并发
+          BROWSER_CONCURRENCY: '4'
 
       - name: 合并进站点数据
         run: npm run merge
