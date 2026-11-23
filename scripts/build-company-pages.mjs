@@ -155,6 +155,9 @@ ul{margin:0;padding-left:20px}
 li{margin:2px 0}
 .rel{font-size:14px}
 .rel a{margin-right:12px;white-space:nowrap}
+.company-search{box-sizing:border-box;width:100%;max-width:520px;height:40px;padding:0 14px;border:1px solid #d8e0f5;border-radius:10px;font-size:14px;margin:0 0 14px;outline:none}
+.company-search:focus{border-color:#3b5bdb;box-shadow:0 0 0 3px rgba(59,91,219,.1)}
+.company-empty{display:none;color:#6b7280;padding:18px 0}
 .note{font-size:12px;color:#8b93a1;margin-top:20px}
 .btn{display:inline-block;margin:12px 10px 0 0;padding:8px 14px;border-radius:8px;background:#3b5bdb;color:#fff;text-decoration:none;font-size:14px}
 .btn.ghost{background:#fff;color:#3b5bdb;border:1px solid #c7d2f5}
@@ -281,9 +284,27 @@ const industryFacets = [...byIndustry.entries()]
 const indexBody = `
 <nav class="crumb"><a href="${SITE}/">校招信息查询</a> › 全部企业</nav>
 <h1>全部企业（${records.length}）</h1>
-<p class="meta">按企业名称浏览校招与实习岗位，仅收录仍有未截止岗位的企业。</p>
+<p class="meta"><span id="companyCount">共 ${records.length} 家企业</span> · 仅收录仍有未截止岗位的企业。</p>
+<input class="company-search" id="companySearch" type="search" placeholder="搜索企业名称…" autocomplete="off" aria-label="按企业名称搜索">
 <p class="rel">按行业浏览：${industryFacets.map((f) => `<a href="${SITE}/?i=${encodeURIComponent(f.name)}">${esc(f.name)}（${f.count}）</a>`).join('')}</p>
-<section class="card"><ul style="columns:2;column-gap:28px">${records.map((r) => `<li><a href="${encodeURIComponent(r.slug)}">${esc(r.company)}</a> ${r.total}</li>`).join('')}</ul></section>`;
+<section class="card"><ul id="companyList" style="columns:2;column-gap:28px">${records.map((r) => `<li data-name="${esc(r.company.toLowerCase())}"><a href="${encodeURIComponent(r.slug)}">${esc(r.company)}</a> ${r.total}</li>`).join('')}</ul><p class="company-empty" id="companyEmpty">没有匹配的企业，请换个关键词。</p></section>
+<script>
+(function(){
+  var input=document.getElementById('companySearch'),list=document.getElementById('companyList');
+  var count=document.getElementById('companyCount'),empty=document.getElementById('companyEmpty');
+  var items=Array.prototype.slice.call(list.children);
+  input.addEventListener('input',function(){
+    var q=input.value.trim().toLowerCase(),shown=0;
+    items.forEach(function(li){
+      var hit=!q||li.getAttribute('data-name').indexOf(q)!==-1;
+      li.style.display=hit?'':'none';
+      if(hit)shown++;
+    });
+    count.textContent='共 '+shown+' 家企业';
+    empty.style.display=shown?'none':'block';
+  });
+})();
+</script>`;
 await writeFile(path.join(OUT, 'index.html'), pageShell('全部企业校招岗位索引', `共 ${records.length} 家企业的校招与实习岗位汇总，按企业名称与行业浏览。`, indexBody, {
   '@context': 'https://schema.org',
   '@graph': [
