@@ -284,14 +284,14 @@ const industryFacets = [...byIndustry.entries()]
 const indexBody = `
 <nav class="crumb"><a href="${SITE}/">校招信息查询</a> › 全部企业</nav>
 <h1>全部企业（${records.length}）</h1>
-<p class="meta"><span id="companyCount">共 ${records.length} 家企业</span> · 仅收录仍有未截止岗位的企业。</p>
+<p class="meta">按企业名称浏览校招与实习岗位，仅收录仍有未截止岗位的企业。</p>
 <input class="company-search" id="companySearch" type="search" placeholder="搜索企业名称…" autocomplete="off" aria-label="按企业名称搜索">
 <p class="rel">按行业浏览：${industryFacets.map((f) => `<a href="${SITE}/?i=${encodeURIComponent(f.name)}">${esc(f.name)}（${f.count}）</a>`).join('')}</p>
 <section class="card"><ul id="companyList" style="columns:2;column-gap:28px">${records.map((r) => `<li data-name="${esc(r.company.toLowerCase())}"><a href="${encodeURIComponent(r.slug)}">${esc(r.company)}</a> ${r.total}</li>`).join('')}</ul><p class="company-empty" id="companyEmpty">没有匹配的企业，请换个关键词。</p></section>
 <script>
 (function(){
   var input=document.getElementById('companySearch'),list=document.getElementById('companyList');
-  var count=document.getElementById('companyCount'),empty=document.getElementById('companyEmpty');
+  var empty=document.getElementById('companyEmpty');
   var items=Array.prototype.slice.call(list.children);
   input.addEventListener('input',function(){
     var q=input.value.trim().toLowerCase(),shown=0;
@@ -300,7 +300,6 @@ const indexBody = `
       li.style.display=hit?'':'none';
       if(hit)shown++;
     });
-    count.textContent='共 '+shown+' 家企业';
     empty.style.display=shown?'none':'block';
   });
 })();
