@@ -12,6 +12,20 @@
 /assets/*
   Cache-Control: public, max-age=604800
 
+# 企业落地页：数据每天变化，1 小时缓存 + 后台校验
+/companies/*
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+
+# 面向生成式引擎的索引文件
+/llms.txt
+  Cache-Control: public, max-age=3600
+
+/llms-full.txt
+  Cache-Control: public, max-age=3600
+
+/sitemap.xml
+  Cache-Control: public, max-age=3600
+
 # 入口与 Service Worker 始终回源校验
 /index.html
   Cache-Control: public, max-age=0, must-revalidate
