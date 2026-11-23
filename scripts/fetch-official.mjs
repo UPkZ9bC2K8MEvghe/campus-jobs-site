@@ -5,6 +5,7 @@
 import * as cheerio from 'cheerio';
 import https from 'node:https';
 import http from 'node:http';
+import { createHash } from 'node:crypto';
 import { writeFile, mkdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -116,6 +117,27 @@ function makeRow(src, o) {
     note: o.note != null ? o.note : (o.content || ''),
     majors: '',
   };
+}
+
+/* ---------- 增量指纹 ---------- */
+
+// 对字符串数组排序后取 sha1，用于判断集合是否变化
+function fingerprintStrings(arr) {
+  return createHash('sha1').update(arr.filter(Boolean).sort().join('\n')).digest('hex');
+}
+// 岗位标题集合：跨列表页/详情页都稳定的标识，用于快速探针
+function titleSet(rows) {
+  return (rows || []).map((r) => (r.positions || [])[0] || '').filter(Boolean);
+}
+// 完整内容指纹：排除 updatedAt / id 等运行时字段，判断岗位内容是否真的变化
+function rowSignature(r) {
+  return JSON.stringify([
+    r.positions, r.cities, r.note || '', r.degree || [], r.deadline || '',
+    r.ownership || '', r.industries || [], r.batches || [], r.deadlineText || '',
+  ]);
+}
+function fingerprintRows(rows) {
+  return fingerprintStrings((rows || []).map(rowSignature));
 }
 
 /* ---------- 百度：服务端渲染，直接解析 HTML ---------- */
@@ -672,6 +694,68 @@ async function collectMoka(src) {
       }
     }
     return rows;
+  } finally {
+    await page.close();
+  }
+}
+
+/* Moka 增量探针：只渲染列表页、不进详情，返回岗位标题集合。
+ * 标题集合与上次一致 → 该企业无新增/变化，直接复用上次完整数据（含原更新时间），
+ * 跳过耗时的详情点击。探针失败返回 null，调用方回退到完整抓取。 */
+async function probeMokaList(src) {
+  const browser = await getBrowser();
+  const page = await browser.newPage({
+    userAgent: UA, locale: 'zh-CN', viewport: { width: 1440, height: 900 },
+  });
+  try {
+    const url = /#/.test(src.url) ? src.url : `${src.url.replace(/\/$/, '')}#/jobs`;
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
+    await page.waitForTimeout(5000);
+    try {
+      const b = page.getByRole('button', { name: '好的', exact: true });
+      if (await b.count()) { await b.click({ timeout: 8000 }); await page.waitForTimeout(1000); }
+    } catch { /* 忽略 */ }
+    if (!(await page.locator('[class*="card-content-"]').count())) {
+      const tab = page.locator('text=职位列表').first();
+      if (await tab.count()) { await tab.click().catch(() => {}); await page.waitForTimeout(3000); }
+    }
+    const titles = [];
+    const seen = new Set();
+    for (let p = 1; p <= ATS_PAGE_LIMIT; p++) {
+      const items = await page.evaluate(() =>
+        [...document.querySelectorAll('[class*="card-content-"]')].map((el) =>
+          (el.querySelector('[class*="title-"]')?.innerText || '').trim().split('\n')[0]
+        )
+      );
+      if (!items.length) break;
+      for (const t of items) {
+        if (!t || /实习/.test(t) || seen.has(t)) continue;
+        seen.add(t);
+        titles.push(t);
+      }
+      const firstTitle = items[0];
+      const next = page.locator('[class*="Pagination-icon"]').last();
+      if (!(await next.count())) break;
+      const disabled = await next.isDisabled().catch(() => false) || await next.evaluate((el) => {
+        let n = el;
+        for (let i = 0; i < 6 && n; i++) {
+          const cn = typeof n.className === 'string' ? n.className : (n.className?.baseVal || '');
+          if (n.hasAttribute?.('disabled') || n.getAttribute?.('aria-disabled') === 'true' || n.disabled === true || /disabled/i.test(cn)) return true;
+          n = n.parentElement;
+        }
+        return false;
+      }).catch(() => false);
+      if (disabled) break;
+      try { await next.click({ timeout: 8000 }); } catch { break; }
+      await page.waitForTimeout(2500);
+      const after = await page.evaluate(() =>
+        (document.querySelector('[class*="card-content-"] [class*="title-"]')?.innerText || '').trim().split('\n')[0]
+      ).catch(() => '');
+      if (!after || after === firstTitle) break;
+    }
+    return titles;
+  } catch {
+    return null;
   } finally {
     await page.close();
   }
@@ -1293,6 +1377,7 @@ async function run() {
     process.exitCode = 1;
     return;
   }
+  const force = process.argv.includes('--force');
   const prevRows = await readJSONSafe(path.join(DATA_DIR, 'supplement.json'), []);
   const prevHealth = await readJSONSafe(path.join(DATA_DIR, 'fetch-health.json'), { sources: [] });
   const prevByCompany = new Map();
@@ -1302,14 +1387,36 @@ async function run() {
   }
   const fetchOne = async (src) => {
     process.stdout.write(`抓取 ${src.company} (${src.key}) ... `);
-    const r = await fetchSource(src);
     const prev = prevByCompany.get(src.company) || [];
+    // 增量探针：Moka 源只渲染列表、不进详情。标题集与上次一致 → 直接复用上次完整数据
+    // （含原 updatedAt），跳过耗时的详情点击。探针失败（null）则回退完整抓取。
+    if (!force && prev.length && src.collect === collectMoka) {
+      const probeStarted = Date.now();
+      const titles = await probeMokaList(src);
+      if (titles && fingerprintStrings(titles) === fingerprintStrings(titleSet(prev))) {
+        console.log(`无变化，沿用上次 ${prev.length} 条（探针 ${((Date.now() - probeStarted) / 1000).toFixed(1)}s）`);
+        return {
+          src, rows: prev, status: 'cached', freshCount: 0, attempts: 1,
+          durationMs: Date.now() - probeStarted, error: '', unchanged: true,
+        };
+      }
+    }
+    const r = await fetchSource(src);
     let status;
     let rows;
+    let unchanged = false;
     if (r.rows.length) {
-      status = 'ok';
-      rows = r.rows;
-      console.log(`${rows.length} 条`);
+      // 完整内容指纹（排除 updatedAt/id）没变 → 复用上次行，保留原时间戳
+      if (prev.length && fingerprintRows(r.rows) === fingerprintRows(prev)) {
+        status = 'cached';
+        rows = prev;
+        unchanged = true;
+        console.log(`${r.rows.length} 条（内容无变化，沿用上次时间戳）`);
+      } else {
+        status = 'ok';
+        rows = r.rows;
+        console.log(`${rows.length} 条`);
+      }
     } else {
       status = r.error ? 'error' : 'empty';
       rows = prev;
@@ -1325,18 +1432,20 @@ async function run() {
       attempts: r.attempts,
       durationMs: r.durationMs,
       error: r.error ? r.error.message : '',
+      unchanged,
     };
   };
 
-  // collect/http 源并发 3；浏览器源单独并发 2，避免同时开太多页面
+  // collect/http 源并发 3；浏览器源并发由 BROWSER_CONCURRENCY 控制（默认 2），避免同时开太多页面
   const isBrowserSource = (s) => s.mode === 'browser' || s.usesBrowser === true;
   const fast = activeSources.filter((s) => !isBrowserSource(s));
   const browser = activeSources.filter(isBrowserSource);
+  const browserConcurrency = Math.max(1, Number(process.env.BROWSER_CONCURRENCY) || 2);
   let results;
   try {
     const [fastResults, browserResults] = await Promise.all([
       mapLimit(fast, 3, fetchOne),
-      mapLimit(browser, 2, fetchOne),
+      mapLimit(browser, browserConcurrency, fetchOne),
     ]);
     results = new Map([...fastResults, ...browserResults].map((r) => [r.src.key, r]));
   } finally {
@@ -1358,20 +1467,22 @@ async function run() {
   const updatedByKey = new Map(activeSources.map((src) => {
     const h = results.get(src.key);
     const prev = prevSources.get(src.key);
-    const failed = h.status !== 'ok';
+    // cached / unchanged 视为成功（沿用了上次数据），不计入失败
+    const failed = h.status !== 'ok' && h.status !== 'cached';
     return [src.key, {
       key: src.key,
       company: src.company,
       mode: src.usesBrowser ? 'browser' : (src.collect ? 'collect' : (src.mode || 'http')),
       optional: src.optional === true,
       status: h.status,
+      unchanged: h.unchanged === true,
       count: h.rows.length,
       freshCount: h.freshCount,
       attempts: h.attempts,
       durationMs: h.durationMs,
       error: h.error || undefined,
       consecutiveFailures: failed ? (Number(prev?.consecutiveFailures) || 0) + 1 : 0,
-      lastSuccessAt: h.status === 'ok' ? now : (prev?.lastSuccessAt || null),
+      lastSuccessAt: (h.status === 'ok' || h.status === 'cached') ? now : (prev?.lastSuccessAt || null),
       lastFailureAt: failed ? now : (prev?.lastFailureAt || null),
     }];
   }));
@@ -1379,11 +1490,11 @@ async function run() {
     ? SOURCES.map((src) => updatedByKey.get(src.key) || prevSources.get(src.key)).filter(Boolean)
     : [...updatedByKey.values()];
   const warnings = [...updatedByKey.values()]
-    .filter((s) => s.status !== 'ok' && !(s.optional && s.status === 'empty' && s.count === 0))
+    .filter((s) => s.status !== 'ok' && s.status !== 'cached' && !(s.optional && s.status === 'empty' && s.count === 0))
     .map((s) => `${s.company}: ${s.status}（${s.count} 条${s.error ? `，${s.error}` : ''}）`);
   const history = [
     ...(Array.isArray(prevHealth.history) ? prevHealth.history : []),
-    { generatedAt: now, total: uniq.length, warnings: warnings.length, failed: sources.filter((s) => s.status !== 'ok').length },
+    { generatedAt: now, total: uniq.length, warnings: warnings.length, failed: sources.filter((s) => s.status !== 'ok' && s.status !== 'cached').length },
   ].slice(-14);
   const health = {
     generatedAt: now,

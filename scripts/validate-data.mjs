@@ -178,8 +178,10 @@ async function checkSupplement() {
     const optional = new Set((health.sources || []).filter((s) => s.optional).map((s) => s.key));
     for (const s of health.sources) {
       if (!s.key) fail('fetch-health 存在空 key 来源');
-      if (s.status === 'error' && !optional.has(s.key)) fail(`来源 ${s.company || s.key} 抓取失败：${s.error || '未知错误'}`);
-      if (s.status === 'empty' && !optional.has(s.key)) fail(`来源 ${s.company || s.key} 返回 0 条且没有历史数据`);
+      // 源级抓取失败/空返回：fetch-official 已自动回退到上次数据，数据完整性不受影响，
+      // 只能作为告警（warn），不能阻塞构建/部署。仅结构性损坏（total 不一致等）才 fail。
+      if (s.status === 'error' && !optional.has(s.key)) warn(`来源 ${s.company || s.key} 抓取失败：${s.error || '未知错误'}（已沿用历史数据）`);
+      if (s.status === 'empty' && !optional.has(s.key)) warn(`来源 ${s.company || s.key} 返回 0 条且没有历史数据`);
       if (s.status === 'stale') warn(`来源 ${s.company || s.key} 沿用历史数据（fresh=0）`);
       if (typeof s.consecutiveFailures === 'number' && s.consecutiveFailures >= 3) {
         warn(`来源 ${s.company || s.key} 已连续失败 ${s.consecutiveFailures} 次`);
