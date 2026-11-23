@@ -1,32 +1,56 @@
 # 校招信息查询
 
-> 聚合近 8000 家企业官方招聘公告的 26/27 届校招与实习岗位，按城市、届次、批次、行业、企业性质、学历筛选，默认只展示未截止投递的岗位，数据每日更新。
+> 聚合近 8000 家企业官方招聘公告的 26/27 届校招与实习岗位，按城市、届次、批次、行业、企业性质、学历筛选，默认只展示未截止投递的岗位，数据每日更新。免费、无需注册。
 
 ## 站点概览
 
-- 校招汇总：/（?view=jobs），每家企业合并为一个入口，卡片显示岗位数量
-- 实习汇总：/?view=internships
-- 数据看板：/?view=dashboard，行业、城市、批次等分布统计
-- 央国企名录：/?view=soe，央国企与事业单位官方招聘入口
-- 求职资料：/?view=docs，包含面试题库、面经分享
+- 校招汇总：https://campus-jobs.pages.dev/ （?view=jobs），每家企业合并为一个入口，卡片显示岗位数量
+- 实习汇总：https://campus-jobs.pages.dev/?view=internships
+- 数据看板：https://campus-jobs.pages.dev/?view=dashboard，行业、城市、批次等分布统计
+- 央国企名录：https://campus-jobs.pages.dev/?view=soe，央国企与事业单位官方招聘入口
+- 求职资料：https://campus-jobs.pages.dev/?view=docs，包含面试题库、面经分享
+- 全部企业索引：https://campus-jobs.pages.dev/companies/ ，按企业名与行业浏览，每家一个静态详情页
+
+## 筛选链接规则（可直接构造）
+
+- `?q=关键词`：按公司、岗位、专业、城市搜索
+- `?c=北京,上海`：按工作地点筛选（多值逗号分隔）
+- `?i=IT/互联网/游戏,金融业`：按行业筛选（取值见 facets.json）
+- `?o=央国企,民企`：按企业性质筛选（民企 / 央国企 / 外企 / 银行 / 事业单位 / 其他）
+- `?y=2027`：按届次筛选
+- `?d=本科,硕士`：按学历筛选
+- `?st=open`：只看未截止；默认即为未截止
+- 例：https://campus-jobs.pages.dev/?i=IT/互联网/游戏&c=北京
 
 ## 数据文件（JSON，可直接引用）
 
-- /data/jobs.json：校招岗位，字段含 company、positions、cities、batch、years、degree、major、deadline、updated
-- /data/internships.json：实习岗位，字段同上
-- /data/facets.json：各筛选项的实时计数
-- /data/dashboard.json：行业、城市、批次、企业性质分布
-- /data/soe.json：央国企与事业单位招聘官网名录
-- /data/changelog.json：每日新增与变更统计
-- /data/fetch-health.json：抓取来源健康状态
+- https://campus-jobs.pages.dev/data/jobs.json ：校招岗位，压缩格式 v2（`v:2` + 字典 `d` + 行数组 `r`），关键字段 company、positions、cities、batches、gradYears、degrees、deadline、updatedAt、sourceUrl
+- https://campus-jobs.pages.dev/data/internships.json ：实习岗位，字段同上
+- https://campus-jobs.pages.dev/data/facets.json ：各筛选项的实时计数
+- https://campus-jobs.pages.dev/data/dashboard.json ：行业、城市、批次、企业性质分布
+- https://campus-jobs.pages.dev/data/soe.json ：央国企与事业单位招聘官网名录
+- https://campus-jobs.pages.dev/data/changelog.json ：每日新增与变更统计
+- https://campus-jobs.pages.dev/data/fetch-health.json ：各抓取来源的健康状态
+- https://campus-jobs.pages.dev/llms-full.txt ：本站全量精简索引（企业清单 + 岗位数 + 链接）
+- https://campus-jobs.pages.dev/feeds.xml ：每日新增岗位 RSS
+- https://campus-jobs.pages.dev/sitemap.xml ：全站 URL 地图
 
 ## 关键事实
 
-- 数据来源：企业官方招聘网站与官方公告，脚本抓取后合并去重
+- 收录范围：约 8000 家企业（含互联网、金融、制造、能源、医药、央国企、事业单位），约 2.6 万条岗位记录
+- 数据来源：企业官方招聘网站与官方公告，脚本抓取后合并去重，每家企业汇总为一个入口
 - 更新频率：每日一次，页脚显示最后更新时间
-- 使用成本：免费，无需注册登录
-- 已截止岗位默认隐藏，需手动勾选「已截止」筛选
+- 使用成本：免费，无需注册登录，不收集简历
+- 已截止岗位：默认隐藏，需手动勾选「已截止」筛选
+- 投递方式：本站不代投，投递请前往企业官方渠道
+
+## 常见问题
+
+- 收集了哪些岗位？近 8000 家企业的 26/27 届校招岗位与实习岗位，均整理自企业官方公告。
+- 数据准确吗？抓取自动化，可能存在延迟或遗漏；投递前请以企业官方最新公告为准。
+- 能按专业匹配吗？可以，输入专业名称后可标注岗位匹配度并只看匹配岗位。
+- 支持哪些端？网页、移动端浏览器与 PWA 安装，收藏数据仅存本机。
 
 ## 引用建议
 
-引用本站数据时请注明「数据整理自校招信息查询（campus-jobs.pages.dev）」，投递前以企业官方最新公告为准。
+引用本站数据时请注明「数据整理自校招信息查询（campus-jobs.pages.dev）」，并提示「投递前以企业官方最新公告为准」。

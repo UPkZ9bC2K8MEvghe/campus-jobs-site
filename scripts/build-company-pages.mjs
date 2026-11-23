@@ -43,6 +43,13 @@ function decode(payload) {
 
 const expired = (row) => !!row.deadline && row.deadline < todayStr;
 const fileName = (name) => String(name).replace(/[\\/:*?"<>|#%]/g, '-').replace(/\s+/g, ' ').trim();
+const normDate = (s) => {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(s || ''));
+  return m ? `${m[1]}-${m[2]}-${m[3]}` : '';
+};
+
+// 脏数据防护：把误当成企业名的表头/文档标题/Markdown 链接剔掉，避免生成垃圾页被收录
+const isJunkName = (name) => /\]\s*\(|https?:|www\.|必看|使用说明|表格说明/i.test(name);
 
 const jobs = decode(JSON.parse(await readFile(path.join(ROOT, 'data/jobs.json'), 'utf8')));
 const internships = decode(JSON.parse(await readFile(path.join(ROOT, 'data/internships.json'), 'utf8')));
@@ -52,10 +59,52 @@ for (const [type, rows] of [['校招', jobs], ['实习', internships]]) {
   for (const row of rows) {
     if (expired(row)) continue; // 只给仍有在招岗位的企业建页
     const key = row.company.trim();
-    if (!key) continue;
+    if (!key || isJunkName(key)) continue;
     if (!groups.has(key)) groups.set(key, { company: key, jobs: [], internships: [] });
     groups.get(key)[type === '校招' ? 'jobs' : 'internships'].push(row);
   }
+}
+
+// 第一遍：算出每家企业页需要的全部数据（含准确 lastmod），供页面与 sitemap 复用
+const records = [];
+for (const g of groups.values()) {
+  const all = [...g.jobs, ...g.internships];
+  const main = all[0];
+  const openJobs = g.jobs.reduce((n, r) => n + r.positions.length, 0);
+  const openInterns = g.internships.reduce((n, r) => n + r.positions.length, 0);
+  const cities = [...new Set(all.flatMap((r) => r.cities))].slice(0, 12);
+  const batches = [...new Set(all.flatMap((r) => r.batches))];
+  const years = [...new Set(all.flatMap((r) => (r.gradUnlimited ? [...r.gradYears, '不限届别'] : r.gradYears.map(String))))];
+  const degrees = [...new Set(all.flatMap((r) => r.degrees))];
+  const industries = [...new Set(all.flatMap((r) => r.industries))];
+  const majors = [...new Set(all.map((r) => r.majors).filter(Boolean))];
+  const deadlines = all.map((r) => r.deadlineText || r.deadline).filter(Boolean).sort();
+  const deadline = deadlines[deadlines.length - 1] || '长期有效';
+  const lastmod = all.map((r) => normDate(r.updatedAt)).filter(Boolean).sort().pop() || todayStr;
+  const slug = fileName(g.company);
+  records.push({
+    company: g.company, slug, jobs: g.jobs, internships: g.internships, main,
+    openJobs, openInterns, total: openJobs + openInterns,
+    cities, batches, years, degrees, industries, majors, deadline, lastmod,
+    url: `${SITE}/companies/${encodeURIComponent(slug)}.html`,
+  });
+}
+records.sort((a, b) => a.company.localeCompare(b.company, 'zh-CN'));
+
+// 反向索引：用来在每页底部挂「同行业 / 同城市」内链，降低 7000+ 页面的爬取深度
+const byIndustry = new Map();
+const byCity = new Map();
+const pushTo = (map, key, rec) => {
+  if (!key) return;
+  if (!map.has(key)) map.set(key, []);
+  map.get(key).push(rec);
+};
+for (const rec of records) {
+  rec.industries.slice(0, 2).forEach((k) => pushTo(byIndustry, k, rec));
+  rec.cities.slice(0, 3).forEach((k) => pushTo(byCity, k, rec));
+}
+for (const map of [byIndustry, byCity]) {
+  for (const list of map.values()) list.sort((a, b) => b.total - a.total || a.company.localeCompare(b.company, 'zh-CN'));
 }
 
 await rm(OUT, { recursive: true, force: true });
@@ -69,6 +118,24 @@ const pageShell = (title, desc, body, ld, canonical) => `<!DOCTYPE html>
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(desc)}">
 <link rel="canonical" href="${esc(canonical)}">
+<meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large">
+<meta name="theme-color" content="#2b59ff">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="alternate" type="application/rss+xml" title="校招信息查询 · 每日新增岗位" href="/feeds.xml">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="校招信息查询">
+<meta property="og:title" content="${esc(title)}">
+<meta property="og:description" content="${esc(desc)}">
+<meta property="og:url" content="${esc(canonical)}">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="${SITE}/icon-512.png">
+<meta property="og:image:width" content="512">
+<meta property="og:image:height" content="512">
+<meta property="og:image:alt" content="校招信息查询">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="${esc(title)}">
+<meta name="twitter:description" content="${esc(desc)}">
+<meta name="twitter:image" content="${SITE}/icon-512.png">
 <style>
 :root{color-scheme:light}
 body{margin:0;background:#f6f7f9;color:#1f2733;font:15px/1.75 -apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
@@ -84,8 +151,11 @@ dt{color:#6b7280}
 dd{margin:0}
 ul{margin:0;padding-left:20px}
 li{margin:2px 0}
+.rel{font-size:14px}
+.rel a{margin-right:12px;white-space:nowrap}
 .note{font-size:12px;color:#8b93a1;margin-top:20px}
-.btn{display:inline-block;margin-top:12px;padding:8px 14px;border-radius:8px;background:#3b5bdb;color:#fff;text-decoration:none;font-size:14px}
+.btn{display:inline-block;margin:12px 10px 0 0;padding:8px 14px;border-radius:8px;background:#3b5bdb;color:#fff;text-decoration:none;font-size:14px}
+.btn.ghost{background:#fff;color:#3b5bdb;border:1px solid #c7d2f5}
 .jump{position:fixed;right:18px;bottom:20px;z-index:5;width:42px;height:42px;border-radius:50%;border:1px solid #d8e0f5;background:#fff;color:#3b5bdb;display:none;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 8px 20px rgba(20,40,110,.16);padding:0}
 .jump.show{display:flex}
 .jump.up{bottom:70px}
@@ -122,41 +192,40 @@ li{margin:2px 0}
 </script>
 </body></html>`;
 
-const links = [];
-for (const g of [...groups.values()].sort((a, b) => a.company.localeCompare(b.company, 'zh-CN'))) {
-  const all = [...g.jobs, ...g.internships];
-  const main = all[0];
-  const openJobs = g.jobs.reduce((n, r) => n + r.positions.length, 0);
-  const openInterns = g.internships.reduce((n, r) => n + r.positions.length, 0);
-  const cities = [...new Set(all.flatMap((r) => r.cities))].slice(0, 12);
-  const batches = [...new Set(all.flatMap((r) => r.batches))];
-  const years = [...new Set(all.flatMap((r) => (r.gradUnlimited ? [...r.gradYears, '不限届别'] : r.gradYears.map(String))))];
-  const degrees = [...new Set(all.flatMap((r) => r.degrees))];
-  const majors = [...new Set(all.map((r) => r.majors).filter(Boolean))];
-  const deadlines = all.map((r) => r.deadlineText || r.deadline).filter(Boolean).sort();
-  const deadline = deadlines[deadlines.length - 1] || '长期有效';
-  const slug = fileName(g.company);
-  const url = `${SITE}/companies/${encodeURIComponent(slug)}.html`;
+const relatedLinks = (list, self) => list
+  .filter((r) => r.company !== self)
+  .slice(0, 8)
+  .map((r) => `<a href="${encodeURIComponent(r.slug)}.html">${esc(r.company)}</a>`)
+  .join('');
+
+for (const rec of records) {
+  const { company, main, openJobs, openInterns, cities, batches, years, degrees, industries, majors, deadline } = rec;
 
   const positionList = (rows) => rows.flatMap((r) => r.positions.map((p) => `<li>${esc(p)}${r.cities.length ? ` <span style="color:#8b93a1">· ${esc(r.cities.slice(0, 6).join('、'))}</span>` : ''}</li>`)).join('');
 
+  const inSiteUrl = `${SITE}/?q=${encodeURIComponent(company)}`;
+  const indLinks = relatedLinks(byIndustry.get(industries[0]) || [], company);
+  const cityLinks = relatedLinks(byCity.get(cities[0]) || [], company);
+
   const body = `
-<nav class="crumb"><a href="${SITE}/">校招信息查询</a> › <a href="${SITE}/companies/">全部企业</a> › ${esc(g.company)}</nav>
-<h1>${esc(g.company)} 校园招聘岗位汇总</h1>
-<p class="meta">${openJobs ? `校招 ${openJobs} 个岗位` : ''}${openJobs && openInterns ? ' · ' : ''}${openInterns ? `实习 ${openInterns} 个岗位` : ''} · 更新于 ${esc(main.updatedAt || todayStr)}</p>
+<nav class="crumb"><a href="${SITE}/">校招信息查询</a> › <a href="${SITE}/companies/">全部企业</a> › ${esc(company)}</nav>
+<h1>${esc(company)} 校园招聘岗位汇总</h1>
+<p class="meta">${openJobs ? `校招 ${openJobs} 个岗位` : ''}${openJobs && openInterns ? ' · ' : ''}${openInterns ? `实习 ${openInterns} 个岗位` : ''} · 更新于 ${esc(rec.lastmod)}</p>
 <section class="card"><h2>基本信息</h2><dl>
 <dt>企业性质</dt><dd>${esc(main.ownership || '—')}</dd>
-<dt>行业</dt><dd>${esc(main.industries.join('、') || '—')}</dd>
+<dt>行业</dt><dd>${esc(industries.join('、') || '—')}</dd>
 <dt>工作地点</dt><dd>${esc(cities.join('、') || '—')}</dd>
 <dt>招聘批次</dt><dd>${esc(batches.join('、') || '—')}</dd>
 <dt>面向届别</dt><dd>${esc(years.join('、') || '—')}</dd>
 <dt>学历要求</dt><dd>${esc(degrees.join('、') || '—')}</dd>
 <dt>投递截止</dt><dd>${esc(deadline)}</dd>
 </dl></section>
-${openJobs ? `<section class="card"><h2>校招岗位（${openJobs}）</h2><ul>${positionList(g.jobs)}</ul></section>` : ''}
-${openInterns ? `<section class="card"><h2>实习岗位（${openInterns}）</h2><ul>${positionList(g.internships)}</ul></section>` : ''}
+<p><a class="btn" href="${inSiteUrl}">在站内查看 ${esc(company)} 全部岗位</a>${cities[0] ? `<a class="btn ghost" href="${SITE}/?c=${encodeURIComponent(cities[0])}">${esc(cities[0])} 校招岗位</a>` : ''}${main.sourceUrl ? `<a class="btn ghost" href="${esc(main.sourceUrl)}" rel="nofollow noopener" target="_blank">官方招聘公告</a>` : ''}</p>
+${openJobs ? `<section class="card"><h2>校招岗位（${openJobs}）</h2><ul>${positionList(rec.jobs)}</ul></section>` : ''}
+${openInterns ? `<section class="card"><h2>实习岗位（${openInterns}）</h2><ul>${positionList(rec.internships)}</ul></section>` : ''}
 ${majors.length ? `<section class="card"><h2>专业要求</h2><p>${majors.map((m) => esc(m)).join('<br>')}</p></section>` : ''}
-${main.sourceUrl ? `<a class="btn" href="${esc(main.sourceUrl)}" rel="nofollow noopener" target="_blank">查看官方招聘公告</a>` : ''}`;
+${indLinks ? `<section class="card"><h2>同行业企业（${esc(industries[0])}）</h2><p class="rel">${indLinks}</p></section>` : ''}
+${cityLinks ? `<section class="card"><h2>${esc(cities[0])} 同城招聘企业</h2><p class="rel">${cityLinks}</p></section>` : ''}`;
 
   const ld = {
     '@context': 'https://schema.org',
@@ -166,50 +235,131 @@ ${main.sourceUrl ? `<a class="btn" href="${esc(main.sourceUrl)}" rel="nofollow n
         itemListElement: [
           { '@type': 'ListItem', position: 1, name: '校招信息查询', item: `${SITE}/` },
           { '@type': 'ListItem', position: 2, name: '全部企业', item: `${SITE}/companies/` },
-          { '@type': 'ListItem', position: 3, name: g.company, item: url },
+          { '@type': 'ListItem', position: 3, name: company, item: rec.url },
         ],
       },
       {
         '@type': 'Organization',
-        name: g.company,
+        name: company,
         ...(main.sourceUrl ? { sameAs: [main.sourceUrl] } : {}),
-        description: `${g.company} ${years.join('、')} 校园招聘与实习岗位汇总，共 ${openJobs + openInterns} 个在招岗位，工作地点：${cities.join('、')}。`,
+        description: `${company} ${years.join('、')} 校园招聘与实习岗位汇总，共 ${rec.total} 个在招岗位，工作地点：${cities.join('、')}。`,
+      },
+      {
+        '@type': 'WebPage',
+        '@id': rec.url,
+        url: rec.url,
+        name: `${company} 校招岗位与实习岗位汇总`,
+        inLanguage: 'zh-CN',
+        dateModified: `${rec.lastmod}T00:00:00+08:00`,
+        isPartOf: { '@type': 'WebSite', '@id': `${SITE}/#website`, name: '校招信息查询', url: `${SITE}/` },
+      },
+      {
+        '@type': 'ItemList',
+        name: `${company} 在招岗位`,
+        numberOfItems: rec.total,
+        itemListElement: [...rec.jobs, ...rec.internships]
+          .flatMap((r) => r.positions)
+          .slice(0, 100)
+          .map((p, i) => ({ '@type': 'ListItem', position: i + 1, name: p })),
       },
     ],
   };
 
-  const desc = `${g.company} ${years.join('、')} 校园招聘与实习岗位汇总，共 ${openJobs + openInterns} 个在招岗位，工作地点覆盖${cities.slice(0, 5).join('、') || '全国'}，投递截止 ${deadline}。`;
-  await writeFile(path.join(OUT, `${slug}.html`), pageShell(`${g.company} 校招岗位与实习岗位汇总`, desc, body, ld, url), 'utf8');
-  links.push({ url, name: g.company, count: openJobs + openInterns });
+  const desc = `${company} ${years.join('、')} 校园招聘与实习岗位汇总，共 ${rec.total} 个在招岗位，工作地点覆盖${cities.slice(0, 5).join('、') || '全国'}，投递截止 ${deadline}。`;
+  await writeFile(path.join(OUT, `${rec.slug}.html`), pageShell(`${company} 校招岗位与实习岗位汇总`, desc, body, ld, rec.url), 'utf8');
 }
 
-// 企业索引页
+// 企业索引页：按行业给出入口，顺带覆盖「XX行业 校招」这类长尾词
+const industryFacets = [...byIndustry.entries()]
+  .map(([name, list]) => ({ name, count: list.length }))
+  .filter((f) => f.count >= 3)
+  .sort((a, b) => b.count - a.count)
+  .slice(0, 24);
+
 const indexBody = `
 <nav class="crumb"><a href="${SITE}/">校招信息查询</a> › 全部企业</nav>
-<h1>全部企业（${links.length}）</h1>
+<h1>全部企业（${records.length}）</h1>
 <p class="meta">按企业名称浏览校招与实习岗位，仅收录仍有未截止岗位的企业。</p>
-<section class="card"><ul style="columns:2;column-gap:28px">${links.map((l) => `<li><a href="${l.url}">${esc(l.name)}</a> ${l.count}</li>`).join('')}</ul></section>`;
-await writeFile(path.join(OUT, 'index.html'), pageShell('全部企业校招岗位索引', `共 ${links.length} 家企业的校招与实习岗位汇总，按企业名称浏览。`, indexBody, {
+<p class="rel">按行业浏览：${industryFacets.map((f) => `<a href="${SITE}/?i=${encodeURIComponent(f.name)}">${esc(f.name)}（${f.count}）</a>`).join('')}</p>
+<section class="card"><ul style="columns:2;column-gap:28px">${records.map((r) => `<li><a href="${encodeURIComponent(r.slug)}.html">${esc(r.company)}</a> ${r.total}</li>`).join('')}</ul></section>`;
+await writeFile(path.join(OUT, 'index.html'), pageShell('全部企业校招岗位索引', `共 ${records.length} 家企业的校招与实习岗位汇总，按企业名称与行业浏览。`, indexBody, {
   '@context': 'https://schema.org',
-  '@type': 'CollectionPage',
-  name: '全部企业校招岗位索引',
-  url: `${SITE}/companies/`,
+  '@graph': [
+    {
+      '@type': 'CollectionPage',
+      name: '全部企业校招岗位索引',
+      url: `${SITE}/companies/`,
+      inLanguage: 'zh-CN',
+      isPartOf: { '@type': 'WebSite', '@id': `${SITE}/#website`, name: '校招信息查询', url: `${SITE}/` },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: '校招信息查询', item: `${SITE}/` },
+        { '@type': 'ListItem', position: 2, name: '全部企业', item: `${SITE}/companies/` },
+      ],
+    },
+  ],
 }, `${SITE}/companies/`), 'utf8');
 
-// 覆盖 dist/sitemap.xml，把企业页一并收录
+// 覆盖 dist/sitemap.xml：lastmod 用每家企业的真实更新时间，避免「全站同一天更新」的失真信号
 const urls = [
-  `${SITE}/`,
-  `${SITE}/companies/`,
-  `${SITE}/?view=internships`,
-  `${SITE}/?view=soe`,
-  `${SITE}/?view=dashboard`,
-  ...links.map((l) => l.url),
+  { loc: `${SITE}/`, lastmod: todayStr },
+  { loc: `${SITE}/companies/`, lastmod: todayStr },
+  { loc: `${SITE}/?view=internships`, lastmod: todayStr },
+  { loc: `${SITE}/?view=soe`, lastmod: todayStr },
+  { loc: `${SITE}/?view=dashboard`, lastmod: todayStr },
+  ...records.map((r) => ({ loc: r.url, lastmod: r.lastmod })),
 ];
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls.map((u) => `  <url><loc>${u.replace(/&/g, '&amp;')}</loc><lastmod>${todayStr}</lastmod></url>`).join('\n')}
+${urls.map((u) => `  <url><loc>${u.loc.replace(/&/g, '&amp;')}</loc><lastmod>${u.lastmod}</lastmod></url>`).join('\n')}
 </urlset>`;
 await writeFile(path.join(DIST, 'sitemap.xml'), sitemap, 'utf8');
 
-console.log(`企业页生成完成：${links.length} 家 → dist/companies/`);
-console.log(`sitemap 收录 ${urls.length} 个地址`);
+// 供大模型整篇读取的精简索引（llms.txt 的「全文版」）：顶部企业与数据结构，控制体积
+const topCompanies = [...records].sort((a, b) => b.total - a.total).slice(0, 200);
+const llmsFull = `# 校招信息查询 · 全量索引
+
+> 聚合 ${records.length} 家企业官方招聘公告的 26/27 届校招与实习岗位，默认仅展示未截止投递岗位。数据更新于 ${todayStr}。
+
+## 站点
+
+- 首页（校招汇总）：${SITE}/
+- 实习汇总：${SITE}/?view=internships
+- 全部企业索引：${SITE}/companies/
+- 数据看板：${SITE}/?view=dashboard
+- 央国企名录：${SITE}/?view=soe
+- 求职资料（面试题库 / 面经）：${SITE}/?view=docs
+
+## 常见问题
+
+1. 收录范围：${records.length} 家企业、约 2.6 万条岗位记录，覆盖互联网、金融、制造、能源、医药、央国企与事业单位。
+2. 数据来源：各企业官方招聘网站与官方公告，脚本抓取后合并去重，每家企业汇总为一个入口。
+3. 更新频率：每日一次，页脚展示最后更新时间。
+4. 使用成本：免费，无需注册登录。
+5. 已截止岗位：默认隐藏，需在筛选里勾选「已截止」。
+6. 联系方式：本站不收集投递简历，投递请前往企业官方渠道。
+
+## 数据结构（JSON）
+
+- ${SITE}/data/jobs.json：校招岗位（压缩格式 v2，含 company / positions / cities / batches / gradYears / degrees / deadline / updatedAt / sourceUrl）
+- ${SITE}/data/internships.json：实习岗位（同上）
+- ${SITE}/data/facets.json：各筛选项实时计数
+- ${SITE}/data/dashboard.json：行业 / 城市 / 批次 / 企业性质分布
+- ${SITE}/data/soe.json：央国企与事业单位官方招聘入口
+- ${SITE}/data/changelog.json：每日新增与变更统计
+- ${SITE}/data/fetch-health.json：各来源抓取健康状态
+
+## 岗位数量靠前的企业（共 ${records.length} 家，此处列前 ${topCompanies.length} 家）
+
+${topCompanies.map((r) => `- ${r.company}：${r.total} 个在招岗位（校招 ${r.openJobs} / 实习 ${r.openInterns}）；城市：${r.cities.slice(0, 4).join('、') || '全国'}；截止：${r.deadline}；${r.url}`).join('\n')}
+
+## 引用建议
+
+引用本站数据时请注明「数据整理自校招信息查询（${SITE.replace('https://', '')}）」，并以企业官方最新公告为准。
+`;
+await writeFile(path.join(DIST, 'llms-full.txt'), llmsFull, 'utf8');
+
+console.log(`企业页生成完成：${records.length} 家 → dist/companies/`);
+console.log(`sitemap 收录 ${urls.length} 个地址；llms-full.txt 收录 ${topCompanies.length} 家企业`);
