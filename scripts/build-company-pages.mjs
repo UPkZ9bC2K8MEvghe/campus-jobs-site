@@ -86,7 +86,9 @@ for (const g of groups.values()) {
     company: g.company, slug, jobs: g.jobs, internships: g.internships, main,
     openJobs, openInterns, total: openJobs + openInterns,
     cities, batches, years, degrees, industries, majors, deadline, lastmod,
-    url: `${SITE}/companies/${encodeURIComponent(slug)}.html`,
+    // Cloudflare Pages 会把 /companies/xxx.html 308 到 /companies/xxx（无后缀），
+    // 因此 canonical/sitemap/内链统一用无后缀形式，避免每页多一次重定向、信号不一致
+    url: `${SITE}/companies/${encodeURIComponent(slug)}`,
   });
 }
 records.sort((a, b) => a.company.localeCompare(b.company, 'zh-CN'));
@@ -195,7 +197,7 @@ li{margin:2px 0}
 const relatedLinks = (list, self) => list
   .filter((r) => r.company !== self)
   .slice(0, 8)
-  .map((r) => `<a href="${encodeURIComponent(r.slug)}.html">${esc(r.company)}</a>`)
+  .map((r) => `<a href="${encodeURIComponent(r.slug)}">${esc(r.company)}</a>`)
   .join('');
 
 for (const rec of records) {
@@ -281,7 +283,7 @@ const indexBody = `
 <h1>全部企业（${records.length}）</h1>
 <p class="meta">按企业名称浏览校招与实习岗位，仅收录仍有未截止岗位的企业。</p>
 <p class="rel">按行业浏览：${industryFacets.map((f) => `<a href="${SITE}/?i=${encodeURIComponent(f.name)}">${esc(f.name)}（${f.count}）</a>`).join('')}</p>
-<section class="card"><ul style="columns:2;column-gap:28px">${records.map((r) => `<li><a href="${encodeURIComponent(r.slug)}.html">${esc(r.company)}</a> ${r.total}</li>`).join('')}</ul></section>`;
+<section class="card"><ul style="columns:2;column-gap:28px">${records.map((r) => `<li><a href="${encodeURIComponent(r.slug)}">${esc(r.company)}</a> ${r.total}</li>`).join('')}</ul></section>`;
 await writeFile(path.join(OUT, 'index.html'), pageShell('全部企业校招岗位索引', `共 ${records.length} 家企业的校招与实习岗位汇总，按企业名称与行业浏览。`, indexBody, {
   '@context': 'https://schema.org',
   '@graph': [
