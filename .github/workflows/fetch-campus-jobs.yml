@@ -60,13 +60,6 @@ jobs:
       - name: 构建站点
         run: npm run build
 
-      - name: 接入 Cloudflare 访问统计（不阻塞部署）
-        continue-on-error: true
-        run: node scripts/inject-web-analytics.mjs
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-
       - name: 部署到 Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
