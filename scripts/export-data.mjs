@@ -960,9 +960,25 @@ async function fetchDocMarkdownViaApp(docToken, appToken) {
   return lines.join('\n');
 }
 
+/* 文档当前 revision（轻量元信息请求，不拉正文）。
+ * 用于增量判断：revision 与上次一致 → 文档未被编辑，站点已有内容直接复用。 */
+async function fetchDocRevision(docToken, appToken) {
+  const res = await fetch(`https://open.feishu.cn/open-apis/docx/v1/documents/${docToken}`, {
+    headers: { Authorization: `Bearer ${appToken}` }, signal: AbortSignal.timeout(15000),
+  });
+  const j = await res.json();
+  if (j.code !== 0) throw new Error(`document meta: ${j.msg || j.code}`);
+  return String(j.data.document.revision_id ?? '');
+}
+
+/* 每个文档上次抓取时的 revision 缓存（与 docs.json 分离，避免改变其结构） */
+const DOCS_REV_FILE = path.join(DATA_DIR, 'docs-revisions.json');
+
 async function exportDocs() {
   let docs = {};
   try { docs = JSON.parse(await readFile(path.join(DATA_DIR, 'docs.json'), 'utf8')); } catch { /* 首次导出 */ }
+  let revCache = {};
+  try { revCache = JSON.parse(await readFile(DOCS_REV_FILE, 'utf8')); } catch { /* 首次运行 */ }
 
   let appToken = null;
   try { appToken = await feishuTenantToken(); } catch (e) {
@@ -970,7 +986,19 @@ async function exportDocs() {
   }
   if (!appToken) process.stdout.write('  · 未配置 FEISHU_APP_ID / FEISHU_APP_SECRET，使用 lark-cli 导出\n');
 
+  let changed = 0;
   for (const d of DOCS) {
+    // 增量检查：轻量请求当前 revision，与上次抓取一致 → 文档未被编辑，直接复用站点已有内容
+    let rev = null;
+    if (appToken) {
+      try { rev = await fetchDocRevision(d.token, appToken); } catch (e) {
+        process.stdout.write(`  ⚠ ${d.title} revision 查询失败（${e.message}），走全量抓取\n`);
+      }
+    }
+    if (rev && revCache[d.key]?.revision === rev && docs[d.key]?.html) {
+      process.stdout.write(`  ✓ ${d.title}（revision ${rev} 无变化，复用站点已有内容）\n`);
+      continue;
+    }
     try {
       let md = '';
       if (appToken) {
@@ -980,13 +1008,20 @@ async function exportDocs() {
       }
       if (!md) md = await fetchDocHtml(d.token);
       docs[d.key] = { title: d.title, html: stripDocPromo(mdToHtml(md)) };
-      process.stdout.write(`  ✓ ${d.title}\n`);
+      if (rev) revCache[d.key] = { revision: rev, updatedAt: new Date().toISOString() };
+      changed += 1;
+      process.stdout.write(`  ✓ ${d.title}（已更新${rev ? `，revision ${rev}` : ''}）\n`);
     } catch (e) {
       process.stdout.write(`  ⚠ ${d.title} 导出失败: ${e.message}\n`);
     }
   }
-  await writeFile(path.join(DATA_DIR, 'docs.json'), JSON.stringify(docs), 'utf8');
-  process.stdout.write('  → docs.json\n');
+  if (changed) {
+    await writeFile(path.join(DATA_DIR, 'docs.json'), JSON.stringify(docs), 'utf8');
+    await writeFile(DOCS_REV_FILE, JSON.stringify(revCache, null, 2), 'utf8');
+    process.stdout.write(`  → docs.json（${changed} 个文档有更新）\n`);
+  } else {
+    process.stdout.write('  → 文档均无变化，docs.json 保持不变\n');
+  }
 }
 
 async function mergeOnly() {
