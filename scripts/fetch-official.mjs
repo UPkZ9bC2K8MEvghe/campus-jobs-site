@@ -223,7 +223,9 @@ async function paginate(page, { maxPages = 5, nextSel, readFn, toRow, codePrefix
     );
     if (disabled) break;
     await next.first().click();
-    await page.waitForTimeout(1600);
+    // networkidle 信号 + 渲染缓冲，替代固定 sleep 1600ms：接口就绪即继续，最长 2.9s
+    await page.waitForLoadState('networkidle', { timeout: 2500 }).catch(() => {});
+    await page.waitForTimeout(400);
   }
   return rows;
 }
@@ -237,8 +239,9 @@ async function runBrowserSource(src) {
   });
   try {
     await page.goto(src.url, { waitUntil: 'domcontentloaded', timeout: 60000 });
-    await page.waitForTimeout(src.wait || 5000);
-    try { await page.waitForLoadState('networkidle', { timeout: 20000 }); } catch {}
+    // networkidle 信号替代固定盲等：接口就绪即走，src.wait 只作为兜底上限
+    await page.waitForLoadState('networkidle', { timeout: src.wait || 5000 }).catch(() => {});
+    await page.waitForTimeout(500);
     return await src.extract(page, src);
   } finally {
     await page.close();
@@ -478,7 +481,7 @@ async function zhiyeList(host, portalId, locId, maxPages = 20, strict = false) {
     out.push(...arr);
     if (arr.length < 50) break;
     if (strict && p + 1 >= maxPages) {
-      throw new Error(`${host} 北森岗位超过 ${maxPages} 页，已停止以避免静默截断`);
+      return failFatal(`${host} 北森岗位超过 ${maxPages} 页，已停止以避免静默截断`);
     }
   }
   return out;
@@ -594,7 +597,8 @@ async function collectMoka(src) {
   try {
     const url = /#/.test(src.url) ? src.url : `${src.url.replace(/\/$/, '')}#/jobs`;
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
-    await page.waitForTimeout(5000);
+    // 事件驱动等待：卡片渲染出来即继续，替代固定盲等 5s（8s 兜底）
+    await page.waitForSelector('[class*="card-content-"]', { timeout: 8000 }).catch(() => {});
     const cookieAccept = page.getByRole('button', { name: '好的', exact: true });
     if (await cookieAccept.count()) {
       await cookieAccept.click({ timeout: 8000 });
@@ -604,7 +608,7 @@ async function collectMoka(src) {
       const tab = page.locator('text=职位列表').first();
       if (await tab.count()) {
         await tab.click().catch(() => {});
-        await page.waitForTimeout(3000);
+        await page.waitForSelector('[class*="card-content-"]', { timeout: 5000 }).catch(() => {});
       }
     }
 
@@ -621,7 +625,7 @@ async function collectMoka(src) {
       );
       if (!items.length) {
         if (p === 1) break;
-        throw new Error(`${src.company} Moka 翻页后岗位列表为空，已停止以避免静默截断`);
+        return failFatal(`${src.company} Moka 翻页后岗位列表为空，已停止以避免静默截断`);
       }
       for (let i = 0; i < items.length; i++) {
         const it = items[i];
@@ -681,16 +685,17 @@ async function collectMoka(src) {
       });
       if (disabled) break;
       if (p === maxPages) {
-        throw new Error(`${src.company} Moka 岗位超过 ${maxPages} 页，已停止以避免静默截断`);
+        return failFatal(`${src.company} Moka 岗位超过 ${maxPages} 页，已停止以避免静默截断`);
       }
       try { await next.click({ timeout: 8000 }); }
-      catch (e) { throw new Error(`${src.company} Moka 下一页点击失败：${e.message}`); }
-      await page.waitForTimeout(2500);
-      const after = await page.evaluate(() =>
-        (document.querySelector('[class*="card-content-"] [class*="title-"]')?.innerText || '').trim().split('\n')[0]
-      );
-      if (!after || after === firstTitle) {
-        throw new Error(`${src.company} Moka 下一页未出现新岗位，已停止以避免静默截断`);
+      catch (e) { return failFatal(`${src.company} Moka 下一页点击失败：${e.message}`); }
+      // 事件驱动：轮询第一个卡片标题变化（250ms 间隔，最多 3s），替代固定 sleep 2.5s
+      const changed = await page.waitForFunction((prev) => {
+        const t = (document.querySelector('[class*="card-content-"] [class*="title-"]')?.innerText || '').trim().split('\n')[0];
+        return t && t !== prev;
+      }, firstTitle, { polling: 250, timeout: 3000 }).then(() => true).catch(() => false);
+      if (!changed) {
+        return failFatal(`${src.company} Moka 下一页未出现新岗位，已停止以避免静默截断`);
       }
     }
     return rows;
@@ -710,14 +715,14 @@ async function probeMokaList(src) {
   try {
     const url = /#/.test(src.url) ? src.url : `${src.url.replace(/\/$/, '')}#/jobs`;
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
-    await page.waitForTimeout(5000);
+    await page.waitForSelector('[class*="card-content-"]', { timeout: 8000 }).catch(() => {});
     try {
       const b = page.getByRole('button', { name: '好的', exact: true });
       if (await b.count()) { await b.click({ timeout: 8000 }); await page.waitForTimeout(1000); }
     } catch { /* 忽略 */ }
     if (!(await page.locator('[class*="card-content-"]').count())) {
       const tab = page.locator('text=职位列表').first();
-      if (await tab.count()) { await tab.click().catch(() => {}); await page.waitForTimeout(3000); }
+      if (await tab.count()) { await tab.click().catch(() => {}); await page.waitForSelector('[class*="card-content-"]', { timeout: 5000 }).catch(() => {}); }
     }
     const titles = [];
     const seen = new Set();
@@ -747,11 +752,12 @@ async function probeMokaList(src) {
       }).catch(() => false);
       if (disabled) break;
       try { await next.click({ timeout: 8000 }); } catch { break; }
-      await page.waitForTimeout(2500);
-      const after = await page.evaluate(() =>
-        (document.querySelector('[class*="card-content-"] [class*="title-"]')?.innerText || '').trim().split('\n')[0]
-      ).catch(() => '');
-      if (!after || after === firstTitle) break;
+      // 事件驱动：轮询标题变化（250ms 间隔，最多 3s），替代固定 sleep 2.5s
+      const changed = await page.waitForFunction((prev) => {
+        const t = (document.querySelector('[class*="card-content-"] [class*="title-"]')?.innerText || '').trim().split('\n')[0];
+        return t && t !== prev;
+      }, firstTitle, { polling: 250, timeout: 3000 }).then(() => true).catch(() => false);
+      if (!changed) break;
     }
     return titles;
   } catch {
@@ -768,19 +774,19 @@ async function collectByd(src) {
   let totalPage = 1;
   let totalCount = null;
   for (let p = 1; p <= totalPage; p++) {
-    if (p > ATS_PAGE_LIMIT) throw new Error(`${src.company} 职位超过 ${ATS_PAGE_LIMIT} 页，已停止以避免静默截断`);
+    if (p > ATS_PAGE_LIMIT) return failFatal(`${src.company} 职位超过 ${ATS_PAGE_LIMIT} 页，已停止以避免静默截断`);
     const j = await postJSON('https://job.byd.com/portal/api/portal-api/schoolPortal/queryPositionList', {
       topicCode: '', batch: '2027', campusNature: '008501', abroad: '', degree: '',
       jobType: [], researchDirection: [], workPlace: [], keywords: '', pageSize: 100, pageIndex: p,
     }, { Referer: 'https://job.byd.com/portal/pc/#/school/home' });
-    if (j.code !== 0 || !Array.isArray(j.data)) throw new Error(`${src.company} 职位接口异常：${j.msg || '未知错误'}`);
+    if (j.code !== 0 || !Array.isArray(j.data)) return failFatal(`${src.company} 职位接口异常：${j.msg || '未知错误'}`);
     items.push(...j.data);
     totalPage = Number(j.page?.totalPage) || p;
     totalCount = Number(j.page?.totalCount);
-    if (!j.data.length && p < totalPage) throw new Error(`${src.company} 第 ${p} 页为空，已停止以避免静默截断`);
+    if (!j.data.length && p < totalPage) return failFatal(`${src.company} 第 ${p} 页为空，已停止以避免静默截断`);
   }
   if (totalCount != null && items.length !== totalCount) {
-    throw new Error(`${src.company} 岗位数 ${items.length} 与官网总数 ${totalCount} 不一致`);
+    return failFatal(`${src.company} 岗位数 ${items.length} 与官网总数 ${totalCount} 不一致`);
   }
   return items.map((it) => makeRow(src, {
     code: it.id,
@@ -801,14 +807,14 @@ async function collectPdd(src) {
       page: p, pageSize, t: null,
     }, { Referer: 'https://careers.pddglobalhr.com/campus/grad' });
     const list = j.result?.list;
-    if (!j.success || !Array.isArray(list)) throw new Error(`${src.company} 职位接口异常：${j.errorMsg || '未知错误'}`);
+    if (!j.success || !Array.isArray(list)) return failFatal(`${src.company} 职位接口异常：${j.errorMsg || '未知错误'}`);
     items.push(...list);
     total = Number(j.result.total);
     if (items.length >= total || list.length < pageSize) break;
-    if (p === ATS_PAGE_LIMIT) throw new Error(`${src.company} 职位超过 ${ATS_PAGE_LIMIT} 页，已停止以避免静默截断`);
+    if (p === ATS_PAGE_LIMIT) return failFatal(`${src.company} 职位超过 ${ATS_PAGE_LIMIT} 页，已停止以避免静默截断`);
   }
   if (total != null && items.length !== total) {
-    throw new Error(`${src.company} 岗位数 ${items.length} 与官网总数 ${total} 不一致`);
+    return failFatal(`${src.company} 岗位数 ${items.length} 与官网总数 ${total} 不一致`);
   }
   return items.map((it) => {
     const meta = [it.recruitTypeName, it.jobName, it.graduationYear ? `${it.graduationYear}届` : ''].filter(Boolean).join(' · ');
@@ -856,6 +862,14 @@ async function mapLimit(items, limit, fn) {
   });
   await Promise.all(workers);
   return out;
+}
+
+/* 构造带 fatal 标记的错误：确定性失败（翻页断点、超限、数据一致性校验等），
+ * 重试同样会失败，fetchSource 收到 fatal 后不再重试，避免浪费整轮时间。 */
+function failFatal(message) {
+  const err = new Error(message);
+  err.fatal = true;
+  throw err;
 }
 
 /* ---------- 携程：招聘官网 JSON API ---------- */
@@ -1360,6 +1374,7 @@ async function fetchSource(src) {
       return { rows, durationMs: Date.now() - started, attempts: attempt, error: null };
     } catch (e) {
       error = e;
+      if (e.fatal) break; // 确定性失败（翻页断点/超限/一致性校验），重试无意义
       if (attempt < 3) await sleep(1000 * 2 ** (attempt - 1)); // 1s、2s 后重试
     }
   }
@@ -1371,23 +1386,59 @@ async function run() {
   // 增量抓取：node scripts/fetch-official.mjs --only=moka-xxx,beisen-yyy
   const onlyArg = process.argv.find((a) => a.startsWith('--only='));
   const onlyKeys = onlyArg ? new Set(onlyArg.slice(7).split(',').map((s) => s.trim()).filter(Boolean)) : null;
-  const activeSources = onlyKeys ? SOURCES.filter((s) => onlyKeys.has(s.key)) : SOURCES;
+  // CI 分片抓取：node scripts/fetch-official.mjs --shard=0/3
+  // 按源 key 的稳定哈希把来源均分为 n 片，只跑第 i 片，输出 supplement.shard-i.json / fetch-health.shard-i.json，
+  // 主文件由 scripts/merge-shards.mjs 汇总，便于 GitHub Actions matrix 并行。
+  const shardArg = process.argv.find((a) => a.startsWith('--shard='));
+  let shard = null;
+  if (shardArg) {
+    const [i, n] = shardArg.slice(8).split('/').map((v) => Number(v));
+    if (!Number.isInteger(i) || !Number.isInteger(n) || n < 1 || i < 0 || i >= n) {
+      console.error('✗ --shard 格式应为 i/n，如 --shard=0/3');
+      process.exitCode = 1;
+      return;
+    }
+    shard = { i, n };
+  }
+  const shardOf = (key, total) => createHash('sha1').update(String(key)).digest().readUInt16BE(0) % total;
+  let activeSources = onlyKeys ? SOURCES.filter((s) => onlyKeys.has(s.key)) : SOURCES;
   if (onlyKeys && !activeSources.length) {
     console.error('✗ --only 未匹配到任何来源，请检查 key');
     process.exitCode = 1;
     return;
   }
+  if (shard) {
+    activeSources = activeSources.filter((s) => shardOf(s.key, shard.n) === shard.i);
+    if (!activeSources.length) {
+      console.error(`✗ 分片 ${shard.i}/${shard.n} 没有匹配到任何来源`);
+      process.exitCode = 1;
+      return;
+    }
+  }
   const force = process.argv.includes('--force');
   const prevRows = await readJSONSafe(path.join(DATA_DIR, 'supplement.json'), []);
   const prevHealth = await readJSONSafe(path.join(DATA_DIR, 'fetch-health.json'), { sources: [] });
+  const prevSources = new Map((prevHealth.sources || []).map((s) => [s.key, s]));
   const prevByCompany = new Map();
   for (const row of Array.isArray(prevRows) ? prevRows : []) {
     if (!prevByCompany.has(row.company)) prevByCompany.set(row.company, []);
     prevByCompany.get(row.company).push(row);
   }
+  // 连续失败达到阈值的源隔次重试：本次直接沿用旧数据跳过（标记 skipped，0 耗时），
+  // 下次运行 skipped 标记生效前必然真跑一次，避免持续故障源每天浪费整轮抓取时间。
+  const SKIP_FAILURE_THRESHOLD = 2;
   const fetchOne = async (src) => {
     process.stdout.write(`抓取 ${src.company} (${src.key}) ... `);
     const prev = prevByCompany.get(src.company) || [];
+    const prevEntry = prevSources.get(src.key);
+    const prevFailures = Number(prevEntry?.consecutiveFailures) || 0;
+    if (!force && prev.length && prevFailures >= SKIP_FAILURE_THRESHOLD && prevEntry?.skipped !== true) {
+      console.log(`连续失败 ${prevFailures} 次，本次跳过（隔次重试），沿用上次 ${prev.length} 条`);
+      return {
+        src, rows: prev, status: 'skipped', freshCount: 0, attempts: 0,
+        durationMs: 0, error: '', unchanged: true, skipped: true,
+      };
+    }
     // 增量探针：Moka 源只渲染列表、不进详情。标题集与上次一致 → 直接复用上次完整数据
     // （含原 updatedAt），跳过耗时的详情点击。探针失败（null）则回退完整抓取。
     if (!force && prev.length && src.collect === collectMoka) {
@@ -1436,15 +1487,17 @@ async function run() {
     };
   };
 
-  // collect/http 源并发 3；浏览器源并发由 BROWSER_CONCURRENCY 控制（默认 2），避免同时开太多页面
+  // collect/http 源为 JSON API / HTML 直抓，网络 IO 为主，默认并发 10（HTTP_CONCURRENCY 可调）；
+  // 浏览器源并发由 BROWSER_CONCURRENCY 控制（默认 8），配合事件驱动等待降低单源 CPU 占用
   const isBrowserSource = (s) => s.mode === 'browser' || s.usesBrowser === true;
   const fast = activeSources.filter((s) => !isBrowserSource(s));
   const browser = activeSources.filter(isBrowserSource);
-  const browserConcurrency = Math.max(1, Number(process.env.BROWSER_CONCURRENCY) || 2);
+  const httpConcurrency = Math.max(1, Number(process.env.HTTP_CONCURRENCY) || 10);
+  const browserConcurrency = Math.max(1, Number(process.env.BROWSER_CONCURRENCY) || 8);
   let results;
   try {
     const [fastResults, browserResults] = await Promise.all([
-      mapLimit(fast, 3, fetchOne),
+      mapLimit(fast, httpConcurrency, fetchOne),
       mapLimit(browser, browserConcurrency, fetchOne),
     ]);
     results = new Map([...fastResults, ...browserResults].map((r) => [r.src.key, r]));
@@ -1463,12 +1516,13 @@ async function run() {
   }
 
   const now = new Date().toISOString();
-  const prevSources = new Map((prevHealth.sources || []).map((s) => [s.key, s]));
+  // ok / cached / skipped 均视为"无需担心"：skipped 是主动隔次跳过，不计入失败，
+  // 且保持 consecutiveFailures 不变，确保下个周期会真正重试。参数为状态字符串。
+  const isGood = (status) => status === 'ok' || status === 'cached' || status === 'skipped';
   const updatedByKey = new Map(activeSources.map((src) => {
     const h = results.get(src.key);
     const prev = prevSources.get(src.key);
-    // cached / unchanged 视为成功（沿用了上次数据），不计入失败
-    const failed = h.status !== 'ok' && h.status !== 'cached';
+    const failed = !isGood(h.status);
     return [src.key, {
       key: src.key,
       company: src.company,
@@ -1476,12 +1530,15 @@ async function run() {
       optional: src.optional === true,
       status: h.status,
       unchanged: h.unchanged === true,
+      skipped: h.status === 'skipped' || undefined,
       count: h.rows.length,
       freshCount: h.freshCount,
       attempts: h.attempts,
       durationMs: h.durationMs,
       error: h.error || undefined,
-      consecutiveFailures: failed ? (Number(prev?.consecutiveFailures) || 0) + 1 : 0,
+      consecutiveFailures: h.status === 'skipped'
+        ? (Number(prev?.consecutiveFailures) || 0)
+        : (failed ? (Number(prev?.consecutiveFailures) || 0) + 1 : 0),
       lastSuccessAt: (h.status === 'ok' || h.status === 'cached') ? now : (prev?.lastSuccessAt || null),
       lastFailureAt: failed ? now : (prev?.lastFailureAt || null),
     }];
@@ -1490,12 +1547,31 @@ async function run() {
     ? SOURCES.map((src) => updatedByKey.get(src.key) || prevSources.get(src.key)).filter(Boolean)
     : [...updatedByKey.values()];
   const warnings = [...updatedByKey.values()]
-    .filter((s) => s.status !== 'ok' && s.status !== 'cached' && !(s.optional && s.status === 'empty' && s.count === 0))
+    .filter((s) => !isGood(s.status) && !(s.optional && s.status === 'empty' && s.count === 0))
     .map((s) => `${s.company}: ${s.status}（${s.count} 条${s.error ? `，${s.error}` : ''}）`);
+
+  // 分片模式：只写本片文件，主 supplement.json / fetch-health.json 由 scripts/merge-shards.mjs 汇总
+  if (shard) {
+    await mkdir(DATA_DIR, { recursive: true });
+    await writeFile(path.join(DATA_DIR, `supplement.shard-${shard.i}.json`), JSON.stringify(uniq), 'utf8');
+    await writeFile(path.join(DATA_DIR, `fetch-health.shard-${shard.i}.json`), JSON.stringify({
+      generatedAt: now,
+      durationMs: Date.now() - startedAt,
+      total: uniq.length,
+      warnings,
+      sources,
+    }, null, 2), 'utf8');
+    if (warnings.length) {
+      console.log('\n⚠ 需要关注（分片本地告警，webhook 由合并阶段统一推送）：');
+      for (const w of warnings) console.log(`  - ${w}`);
+    }
+    console.log(`\n分片 ${shard.i}/${shard.n} 完成：${uniq.length} 条（耗时 ${((Date.now() - startedAt) / 1000).toFixed(1)}s）`);
+    return;
+  }
+
   const history = [
     ...(Array.isArray(prevHealth.history) ? prevHealth.history : []),
-    { generatedAt: now, total: uniq.length, warnings: warnings.length, failed: sources.filter((s) => s.status !== 'ok' && s.status !== 'cached').length },
-  ].slice(-14);
+    { generatedAt: now, total: uniq.length, warnings: warnings.length, failed: sources.filter((s) => !isGood(s.status)).length },  ].slice(-14);
   const health = {
     generatedAt: now,
     durationMs: Date.now() - startedAt,

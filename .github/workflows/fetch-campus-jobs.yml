@@ -14,9 +14,14 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  update:
+  # 3 个分片并行抓取：每个 runner 独立起浏览器，墙钟约降为单机 1/3
+  fetch:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2]
     steps:
       - uses: actions/checkout@v4
 
@@ -38,21 +43,56 @@ jobs:
       - name: 安装 Playwright 浏览器
         run: npx playwright install --with-deps chromium
 
+      - name: 抓取分片 ${{ matrix.shard }}
+        run: node scripts/fetch-official.mjs --shard=${{ matrix.shard }}/3
+        env:
+          # 分片内浏览器源并发；事件驱动等待后单源耗时大降，2 核 runner 取 6
+          BROWSER_CONCURRENCY: '6'
+          HTTP_CONCURRENCY: '12'
+
+      - name: 上传分片产物
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: shard-${{ matrix.shard }}
+          path: |
+            data/supplement.shard-*.json
+            data/fetch-health.shard-*.json
+          if-no-files-found: error
+          retention-days: 1
+
+  # 汇总：合并分片数据 → 校验 → 构建 → 部署 → 回写
+  deploy:
+    needs: fetch
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: 下载分片产物
+        uses: actions/download-artifact@v4
+        with:
+          pattern: shard-*
+          path: data
+          merge-multiple: true
+
       - name: 刷新求职资料两个文档
         run: node scripts/export-data.mjs --docs-only
         env:
           FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
           FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
 
-      - name: 抓取企业官网岗位
-        run: npm run fetch
+      - name: 合并分片数据
+        run: node scripts/merge-shards.mjs
         env:
           FETCH_ALERT_WEBHOOK: ${{ secrets.FETCH_ALERT_WEBHOOK }}
-          # Moka 等浏览器源并发；增量探针命中后多数源秒级完成，可适当提高并发
-          BROWSER_CONCURRENCY: '4'
-
-      - name: 合并进站点数据
-        run: npm run merge
 
       - name: 数据校验
         run: npm run validate
