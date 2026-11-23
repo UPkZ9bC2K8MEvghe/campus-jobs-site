@@ -151,6 +151,9 @@
         <input id="searchInput" type="search" placeholder="搜索公司、岗位、专业、城市…" autocomplete="off" aria-label="关键词搜索">
         <button class="search-clear" id="searchClear" title="清空搜索" aria-label="清空搜索">×</button>
       </div>
+      <div class="visit-counter" title="全站累计页面浏览量（PV）">
+        访问量 <b><span id="busuanzi_value_site_pv">—</span></b>
+      </div>
     </div>
     <nav class="tabs" role="tablist" aria-label="主导航">
       <button class="tab" role="tab" data-view="jobs" aria-selected="true">校招汇总<span class="tab-count" id="countJobs"></span></button>
@@ -299,6 +302,7 @@
 </aside>
 
 <script src="assets/app.js"></script>
+<script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <noscript>
   <div class="noscript-note">
     <h2>校招信息查询</h2>
