@@ -73,6 +73,8 @@ jobs:
       MIRROR_PAT: ${{ secrets.MIRROR_PAT }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # 镜像仓库推送需要完整历史对象，浅克隆会导致 did not receive expected object
 
       - uses: actions/setup-node@v4
         with:
