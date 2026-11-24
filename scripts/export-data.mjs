@@ -35,6 +35,9 @@ const TABLES = [
 const PAGE_LIMIT = 2000;
 const MAX_PAGES = 12;
 
+const beijingDate = (value = new Date()) =>
+  new Date(new Date(value).getTime() + 8 * 3600 * 1000).toISOString().slice(0, 10);
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = path.resolve(__dirname, '..', 'data');
 const SUPPLEMENT_FILE = path.join(DATA_DIR, 'supplement.json');
@@ -665,15 +668,37 @@ function flattenBitableValue(v) {
   return v;
 }
 
-async function fetchBitableRecordsViaApp(tableId, appToken) {
+async function fetchBitableRecordsViaApp(tableId, appToken, { updatedSince } = {}) {
   const records = [];
   let pageToken = '';
+  const incremental = Boolean(updatedSince);
+  const sinceMs = incremental
+    ? Date.parse(`${updatedSince}T00:00:00+08:00`) - 24 * 3600 * 1000
+    : 0;
+  if (incremental && !Number.isFinite(sinceMs)) throw new Error(`无效增量日期：${updatedSince}`);
   for (let page = 0; page < 40; page += 1) {
     const qs = new URLSearchParams({ page_size: '500' });
     if (pageToken) qs.set('page_token', pageToken);
-    const res = await fetch(`https://open.feishu.cn/open-apis/bitable/v1/apps/${BASE_TOKEN}/tables/${tableId}/records?${qs}`, {
-      headers: { Authorization: `Bearer ${appToken}` }, signal: AbortSignal.timeout(60000),
-    });
+    const headers = { Authorization: `Bearer ${appToken}` };
+    const options = { headers, signal: AbortSignal.timeout(60000) };
+    let url = `https://open.feishu.cn/open-apis/bitable/v1/apps/${BASE_TOKEN}/tables/${tableId}/records?${qs}`;
+    if (incremental) {
+      url = `https://open.feishu.cn/open-apis/bitable/v1/apps/${BASE_TOKEN}/tables/${tableId}/records/search?${qs}`;
+      headers['Content-Type'] = 'application/json';
+      options.method = 'POST';
+      options.body = JSON.stringify({
+        automatic_fields: true,
+        filter: {
+          conjunction: 'and',
+          conditions: [{
+            field_name: '更新时间',
+            operator: 'isGreater',
+            value: ['ExactDate', String(sinceMs)],
+          }],
+        },
+      });
+    }
+    const res = await fetch(url, options);
     const j = await res.json();
     if (j.code !== 0) throw new Error(`bitable ${tableId}: ${j.msg || j.code}`);
     for (const it of j.data.items || []) {
@@ -763,6 +788,38 @@ async function exportTable({ key, tableId, expected }, appToken = null) {
     process.stdout.write(`  ✓ ${key} 共 ${rows.length} 条，与预期一致\n`);
   }
   return { rows, details };
+}
+
+async function loadTableState(key) {
+  const payload = JSON.parse(await readFile(path.join(DATA_DIR, `${key}.json`), 'utf8'));
+  return {
+    rows: decodeRows(payload),
+    details: await loadDetailShards(key),
+  };
+}
+
+async function exportTableIncremental(table, appToken, updatedSince) {
+  const previous = await loadTableState(table.key);
+  if (!previous.rows.length) return null;
+  const records = await fetchBitableRecordsViaApp(table.tableId, appToken, { updatedSince });
+  if (!records.length) return null;
+  const rowsById = new Map(previous.rows.map((row) => [row.id, row]));
+  const details = { ...previous.details };
+  let changed = 0;
+  for (const rec of records) {
+    const normalized = normalizeJob(rec);
+    if (!normalized) continue;
+    rowsById.set(normalized.list.id, normalized.list);
+    if (Object.keys(normalized.detail).length) details[normalized.list.id] = normalized.detail;
+    else delete details[normalized.list.id];
+    changed += 1;
+  }
+  return {
+    rows: [...rowsById.values()],
+    details,
+    fetchedCount: records.length,
+    changedCount: changed,
+  };
 }
 
 /* ---------- 选项统计 ---------- */
@@ -1068,23 +1125,38 @@ async function fetchBitableRevisions(appToken) {
 async function incrementalProbe(appToken) {
   const supplementHash = createHash('sha1')
     .update(await readFile(SUPPLEMENT_FILE, 'utf8').catch(() => '[]')).digest('hex');
-  if (process.env.FORCE_FULL_EXPORT === '1') return { skip: false, reason: 'FORCE_FULL_EXPORT', supplementHash };
-  if (!appToken) return { skip: false, reason: 'lark-cli 回退模式，不做增量跳过', supplementHash };
+  if (process.env.FORCE_FULL_EXPORT === '1') return { mode: 'full', reason: 'FORCE_FULL_EXPORT', supplementHash };
+  if (!appToken) return { mode: 'full', reason: 'lark-cli 回退模式，不做增量跳过', supplementHash };
   let revisions;
   try { revisions = await fetchBitableRevisions(appToken); }
-  catch (e) { return { skip: false, reason: `revision 探针失败：${e.message}`, supplementHash }; }
+  catch (e) { return { mode: 'full', reason: `revision 探针失败：${e.message}`, supplementHash }; }
   const target = TABLES.map((t) => Number(revisions[t.tableId]) || 0);
-  if (target.some((v) => !v)) return { skip: false, reason: '部分表 revision 缺失', supplementHash, revisions };
+  if (target.some((v) => !v)) return { mode: 'full', reason: '部分表 revision 缺失', supplementHash, revisions };
   let cache = null;
   try { cache = JSON.parse(await readFile(BITABLE_REV_FILE, 'utf8')); } catch { /* 首次 */ }
-  if (!cache?.revisions) return { skip: false, reason: '无历史 revision 缓存', supplementHash, revisions };
+  if (!cache?.revisions) return { mode: 'full', reason: '无历史 revision 缓存', supplementHash, revisions };
   const sameRevs = TABLES.every((t) => Number(cache.revisions[t.tableId]) === Number(revisions[t.tableId]));
-  const sameSupp = cache.supplementHash === supplementHash;
-  const freshEnough = Date.now() - Date.parse(cache.generatedAt || 0) < MAX_INCREMENTAL_AGE_MS;
-  if (sameRevs && sameSupp && freshEnough) {
-    return { skip: true, reason: `表 revision（${target.join('/')}）与 supplement 指纹均未变化`, supplementHash, revisions };
+  const supplementChanged = cache.supplementHash !== supplementHash;
+  const lastFullAt = Date.parse(cache.generatedAt || 0);
+  const freshEnough = Number.isFinite(lastFullAt) && Date.now() - lastFullAt < MAX_INCREMENTAL_AGE_MS;
+  if (sameRevs && freshEnough) {
+    return {
+      mode: 'skip', skip: true, supplementChanged, cache, revisions, supplementHash,
+      reason: `表 revision（${target.join('/')}）未变化${supplementChanged ? '，仅官网补充数据变化' : ''}`,
+    };
   }
-  return { skip: false, reason: `revision/supplement 变化或缓存过期（${target.join('/')}）`, supplementHash, revisions };
+  if (!sameRevs && freshEnough) {
+    const lastSyncAt = Date.parse(cache.lastSyncAt || cache.generatedAt);
+    const updatedSince = beijingDate(Number.isFinite(lastSyncAt) ? lastSyncAt : lastFullAt);
+    return {
+      mode: 'incremental', skip: false, supplementChanged, cache, revisions, supplementHash, updatedSince,
+      reason: `表 revision 变化，按更新时间 ${updatedSince} 起增量导出`,
+    };
+  }
+  return {
+    mode: 'full', skip: false, supplementChanged, cache, revisions, supplementHash,
+    reason: sameRevs ? '增量缓存超过 7 天，执行全量对账' : `revision 变化且缓存过期（${target.join('/')}）`,
+  };
 }
 
 async function exportDocs() {
@@ -1172,6 +1244,17 @@ async function mergeOnly() {
 const DOC_PROMO_RE = /<p>(?:(?!<\/p>)[\s\S])*?婉清学姐(?:(?!<\/p>)[\s\S])*?<\/p>\s*(?:<p>\s*<img\b(?:(?!<\/p>)[\s\S])*?<\/p>\s*)?/g;
 const stripDocPromo = (html) => html.replace(DOC_PROMO_RE, '').replace(/\n{3,}/g, '\n\n').trim();
 
+async function saveBitableCache(probe, fullExport) {
+  const now = new Date().toISOString();
+  await writeFile(BITABLE_REV_FILE, JSON.stringify({
+    generatedAt: fullExport ? now : (probe.cache?.generatedAt || now),
+    lastSyncAt: now,
+    revisions: probe.revisions || {},
+    supplementHash: probe.supplementHash,
+  }, null, 2), 'utf8');
+  process.stdout.write('  → bitable-revisions.json（增量基线已更新）\n');
+}
+
 async function main() {
   await mkdir(DATA_DIR, { recursive: true });
   if (process.argv.includes('--merge-only')) return mergeOnly();
@@ -1190,23 +1273,44 @@ async function main() {
   }
   if (appToken) process.stdout.write('  · 使用飞书自建应用直读多维表格\n');
 
-  // 增量模式：表 revision + supplement 指纹均未变化 → 跳过飞书全量导出（docs 仍走自身 revision 增量）
+  // 飞书表 revision 与官网补充数据相互独立：表未变时复用飞书数据，仅重新合并官网补充。
   let probe = null;
   if (process.argv.includes('--incremental')) {
     probe = await incrementalProbe(appToken);
     process.stdout.write(`  · 增量探针：${probe.reason}\n`);
     if (probe.skip) {
       await exportDocs();
-      process.stdout.write('全部完成（飞书表格数据无变化，仅做增量校验）\n');
+      if (probe.supplementChanged) {
+        process.stdout.write('官网补充数据变化，复用飞书数据并重新合并…\n');
+        await mergeOnly();
+      }
+      await saveBitableCache(probe, false);
+      process.stdout.write('全部完成（飞书表格无需重新读取）\n');
       return;
     }
   }
 
+  let usedFullExport = !probe || probe.mode === 'full';
   for (const table of TABLES) {
     process.stdout.write(`导出 ${table.key} (${table.tableId})…\n`);
-    const { rows: rawRows, details: rawDetails } = await exportTable(table, appToken);
-    let rows = rawRows;
-    let details = rawDetails;
+    let exported = null;
+    if (probe?.mode === 'incremental') {
+      try {
+        exported = await exportTableIncremental(table, appToken, probe.updatedSince);
+      } catch (e) {
+        process.stdout.write(`  ⚠ ${table.key} 增量读取失败（${e.message}），回退全量导出\n`);
+      }
+      if (!exported) {
+        process.stdout.write(`  ⚠ ${table.key} 增量窗口无记录，回退全量对账\n`);
+        usedFullExport = true;
+      }
+    }
+    if (!exported) exported = await exportTable(table, appToken);
+    if (exported.fetchedCount != null) {
+      process.stdout.write(`  ${table.key} 增量读取: ${exported.fetchedCount} 条, 更新 ${exported.changedCount} 条\n`);
+    }
+    let rows = exported.rows;
+    let details = exported.details;
     if (table.key === 'jobs') {
       const merged = mergeSupplement(rows, await loadSupplement());
       rows = merged.rows;
@@ -1237,14 +1341,7 @@ async function main() {
 
   process.stdout.write(`导出文档栏目…\n`);
   await exportDocs();
-  if (probe) {
-    await writeFile(BITABLE_REV_FILE, JSON.stringify({
-      generatedAt: new Date().toISOString(),
-      revisions: probe.revisions || {},
-      supplementHash: probe.supplementHash,
-    }, null, 2), 'utf8');
-    process.stdout.write('  → bitable-revisions.json（增量探针基线已更新）\n');
-  }
+  if (probe) await saveBitableCache(probe, usedFullExport);
   process.stdout.write('全部完成\n');
 }
 

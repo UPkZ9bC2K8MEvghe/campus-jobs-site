@@ -1386,9 +1386,7 @@ async function run() {
   // 增量抓取：node scripts/fetch-official.mjs --only=moka-xxx,beisen-yyy
   const onlyArg = process.argv.find((a) => a.startsWith('--only='));
   const onlyKeys = onlyArg ? new Set(onlyArg.slice(7).split(',').map((s) => s.trim()).filter(Boolean)) : null;
-  // CI 分片抓取：node scripts/fetch-official.mjs --shard=0/3
-  // 按源 key 的稳定哈希把来源均分为 n 片，只跑第 i 片，输出 supplement.shard-i.json / fetch-health.shard-i.json，
-  // 主文件由 scripts/merge-shards.mjs 汇总，便于 GitHub Actions matrix 并行。
+  // CI 分片抓取：按历史耗时把来源贪心均衡到各 runner，避免稳定哈希产生慢分片。
   const shardArg = process.argv.find((a) => a.startsWith('--shard='));
   let shard = null;
   if (shardArg) {
@@ -1400,7 +1398,10 @@ async function run() {
     }
     shard = { i, n };
   }
-  const shardOf = (key, total) => createHash('sha1').update(String(key)).digest().readUInt16BE(0) % total;
+  const force = process.argv.includes('--force');
+  const prevRows = await readJSONSafe(path.join(DATA_DIR, 'supplement.json'), []);
+  const prevHealth = await readJSONSafe(path.join(DATA_DIR, 'fetch-health.json'), { sources: [] });
+  const prevSources = new Map((prevHealth.sources || []).map((s) => [s.key, s]));
   let activeSources = onlyKeys ? SOURCES.filter((s) => onlyKeys.has(s.key)) : SOURCES;
   if (onlyKeys && !activeSources.length) {
     console.error('✗ --only 未匹配到任何来源，请检查 key');
@@ -1408,17 +1409,33 @@ async function run() {
     return;
   }
   if (shard) {
-    activeSources = activeSources.filter((s) => shardOf(s.key, shard.n) === shard.i);
+    const sourceWeight = (src) => {
+      const duration = Number(prevSources.get(src.key)?.durationMs);
+      if (duration > 0) return duration;
+      return src.mode === 'browser' || src.usesBrowser ? 60000 : 10000;
+    };
+    const bins = Array.from({ length: shard.n }, () => ({ weight: 0, count: 0 }));
+    const assignments = new Map();
+    const sorted = [...activeSources].sort((a, b) =>
+      sourceWeight(b) - sourceWeight(a) || a.key.localeCompare(b.key));
+    for (const src of sorted) {
+      const target = bins.reduce((best, bin, index) => {
+        if (bin.weight < bins[best].weight) return index;
+        if (bin.weight === bins[best].weight && bin.count < bins[best].count) return index;
+        return best;
+      }, 0);
+      bins[target].weight += sourceWeight(src);
+      bins[target].count += 1;
+      assignments.set(src.key, target);
+    }
+    activeSources = activeSources.filter((s) => assignments.get(s.key) === shard.i);
     if (!activeSources.length) {
       console.error(`✗ 分片 ${shard.i}/${shard.n} 没有匹配到任何来源`);
       process.exitCode = 1;
       return;
     }
+    console.log(`分片 ${shard.i}/${shard.n}: ${activeSources.length} 个来源（历史耗时加权均衡）`);
   }
-  const force = process.argv.includes('--force');
-  const prevRows = await readJSONSafe(path.join(DATA_DIR, 'supplement.json'), []);
-  const prevHealth = await readJSONSafe(path.join(DATA_DIR, 'fetch-health.json'), { sources: [] });
-  const prevSources = new Map((prevHealth.sources || []).map((s) => [s.key, s]));
   const prevByCompany = new Map();
   for (const row of Array.isArray(prevRows) ? prevRows : []) {
     if (!prevByCompany.has(row.company)) prevByCompany.set(row.company, []);

@@ -43,7 +43,8 @@ jobs:
             ${{ runner.os }}-playwright-
 
       - name: 安装 Playwright 浏览器
-        run: npx playwright install --with-deps chromium
+        run: |
+          node -e "const fs=require('node:fs');const {chromium}=require('playwright');process.exit(fs.existsSync(chromium.executablePath())?0:1)" || npx playwright install --with-deps chromium
 
       - name: 抓取分片 ${{ matrix.shard }}
         run: node scripts/fetch-official.mjs --shard=${{ matrix.shard }}/5
@@ -112,7 +113,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-playwright-
       - name: 安装 Playwright 浏览器
-        run: npx playwright install --with-deps chromium
+        run: |
+          node -e "const fs=require('node:fs');const {chromium}=require('playwright');process.exit(fs.existsSync(chromium.executablePath())?0:1)" || npx playwright install --with-deps chromium
 
       - name: 抓取牛客外部热榜
         run: node scripts/fetch-external-hot.mjs
@@ -138,6 +140,7 @@ jobs:
           fi
 
       - name: 触发镜像站并行部署
+        id: mirror
         if: env.SKIP_DEPLOY != 'true'
         continue-on-error: true
         run: |
@@ -156,3 +159,9 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy dist --project-name campus-jobs --branch master --commit-dirty=true
+
+      - name: 检查镜像推送结果
+        if: always() && env.SKIP_DEPLOY != 'true' && steps.mirror.outcome == 'failure'
+        run: |
+          echo "::error::镜像仓库推送失败；正式站部署已继续，但本次流水线判定为失败"
+          exit 1
