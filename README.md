@@ -57,6 +57,8 @@ npm run merge           # 仅合并抓取分片
 
 - **GitHub Pages**：推送到 `master` 后由 `.github/workflows/pages.yml` 自动构建 `dist/` 并发布；
   构建时会把 canonical / sitemap 中的正式站地址改写为 Pages 地址。
+  每天 02:20 UTC 还会自动从正式站拉取最新公开数据（`scripts/sync-public-data.mjs`）后重建，
+  因此镜像会跟随每日更新，不需要额外 secret。
 - **Cloudflare Pages**（正式站）：由私有仓库的定时工作流执行
   `wrangler pages deploy dist --project-name campus-jobs`。
 

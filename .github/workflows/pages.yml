@@ -1,16 +1,19 @@
 name: Deploy to GitHub Pages
 
-# 公开镜像站：从仓库内已提交的数据构建静态站点并发布到 GitHub Pages。
-# 每日抓取仍在私有仓库的 fetch-campus-jobs.yml 中执行（Cloudflare 正式站），
-# 这里只负责把当前仓库的数据原样构建、发布。
+# 公开镜像站：构建静态站点并发布到 GitHub Pages。
+# 每日抓取仍在私有仓库的 fetch-campus-jobs.yml 中执行（Cloudflare 正式站）；
+# 本工作流每天从正式站拉取已发布的公开数据（无需 secret），重建后回写仓库。
 
 on:
   push:
     branches: [master]
+  schedule:
+    # 每天 02:20 UTC（北京时间 10:20），排在正式站 01:00 UTC 更新之后
+    - cron: '20 2 * * *'
   workflow_dispatch: {}
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -32,6 +35,10 @@ jobs:
           node-version: 20
           cache: npm
 
+      - name: 同步正式站最新数据
+        if: github.event_name != 'push'
+        run: node scripts/sync-public-data.mjs
+
       - run: npm ci
 
       - name: 校验并构建静态站点
@@ -41,6 +48,19 @@ jobs:
         run: node scripts/rewrite-site-url.mjs
         env:
           SITE_URL: https://upkz9bc2k8mevghe.github.io/campus-jobs-site
+
+      - name: 回写同步数据
+        if: github.event_name != 'push'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data
+          if git diff --cached --quiet; then
+            echo "数据无变化"
+          else
+            git commit -m "chore(data): 镜像同步 $(date -u +%Y-%m-%d)"
+            git push
+          fi
 
       - uses: actions/configure-pages@v5
 
