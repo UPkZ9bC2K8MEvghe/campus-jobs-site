@@ -57,6 +57,16 @@ async function scrapeZhaopinText() {
   }
 }
 
+// 内容（忽略 generatedAt）无变化时不重写，避免每天制造无意义的 git diff
+async function writeIfChanged(file, obj) {
+  const norm = (o) => { const c = { ...o }; delete c.generatedAt; return JSON.stringify(c); };
+  let prev = null;
+  try { prev = JSON.parse(await readFile(file, 'utf8')); } catch { /* 首次写入 */ }
+  if (prev && norm(prev) === norm(obj)) { console.log(`${path.basename(file)}：内容无变化，保留原文件`); return false; }
+  await writeFile(file, JSON.stringify(obj, null, 2), 'utf8');
+  return true;
+}
+
 async function run() {
   const { text, textLen, url } = await scrapeZhaopinText();
   const internalHot = JSON.parse(await readFile(path.join(DATA_DIR, 'external-hot-diff.json'), 'utf8'));
@@ -80,7 +90,7 @@ async function run() {
     notCovered,
     bossDirect: { status: 'skipped-login-wall', note: 'BOSS直聘公开校招频道抓取返回空/登录墙，本次不纳入覆盖校验' },
   };
-  await writeFile(path.join(DATA_DIR, 'external-coverage.json'), JSON.stringify(report, null, 2));
+  await writeIfChanged(path.join(DATA_DIR, 'external-coverage.json'), report);
   console.log(`智联公开页抓取完成（textLen=${textLen}）；内部热门 ${internalHotCompanies.length} 家中，命中外部覆盖 ${covered.length} 家。`);
   console.log(`未被外部覆盖到：${notCovered.join('、') || '无'}`);
 }

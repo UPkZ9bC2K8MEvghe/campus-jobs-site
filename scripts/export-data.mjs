@@ -4,6 +4,7 @@
  *
  * 注意: 本机 PATH 上的 lark-cli 会挂死, 必须使用绝对路径调用 exe。
  */
+import { createHash } from 'node:crypto';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { mkdtemp, readFile, writeFile, mkdir, unlink } from 'node:fs/promises';
@@ -1049,6 +1050,42 @@ async function fetchDocRevision(docToken, appToken) {
 
 /* 每个文档上次抓取时的 revision 缓存（与 docs.json 分离，避免改变其结构） */
 const DOCS_REV_FILE = path.join(DATA_DIR, 'docs-revisions.json');
+const BITABLE_REV_FILE = path.join(DATA_DIR, 'bitable-revisions.json');
+const MAX_INCREMENTAL_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 最多 7 天强制全量一次，避免长期漏检
+
+/* ---------- 飞书多维表格变更探针（增量导出） ---------- */
+async function fetchBitableRevisions(appToken) {
+  const res = await fetch(`https://open.feishu.cn/open-apis/bitable/v1/apps/${BASE_TOKEN}/tables?page_size=100`, {
+    headers: { Authorization: `Bearer ${appToken}` }, signal: AbortSignal.timeout(20000),
+  });
+  const j = await res.json();
+  if (j.code !== 0) throw new Error(`bitable tables revision: ${j.msg || j.code}`);
+  const revisions = {};
+  for (const t of j.data?.items || []) revisions[t.table_id] = Number(t.revision) || 0;
+  return revisions;
+}
+
+async function incrementalProbe(appToken) {
+  const supplementHash = createHash('sha1')
+    .update(await readFile(SUPPLEMENT_FILE, 'utf8').catch(() => '[]')).digest('hex');
+  if (process.env.FORCE_FULL_EXPORT === '1') return { skip: false, reason: 'FORCE_FULL_EXPORT', supplementHash };
+  if (!appToken) return { skip: false, reason: 'lark-cli 回退模式，不做增量跳过', supplementHash };
+  let revisions;
+  try { revisions = await fetchBitableRevisions(appToken); }
+  catch (e) { return { skip: false, reason: `revision 探针失败：${e.message}`, supplementHash }; }
+  const target = TABLES.map((t) => Number(revisions[t.tableId]) || 0);
+  if (target.some((v) => !v)) return { skip: false, reason: '部分表 revision 缺失', supplementHash, revisions };
+  let cache = null;
+  try { cache = JSON.parse(await readFile(BITABLE_REV_FILE, 'utf8')); } catch { /* 首次 */ }
+  if (!cache?.revisions) return { skip: false, reason: '无历史 revision 缓存', supplementHash, revisions };
+  const sameRevs = TABLES.every((t) => Number(cache.revisions[t.tableId]) === Number(revisions[t.tableId]));
+  const sameSupp = cache.supplementHash === supplementHash;
+  const freshEnough = Date.now() - Date.parse(cache.generatedAt || 0) < MAX_INCREMENTAL_AGE_MS;
+  if (sameRevs && sameSupp && freshEnough) {
+    return { skip: true, reason: `表 revision（${target.join('/')}）与 supplement 指纹均未变化`, supplementHash, revisions };
+  }
+  return { skip: false, reason: `revision/supplement 变化或缓存过期（${target.join('/')}）`, supplementHash, revisions };
+}
 
 async function exportDocs() {
   let docs = {};
@@ -1153,6 +1190,18 @@ async function main() {
   }
   if (appToken) process.stdout.write('  · 使用飞书自建应用直读多维表格\n');
 
+  // 增量模式：表 revision + supplement 指纹均未变化 → 跳过飞书全量导出（docs 仍走自身 revision 增量）
+  let probe = null;
+  if (process.argv.includes('--incremental')) {
+    probe = await incrementalProbe(appToken);
+    process.stdout.write(`  · 增量探针：${probe.reason}\n`);
+    if (probe.skip) {
+      await exportDocs();
+      process.stdout.write('全部完成（飞书表格数据无变化，仅做增量校验）\n');
+      return;
+    }
+  }
+
   for (const table of TABLES) {
     process.stdout.write(`导出 ${table.key} (${table.tableId})…\n`);
     const { rows: rawRows, details: rawDetails } = await exportTable(table, appToken);
@@ -1188,6 +1237,14 @@ async function main() {
 
   process.stdout.write(`导出文档栏目…\n`);
   await exportDocs();
+  if (probe) {
+    await writeFile(BITABLE_REV_FILE, JSON.stringify({
+      generatedAt: new Date().toISOString(),
+      revisions: probe.revisions || {},
+      supplementHash: probe.supplementHash,
+    }, null, 2), 'utf8');
+    process.stdout.write('  → bitable-revisions.json（增量探针基线已更新）\n');
+  }
   process.stdout.write('全部完成\n');
 }
 

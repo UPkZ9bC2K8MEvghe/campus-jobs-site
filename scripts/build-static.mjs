@@ -10,7 +10,7 @@ await rm(DIST, { recursive: true, force: true });
 await mkdir(DIST, { recursive: true });
 
 // 只在构建期使用的源数据，不随站点发布（Cloudflare Pages 单文件上限 25 MiB）
-const SKIP = ['data/supplement.json', 'data/docs-revisions.json'];
+const SKIP = ['data/supplement.json', 'data/docs-revisions.json', 'data/bitable-revisions.json'];
 
 for (const name of FILES) {
   const from = path.join(ROOT, name);

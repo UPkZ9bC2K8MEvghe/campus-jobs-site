@@ -6,7 +6,7 @@
  *       默认选中「热门推荐」，可用公开页面 + Playwright 抓取（与 fetch-official 同模式）。
  */
 import { chromium } from 'playwright';
-import { writeFile } from 'node:fs/promises';
+import { writeFile, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -128,6 +128,16 @@ function hotScore(row) {
   return score;
 }
 
+// 内容（忽略 generatedAt）无变化时不重写，避免每天制造无意义的 git diff，使「无数据变化跳过部署」生效
+async function writeIfChanged(file, obj) {
+  const norm = (o) => { const c = { ...o }; delete c.generatedAt; return JSON.stringify(c); };
+  let prev = null;
+  try { prev = JSON.parse(await readFile(file, 'utf8')); } catch { /* 首次写入 */ }
+  if (prev && norm(prev) === norm(obj)) { console.log(`${path.basename(file)}：内容无变化，保留原文件`); return false; }
+  await writeFile(file, JSON.stringify(obj, null, 2), 'utf8');
+  return true;
+}
+
 async function readJSONSafe(file, fallback) {
   try { return JSON.parse(await (await import('node:fs/promises')).readFile(file, 'utf8')); } catch { return fallback; }
 }
@@ -172,20 +182,19 @@ async function run() {
   const externalOnly = externalHotCompanies.filter((k) => !internalHotKeys.has(k));
   const internalOnly = internalHotCompanies.filter((k) => !externalHotKeys.has(k));
 
-  await writeFile(path.join(DATA_DIR, 'external-hot.json'), JSON.stringify({
+  await writeIfChanged(path.join(DATA_DIR, 'external-hot.json'), {
     generatedAt, source: 'nowcoder',
     entries: externalHot.map((e) => ({ company: e.company, batch: e.batch, sourceUrl: e.sourceUrl, updatedAt: e.updatedAt, hot: e.hot })),
-  }, null, 2));
+  });
 
-  await writeFile(path.join(DATA_DIR, 'external-hot-diff.json'), JSON.stringify({
+  await writeIfChanged(path.join(DATA_DIR, 'external-hot-diff.json'), {
     generatedAt, source: 'nowcoder',
     internalHotCount: jobsHot.length + internHot.length,
     internalHotCompanies: internalHotCompanies.map((k) => k),
     externalHotCount: externalHot.length,
     externalHotCompanies: externalHotCompanies.map((k) => k),
     externalOnly, internalOnly,
-  }, null, 2));
-
+  });
   console.log(`外部热榜（牛客）共 ${externalHot.length} 家公司；内部热门榜含 ${jobsHot.length + internHot.length} 条（jobs top${TOP_JOBS} + internships top${TOP_INTERN}）。`);
   console.log(`命中：internal∩external=${[...internalHotKeys].filter((k) => externalHotKeys.has(k)).length}；仅外部=${externalOnly.length}；仅内部=${internalOnly.length}。`);
   if (externalOnly.length) console.log('仅外部热榜：' + externalOnly.join('、'));
