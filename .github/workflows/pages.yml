@@ -20,6 +20,8 @@ concurrency:
 
 jobs:
   build:
+    # 仅公开镜像仓库发布 Pages（私有仓库继续由 Cloudflare Pages 承载）
+    if: github.repository == 'UPkZ9bC2K8MEvghe/campus-jobs-site'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -48,6 +50,7 @@ jobs:
 
   deploy:
     needs: build
+    if: github.repository == 'UPkZ9bC2K8MEvghe/campus-jobs-site'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
