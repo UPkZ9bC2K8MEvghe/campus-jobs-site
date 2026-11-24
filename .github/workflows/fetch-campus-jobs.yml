@@ -100,6 +100,19 @@ jobs:
       - name: 数据校验
         run: npm run validate
 
+      - name: 安装 Playwright 浏览器
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+      - name: 安装 Playwright 浏览器
+        run: npx playwright install --with-deps chromium
+
+      - name: 抓取牛客外部热榜
+        run: node scripts/fetch-external-hot.mjs
+
       - name: 构建站点
         run: npm run build
 

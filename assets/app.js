@@ -59,6 +59,7 @@
     facets: null, dashboard: null, soe: null, docs: null, changelog: null, events: null,
     reviews: null, questions: null, companyQuestions: null,
     hot: { jobs: null, internships: null },
+    externalHot: null, // 外部热榜数据源（牛客热榜等）：Map<companyKey, entry>
   };
   const ui = {
     filtered: [], rendered: 0, observer: null, current: null, soeFiltered: [],
@@ -201,6 +202,9 @@
     if (row.source === 'official') score += 8;
     if (row.gradYears.includes(2027)) score += 4;
     if (row.batches.some((b) => /秋招|春招|暑期/.test(b))) score += 2;
+    // Phase 1：外部热榜加权（牛客公开热推等第三方热度源，确认的公司 +12）
+    const extHot = cache.externalHot ? cache.externalHot.get(companyKey(row.company)) : null;
+    if (extHot) score += 12;
     return score;
   }
 
@@ -494,6 +498,21 @@
       el.footerTotal.textContent = (jobN + openCount(cache.internships)).toLocaleString('zh-CN');
     }
     return cache[tab];
+  }
+
+  /* ---------- 外部热榜：加载牛客等第三方热度数据源（Phase 1） ---------- */
+  async function loadExternalHot() {
+    if (cache.externalHot) return cache.externalHot;
+    cache.externalHot = new Map();
+    try {
+      const d = await loadJSON('external-hot.json');
+      for (const e of (d && d.entries) || []) {
+        if (!e || e.hot !== true) continue;
+        const k = companyKey(e.company);
+        if (k && !cache.externalHot.has(k)) cache.externalHot.set(k, e);
+      }
+    } catch (err) { /* 外部热榜文件缺失时降级为纯内部打分 */ }
+    return cache.externalHot;
   }
 
   async function loadDetail(tab, id) {
@@ -1878,6 +1897,9 @@
     loadJSON('company-questions.json')
       .then((d) => { cache.companyQuestions = d; })
       .catch(() => { /* 面经题为增量模块，失败不影响主列表 */ });
+
+    // Phase 1：先加载外部热榜数据源（牛客公开热推等第三方热度源），热门打分再叠加外部信号
+    await loadExternalHot().catch(() => { /* 降级时外部热榜为空，仅用内部打分 */ });
 
     if (LIST_VIEWS.has(state.view)) {
       try { await loadTab(state.view); renderFilters(); renderResults(); }

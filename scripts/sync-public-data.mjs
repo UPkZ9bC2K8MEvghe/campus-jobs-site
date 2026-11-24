@@ -9,7 +9,7 @@ const SITE = (process.env.SYNC_SOURCE || 'https://campus-jobs.pages.dev').replac
 const SHARDS = 16;
 const FILES = [
   'jobs.json', 'internships.json', 'facets.json', 'dashboard.json', 'soe.json',
-  'changelog.json', 'docs.json', 'questions.json', 'reviews.json',
+  'changelog.json', 'docs.json', 'questions.json', 'reviews.json', 'external-hot.json',
   ...Array.from({ length: SHARDS }, (_, i) => `jobs-detail-${i}.json`),
   ...Array.from({ length: SHARDS }, (_, i) => `internships-detail-${i}.json`),
 ];
