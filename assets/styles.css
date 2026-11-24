@@ -390,6 +390,7 @@ button { font-family: inherit; cursor: pointer; }
 .badge.year { background: #eefaf3; color: #0b7a4b; }
 .badge.test { background: #fff4e5; color: #a4610a; }
 .badge.official { background: #e6f7ee; color: #047857; }
+.badge.hot { background: #fff1e6; color: #c2410c; font-weight: 600; }
 .badge.positions { background: #eef2ff; color: #4338ca; }
 
 .deadline {

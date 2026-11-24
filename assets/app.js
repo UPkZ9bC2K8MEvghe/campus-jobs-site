@@ -16,10 +16,13 @@
     { key: 'soe', label: '央国企' },
     { key: 'private', label: '民企' },
     { key: 'fav', label: '我的收藏' },
+    { key: 'hot', label: '热门岗位' },
   ];
+  // 热门榜每个视图保留的条数（按规则评分取头部）
+  const HOT_TOP = { jobs: 60, internships: 40 };
   const STATUS_LABELS = {
     urgent: '7 天内截止', asap: '尽快投递', test: '有笔试', over: '已截止',
-    open: '只看未截止', official: '只看官网', soe: '只看央国企', private: '只看民企', fav: '只看收藏',
+    open: '只看未截止', official: '只看官网', soe: '只看央国企', private: '只看民企', fav: '只看收藏', hot: '只看热门',
   };
   const FILTER_GROUPS = ['years', 'cities', 'batches', 'industries', 'ownership', 'degrees'];
   // F1 投递进度：本地状态机（仅存本机 localStorage）
@@ -55,6 +58,7 @@
     detail: { jobs: [], internships: [] },
     facets: null, dashboard: null, soe: null, docs: null, changelog: null, events: null,
     reviews: null, questions: null, companyQuestions: null,
+    hot: { jobs: null, internships: null },
   };
   const ui = {
     filtered: [], rendered: 0, observer: null, current: null, soeFiltered: [],
@@ -168,6 +172,50 @@
     if (days < 0) return { cls: 'over', text: '已截止', days };
     if (days <= 7) return { cls: 'urgent', text: days === 0 ? '今天截止' : `剩 ${days} 天`, days };
     return { cls: '', text: `截止 ${row.deadline.slice(5)}`, days };
+  }
+
+  /* ---------- 热门岗位：用站内现有字段打分，不依赖额外数据 ----------
+   * 更新时间（越新越高）+ 截止状态（未截止/临期优先）+ 招聘岗位数 +
+   * 覆盖城市数 + 企业性质（央国企/外企）+ 官网直招 + 27 届/秋招加分
+   * 每个视图取评分最高的前 N 条（jobs 60 / internships 40）
+   */
+  function hotScore(row) {
+    let score = 0;
+    const updatedDays = daysUntil(row.updatedAt);
+    if (updatedDays != null) {
+      const ago = -updatedDays;
+      if (ago <= 1) score += 45;
+      else if (ago <= 3) score += 38;
+      else if (ago <= 7) score += 30;
+      else if (ago <= 30) score += 18;
+      else if (ago <= 90) score += 8;
+    }
+    const deadlineDays = daysUntil(row.deadline);
+    if (deadlineDays != null && deadlineDays >= 0) score += deadlineDays <= 7 ? 22 : 14;
+    else if (deadlineDays == null && /尽快/.test(row.deadlineText || '')) score += 12;
+
+    score += Math.min(row.positions.length, 50) * 0.8; // 招聘规模
+    score += Math.min(row.cities.length, 8);           // 覆盖城市
+    if (row.ownership === '央国企') score += 8;
+    else if (row.ownership === '外企') score += 6;
+    if (row.source === 'official') score += 8;
+    if (row.gradYears.includes(2027)) score += 4;
+    if (row.batches.some((b) => /秋招|春招|暑期/.test(b))) score += 2;
+    return score;
+  }
+
+  function ensureHot(tab) {
+    if (cache.hot[tab]) return cache.hot[tab];
+    const map = new Map();
+    const rows = (cache[tab] || []).filter((r) => !r.expired);
+    if (!rows.length) return map;
+    const ranked = rows
+      .map((r) => [r.id, hotScore(r)])
+      .sort((a, b) => b[1] - a[1] || 0)
+      .slice(0, HOT_TOP[tab] || 60);
+    for (const [id, score] of ranked) map.set(id, score);
+    cache.hot[tab] = map;
+    return map;
   }
 
   function searchText(row) {
@@ -551,9 +599,31 @@
     if (!el.quickFilters) return;
     el.quickFilters.innerHTML = '';
     for (const f of QUICK_FILTERS) {
-      const count = f.key === 'fav' ? favorites.size : null;
-      el.quickFilters.appendChild(chip(f.label, count, state.status.has(f.key), () => toggle(state.status, f.key), 'quick'));
+      let count = null;
+      if (f.key === 'fav') count = favorites.size;
+      else if (f.key === 'hot') {
+        const n = ensureHot(state.view).size;
+        count = n || null;
+      }
+      const btn = chip(f.label, count, state.status.has(f.key), () => onQuickFilter(f.key), 'quick');
+      if (f.key === 'hot') btn.title = '综合更新时间、截止状态、招聘规模、企业性质排序的头部岗位';
+      el.quickFilters.appendChild(btn);
     }
+  }
+
+  function onQuickFilter(key) {
+    if (key !== 'hot') {
+      toggle(state.status, key);
+      return;
+    }
+    // 热门是排序型筛选：打开时按热度排序，关闭时恢复按更新时间
+    const on = !state.status.has('hot');
+    if (on) state.status.add('hot');
+    else state.status.delete('hot');
+    if (on) state.sort = 'hot';
+    else if (state.sort === 'hot') state.sort = 'updated';
+    el.sortSelect.value = state.sort;
+    onFilterChange();
   }
 
   const GROUP_PICK = {
@@ -634,6 +704,7 @@
     if (state.status.has('soe') && row.ownership !== '央国企') return false;
     if (state.status.has('private') && row.ownership !== '民企') return false;
     if (state.status.has('fav') && !favorites.has(row.id)) return false;
+    if (state.status.has('hot') && !ensureHot(state.view).has(row.id)) return false;
 
     const includeStatus = ['urgent', 'over', 'asap', 'test'].filter((k) => state.status.has(k));
     if (includeStatus.length) {
@@ -669,7 +740,10 @@
 
   function sortRows(rows) {
     const copy = rows.slice();
-    if (state.sort === 'company') copy.sort((a, b) => a.company.localeCompare(b.company, 'zh'));
+    if (state.sort === 'hot') {
+      const hot = ensureHot(state.view);
+      copy.sort((a, b) => (hot.get(b.id) || 0) - (hot.get(a.id) || 0) || (b.updatedAt || '').localeCompare(a.updatedAt || ''));
+    } else if (state.sort === 'company') copy.sort((a, b) => a.company.localeCompare(b.company, 'zh'));
     else if (state.sort === 'deadline') {
       const group = (r) => { const d = daysUntil(r.deadline); if (d == null) return 1; return d >= 0 ? 0 : 2; };
       copy.sort((a, b) => {
@@ -701,6 +775,7 @@
       <div class="job-card-top">
         <span class="job-company">${highlight(row.company)}</span>
         ${row.source === 'official' ? '<span class="badge official">官网</span>' : ''}
+        ${ensureHot(state.view).has(row.id) ? '<span class="badge hot">热门</span>' : ''}
         <span class="badge ownership">${esc(row.ownership)}</span>
         ${score ? matchBadge(score) : ''}
         ${appSt && appSt !== 'saved' ? `<span class="badge st-${appSt}">${APP_STATUS_LABELS[appSt]}</span>` : ''}
