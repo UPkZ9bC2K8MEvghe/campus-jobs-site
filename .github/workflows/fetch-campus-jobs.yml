@@ -113,6 +113,9 @@ jobs:
       - name: 抓取牛客外部热榜
         run: node scripts/fetch-external-hot.mjs
 
+      - name: 抓取智联外部覆盖校验
+        run: node scripts/fetch-external-coverage.mjs
+
       - name: 构建站点
         run: npm run build
 
