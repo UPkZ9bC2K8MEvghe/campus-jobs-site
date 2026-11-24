@@ -1,8 +1,8 @@
-name: 每日更新并部署
+name: 姣忔棩鏇存柊骞堕儴缃?
 
 on:
   schedule:
-    # 每天 09:00（北京时间 = UTC 01:00）跑一次
+    # 姣忓ぉ 09:00锛堝寳浜椂闂?= UTC 01:00锛夎窇涓€娆?
     - cron: '0 1 * * *'
   workflow_dispatch: {}
 
@@ -14,9 +14,9 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # 5 个分片并行抓取：每个 runner 独立起浏览器，墙钟约降为单机 1/5
+  # 5 涓垎鐗囧苟琛屾姄鍙栵細姣忎釜 runner 鐙珛璧锋祻瑙堝櫒锛屽閽熺害闄嶄负鍗曟満 1/5
   fetch:
-    # 公开镜像仓库只发布静态站点，不重复执行抓取（抓取与 Cloudflare 部署仅在私有仓库运行）
+    # 鍏紑闀滃儚浠撳簱鍙彂甯冮潤鎬佺珯鐐癸紝涓嶉噸澶嶆墽琛屾姄鍙栵紙鎶撳彇涓?Cloudflare 閮ㄧ讲浠呭湪绉佹湁浠撳簱杩愯锛?
     if: github.repository == 'UPkZ9bC2K8MEvghe/campus-jobs'
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -34,7 +34,7 @@ jobs:
 
       - run: npm ci
 
-      - name: 缓存 Playwright 浏览器
+      - name: 缂撳瓨 Playwright 娴忚鍣?
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
@@ -42,17 +42,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-playwright-
 
-      - name: 安装 Playwright 浏览器
+      - name: 瀹夎 Playwright 娴忚鍣?
         run: npx playwright install --with-deps chromium
 
-      - name: 抓取分片 ${{ matrix.shard }}
+      - name: 鎶撳彇鍒嗙墖 ${{ matrix.shard }}
         run: node scripts/fetch-official.mjs --shard=${{ matrix.shard }}/5
         env:
-          # 分片内浏览器源并发；事件驱动等待后单源耗时大降，2 核 runner 取 6
+          # 鍒嗙墖鍐呮祻瑙堝櫒婧愬苟鍙戯紱浜嬩欢椹卞姩绛夊緟鍚庡崟婧愯€楁椂澶ч檷锛? 鏍?runner 鍙?6
           BROWSER_CONCURRENCY: '6'
           HTTP_CONCURRENCY: '12'
 
-      - name: 上传分片产物
+      - name: 涓婁紶鍒嗙墖浜х墿
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -63,7 +63,7 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
-  # 汇总：合并分片 → 同步飞书表格/文档 → 校验 → 构建 → 部署 → 回写
+  # 姹囨€伙細鍚堝苟鍒嗙墖 鈫?鍚屾椋炰功琛ㄦ牸/鏂囨。 鈫?鏍￠獙 鈫?鏋勫缓 鈫?閮ㄧ讲 鈫?鍥炲啓
   deploy:
     needs: fetch
     if: github.repository == 'UPkZ9bC2K8MEvghe/campus-jobs'
@@ -81,70 +81,73 @@ jobs:
 
       - run: npm ci
 
-      - name: 下载分片产物
+      - name: 涓嬭浇鍒嗙墖浜х墿
         uses: actions/download-artifact@v4
         with:
           pattern: shard-*
           path: data
           merge-multiple: true
 
-      - name: 合并分片数据
+      - name: 鍚堝苟鍒嗙墖鏁版嵁
         run: node scripts/merge-shards.mjs
         env:
           FETCH_ALERT_WEBHOOK: ${{ secrets.FETCH_ALERT_WEBHOOK }}
 
-      - name: 同步飞书多维表格与文档
+      - name: 鍚屾椋炰功澶氱淮琛ㄦ牸涓庢枃妗?
         run: node scripts/export-data.mjs --incremental
         env:
           FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
           FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
 
-      - name: 数据校验
+      - name: 鏁版嵁鏍￠獙
         run: npm run validate
 
-      - name: 安装 Playwright 浏览器
+      - name: 瀹夎 Playwright 娴忚鍣?
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-playwright-
-      - name: 安装 Playwright 浏览器
+      - name: 瀹夎 Playwright 娴忚鍣?
         run: npx playwright install --with-deps chromium
 
-      - name: 抓取牛客外部热榜
+      - name: 鎶撳彇鐗涘澶栭儴鐑
         run: node scripts/fetch-external-hot.mjs
 
-      - name: 抓取智联外部覆盖校验
+      - name: 鎶撳彇鏅鸿仈澶栭儴瑕嗙洊鏍￠獙
         run: node scripts/fetch-external-coverage.mjs
 
-      - name: 构建站点
+      - name: 鏋勫缓绔欑偣
         run: npm run build
 
-      - name: 提交并推送数据
+      - name: 鎻愪氦骞舵帹閫佹暟鎹?
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data
           if git diff --cached --quiet; then
-            echo "没有数据变化，跳过部署"
+            echo "娌℃湁鏁版嵁鍙樺寲锛岃烦杩囬儴缃?
             echo "SKIP_DEPLOY=true" >> $GITHUB_ENV
           else
-            git commit -m "chore(data): 每日更新 $(date -u +%Y-%m-%d)"
+            git commit -m "chore(data): 姣忔棩鏇存柊 $(date -u +%Y-%m-%d)"
             git push
             echo "SKIP_DEPLOY=false" >> $GITHUB_ENV
           fi
 
-      - name: 触发镜像站并行部署
+      - name: 瑙﹀彂闀滃儚绔欏苟琛岄儴缃?
         if: env.SKIP_DEPLOY != 'true'
+        continue-on-error: true
         run: |
-          if [ -z "$MIRROR_PAT" ]; then echo "未配置 MIRROR_PAT，跳过镜像触发"; exit 0; fi
+          if [ -z "$MIRROR_PAT" ]; then echo "鏈厤缃?MIRROR_PAT锛岃烦杩囬暅鍍忚Е鍙?; exit 0; fi
+          # checkout 娉ㄥ叆鐨?extraheader 浼氱敤 github-actions[bot] 瑕嗙洊 URL 閲岀殑 PAT锛屾帹閫佸墠娓呴櫎
+          git config --unset-all http.https://github.com/.extraheader || true
           MIRROR_URL="https://x-access-token:${MIRROR_PAT}@github.com/UPkZ9bC2K8MEvghe/campus-jobs-site.git"
           git remote add mirror "$MIRROR_URL" 2>/dev/null || git remote set-url mirror "$MIRROR_URL"
           git push mirror HEAD:master --force
-          echo "已触发镜像仓库 GitHub Pages 构建（与 Cloudflare 部署并行）"
+          echo "宸茶Е鍙戦暅鍍忎粨搴?GitHub Pages 鏋勫缓锛堜笌 Cloudflare 閮ㄧ讲骞惰锛?
 
-      - name: 部署到 Cloudflare Pages
+      - name: 閮ㄧ讲鍒?Cloudflare Pages
         if: env.SKIP_DEPLOY != 'true'
         uses: cloudflare/wrangler-action@v3
         with:
