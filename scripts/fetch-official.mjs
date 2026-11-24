@@ -441,6 +441,10 @@ async function collectHuawei(src) {
 
 /* ---------- 北森 zhiye 系：统一 JSON API ---------- */
 
+const ZHIYE_REQUEST_TIMEOUT_MS = 15000;
+const ZHIYE_CITY_CONCURRENCY = 6;
+const ZHIYE_SOURCE_BUDGET_MS = 90000;
+
 const zhiyeHeaders = (host) => ({
   'Content-Type': 'application/json',
   Accept: 'application/json, text/plain, */*',
@@ -449,11 +453,12 @@ const zhiyeHeaders = (host) => ({
   'User-Agent': UA,
 });
 
-async function zhiyePost(host, pathname, body) {
+async function zhiyePost(host, pathname, body, signal) {
   const res = await fetch(`https://${host}${pathname}`, {
     method: 'POST',
     headers: zhiyeHeaders(host),
     body: JSON.stringify(body),
+    signal: AbortSignal.any([signal, AbortSignal.timeout(ZHIYE_REQUEST_TIMEOUT_MS)]),
   });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json();
@@ -463,7 +468,7 @@ async function zhiyePost(host, pathname, body) {
 const ATS_PAGE_LIMIT = 200;
 
 /* 拉取一页/全部职位；locId 为地区码数组，null 表示不过滤 */
-async function zhiyeList(host, portalId, locId, maxPages = 20, strict = false) {
+async function zhiyeList(host, portalId, locId, maxPages = 20, strict = false, signal) {
   const out = [];
   for (let p = 0; p < maxPages; p++) {
     const body = {
@@ -476,7 +481,7 @@ async function zhiyeList(host, portalId, locId, maxPages = 20, strict = false) {
       DisplayFields: ['Category', 'Kind', 'PostDate'],
     };
     if (locId) body.LocId = locId;
-    const j = await zhiyePost(host, '/api/Jobad/GetJobAdPageList', body);
+    const j = await zhiyePost(host, '/api/Jobad/GetJobAdPageList', body, signal);
     const arr = j.Data || [];
     out.push(...arr);
     if (arr.length < 50) break;
@@ -489,21 +494,24 @@ async function zhiyeList(host, portalId, locId, maxPages = 20, strict = false) {
 
 const stripJobCode = (s) => String(s || '').replace(/\(J\d+\)\s*$/, '').trim();
 
-async function collectZhiye(src) {
+async function collectZhiye(src, signal) {
   const host = src.host;
   /* 地区码 → 名称 */
   let tree = [];
   try {
     const res = await fetch(`https://${host}/api/Jobad/SearchAreasTreeConditions?categoryId=2&_timestamp=${Date.now()}`, {
       headers: zhiyeHeaders(host),
+      signal: AbortSignal.any([signal, AbortSignal.timeout(ZHIYE_REQUEST_TIMEOUT_MS)]),
     });
     tree = (await res.json()).Data || [];
-  } catch {}
+  } catch (e) {
+    if (signal.aborted) throw e;
+  }
   const nameOf = new Map(tree.map((t) => [String(t.Code), cleanCity((t.Name && t.Name[0]) || '')]));
   const parentOf = new Map(tree.map((t) => [String(t.Code), String(t.ParentCode || '')]));
 
   /* 自动翻到短页，企业配置中的 pages 不再决定抓取完整性。 */
-  const all = await zhiyeList(host, src.portalId, null, ATS_PAGE_LIMIT, true);
+  const all = await zhiyeList(host, src.portalId, null, ATS_PAGE_LIMIT, true, signal);
 
   /* 按地区计数，只查有岗位的叶子地区，给岗位补城市 */
   const cityByJob = new Map();
@@ -514,9 +522,11 @@ async function collectZhiye(src) {
       const cj = await zhiyePost(host, `/api/Jobad/GetJobCount${q}`, {
         Condition: [{ Type: 'workLocation', Values: tree.map((t) => t.Code) }],
         Category: 'campus',
-      });
+      }, signal);
       counts = cj.Data || {};
-    } catch {}
+    } catch (e) {
+      if (signal.aborted) throw e;
+    }
   }
   const active = Object.entries(counts)
     .filter(([, n]) => Number(n) > 0)
@@ -525,18 +535,20 @@ async function collectZhiye(src) {
   const leaf = active
     .filter((c) => !active.some((o) => parentOf.get(o) === c))
     .slice(0, src.cityLimit || 24); // 大城市优先，避免长尾地区拖慢抓取
-  for (const code of leaf) {
-    if (code === '1') continue; // 全国：不作为城市
+  await mapLimit(leaf, ZHIYE_CITY_CONCURRENCY, async (code) => {
+    if (code === '1') return; // 全国：不作为城市
     const nm = /^2$/.test(code) ? '海外' : nameOf.get(code) || '';
-    if (!nm) continue;
+    if (!nm) return;
     try {
-      const arr = await zhiyeList(host, src.portalId, [Number(code)], 1);
+      const arr = await zhiyeList(host, src.portalId, [Number(code)], 1, false, signal);
       for (const it of arr) {
         if (!cityByJob.has(it.Id)) cityByJob.set(it.Id, new Set());
         cityByJob.get(it.Id).add(nm);
       }
-    } catch {}
-  }
+    } catch (e) {
+      if (signal.aborted) throw e;
+    }
+  });
 
   const seen = new Set();
   const rows = [];
@@ -1359,7 +1371,8 @@ async function readJSONSafe(file, fallback) {
   }
 }
 
-async function fetchSourceOnce(src) {
+async function fetchSourceOnce(src, signal) {
+  if (src.collect === collectZhiye) return src.collect(src, signal);
   if (src.collect) return src.collect(src);
   if (src.mode === 'browser') return runBrowserSource(src);
   return src.parse(await fetchText(src.url), src);
@@ -1367,18 +1380,35 @@ async function fetchSourceOnce(src) {
 
 async function fetchSource(src) {
   const started = Date.now();
+  const controller = new AbortController();
+  const budgetError = new Error(`北森来源 ${src.key} 超过 ${ZHIYE_SOURCE_BUDGET_MS / 1000} 秒预算`);
+  budgetError.fatal = true;
+  const isZhiye = src.collect === collectZhiye;
+  const timer = isZhiye
+    ? setTimeout(() => controller.abort(budgetError), ZHIYE_SOURCE_BUDGET_MS)
+    : null;
   let error = null;
-  for (let attempt = 1; attempt <= 3; attempt++) {
-    try {
-      const rows = await fetchSourceOnce(src);
-      return { rows, durationMs: Date.now() - started, attempts: attempt, error: null };
-    } catch (e) {
-      error = e;
-      if (e.fatal) break; // 确定性失败（翻页断点/超限/一致性校验），重试无意义
-      if (attempt < 3) await sleep(1000 * 2 ** (attempt - 1)); // 1s、2s 后重试
+  let attempts = 0;
+  try {
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      if (controller.signal.aborted) {
+        error = budgetError;
+        break;
+      }
+      attempts = attempt;
+      try {
+        const rows = await fetchSourceOnce(src, isZhiye ? controller.signal : undefined);
+        return { rows, durationMs: Date.now() - started, attempts, error: null };
+      } catch (e) {
+        error = controller.signal.aborted ? budgetError : e;
+        if (error.fatal) break; // 确定性失败（翻页断点/超限/一致性校验），重试无意义
+        if (attempt < 3) await sleep(1000 * 2 ** (attempt - 1));
+      }
     }
+    return { rows: [], durationMs: Date.now() - started, attempts, error };
+  } finally {
+    if (timer) clearTimeout(timer);
   }
-  return { rows: [], durationMs: Date.now() - started, attempts: 3, error };
 }
 
 async function run() {
