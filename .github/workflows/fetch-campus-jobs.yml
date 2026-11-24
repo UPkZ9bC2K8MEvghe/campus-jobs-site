@@ -119,21 +119,24 @@ jobs:
       - name: 构建站点
         run: npm run build
 
-      - name: 部署到 Cloudflare Pages
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy dist --project-name campus-jobs --branch master --commit-dirty=true
-
       - name: 提交并推送数据
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data
           if git diff --cached --quiet; then
-            echo "没有数据变化"
+            echo "没有数据变化，跳过部署"
+            echo "SKIP_DEPLOY=true" >> $GITHUB_ENV
           else
             git commit -m "chore(data): 每日更新 $(date -u +%Y-%m-%d)"
             git push
+            echo "SKIP_DEPLOY=false" >> $GITHUB_ENV
           fi
+
+      - name: 部署到 Cloudflare Pages
+        if: env.SKIP_DEPLOY != 'true'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name campus-jobs --branch master --commit-dirty=true
