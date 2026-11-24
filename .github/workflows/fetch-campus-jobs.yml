@@ -63,7 +63,7 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
-  # 汇总：合并分片数据 → 校验 → 构建 → 部署 → 回写
+  # 汇总：合并分片 → 同步飞书表格/文档 → 校验 → 构建 → 部署 → 回写
   deploy:
     needs: fetch
     if: github.repository == 'UPkZ9bC2K8MEvghe/campus-jobs'
@@ -86,16 +86,16 @@ jobs:
           path: data
           merge-multiple: true
 
-      - name: 刷新求职资料两个文档
-        run: node scripts/export-data.mjs --docs-only
-        env:
-          FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
-          FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
-
       - name: 合并分片数据
         run: node scripts/merge-shards.mjs
         env:
           FETCH_ALERT_WEBHOOK: ${{ secrets.FETCH_ALERT_WEBHOOK }}
+
+      - name: 同步飞书多维表格与文档
+        run: node scripts/export-data.mjs
+        env:
+          FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
+          FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
 
       - name: 数据校验
         run: npm run validate

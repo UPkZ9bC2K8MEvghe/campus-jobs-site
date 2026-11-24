@@ -28,8 +28,8 @@ function resolveLarkCli() {
 const LARK_CLI = process.env.LARK_CLI || resolveLarkCli();
 const BASE_TOKEN = 'GtSLbyyR3aCENOsJYC6cdlsVnih';
 const TABLES = [
-  { key: 'jobs', tableId: 'tblH4au5rnBcqHgJ', expected: 9161 },
-  { key: 'internships', tableId: 'tbl507pxNhre0z2l', expected: 2228 },
+  { key: 'jobs', tableId: 'tblH4au5rnBcqHgJ', expected: 9210 },
+  { key: 'internships', tableId: 'tbl507pxNhre0z2l', expected: 2246 },
 ];
 const PAGE_LIMIT = 2000;
 const MAX_PAGES = 12;
@@ -638,13 +638,87 @@ function compactLink(link) {
   return Object.keys(out).length ? out : null;
 }
 
+/* ---------- 飞书多维表格：应用直读（CI 无 lark-cli 时使用） ---------- */
+
+// 表格字段（日期/链接/人员等）转成与 lark-cli NDJSON 一致的可解析值
+function flattenBitableValue(v) {
+  if (v == null) return null;
+  if (Array.isArray(v)) {
+    const out = v.map(flattenBitableValue).filter((x) => x != null && x !== '');
+    return out.length ? out : null;
+  }
+  if (typeof v === 'object') {
+    if (typeof v.link === 'string') {
+      const text = typeof v.text === 'string' && v.text && v.text !== v.link ? v.text : '';
+      return text ? `[${text}](${v.link})` : v.link;
+    }
+    if (typeof v.text === 'string') return v.text;
+    if (Array.isArray(v.text_arr)) return v.text_arr.join('');
+    if (typeof v.name === 'string') return v.name;
+    return null;
+  }
+  // 日期字段是毫秒时间戳，按东八区转 YYYY-MM-DD
+  if (typeof v === 'number' && v >= 1e12) {
+    return new Date(v + 8 * 3600 * 1000).toISOString().slice(0, 10);
+  }
+  return v;
+}
+
+async function fetchBitableRecordsViaApp(tableId, appToken) {
+  const records = [];
+  let pageToken = '';
+  for (let page = 0; page < 40; page += 1) {
+    const qs = new URLSearchParams({ page_size: '500' });
+    if (pageToken) qs.set('page_token', pageToken);
+    const res = await fetch(`https://open.feishu.cn/open-apis/bitable/v1/apps/${BASE_TOKEN}/tables/${tableId}/records?${qs}`, {
+      headers: { Authorization: `Bearer ${appToken}` }, signal: AbortSignal.timeout(60000),
+    });
+    const j = await res.json();
+    if (j.code !== 0) throw new Error(`bitable ${tableId}: ${j.msg || j.code}`);
+    for (const it of j.data.items || []) {
+      const rec = { record_id: it.record_id || it.id };
+      for (const [k, v] of Object.entries(it.fields || {})) {
+        const flat = flattenBitableValue(v);
+        if (flat != null) rec[k] = flat;
+      }
+      records.push(rec);
+    }
+    if (!j.data.has_more || !j.data.page_token) break;
+    pageToken = j.data.page_token;
+  }
+  return records;
+}
+
 /* ---------- 导出 ---------- */
 
-async function exportTable({ key, tableId, expected }) {
-  const workDir = await mkdtemp(path.join(tmpdir(), `campusjobs-${key}-`));
+async function exportTable({ key, tableId, expected }, appToken = null) {
   const rows = [];
   const details = {};
   const seen = new Set();
+
+  const addRecord = (rec) => {
+    if (!rec || !rec.record_id || seen.has(rec.record_id)) return 0;
+    seen.add(rec.record_id);
+    const normalized = normalizeJob(rec);
+    if (!normalized) return 0;
+    rows.push(normalized.list);
+    if (Object.keys(normalized.detail).length) details[normalized.list.id] = normalized.detail;
+    return 1;
+  };
+
+  if (appToken) {
+    const records = await fetchBitableRecordsViaApp(tableId, appToken);
+    for (const rec of records) addRecord(rec);
+    process.stdout.write(`  ${key} 应用直读: 读取 ${records.length} 条, 保留 ${rows.length} 条\n`);
+    if (rows.length !== expected) {
+      process.stdout.write(`  ⚠ ${key} 条数 ${rows.length} 与预期 ${expected} 不一致（数据可能已更新）\n`);
+    } else {
+      process.stdout.write(`  ✓ ${key} 共 ${rows.length} 条，与预期一致\n`);
+    }
+    return { rows, details };
+  }
+
+  const workDir = await mkdtemp(path.join(tmpdir(), `campusjobs-${key}-`));
 
   for (let page = 0; page < MAX_PAGES; page += 1) {
     const offset = page * PAGE_LIMIT;
@@ -676,14 +750,7 @@ async function exportTable({ key, tableId, expected }) {
       } catch {
         continue;
       }
-      if (!rec || !rec.record_id || seen.has(rec.record_id)) continue;
-      seen.add(rec.record_id);
-      const normalized = normalizeJob(rec);
-      if (normalized) {
-        rows.push(normalized.list);
-        if (Object.keys(normalized.detail).length) details[normalized.list.id] = normalized.detail;
-        added += 1;
-      }
+      added += addRecord(rec);
     }
     process.stdout.write(`  ${key} 第 ${page + 1} 页: 读取 ${lines.length} 条, 新增 ${added} 条, 累计 ${rows.length}\n`);
     if (lines.length < PAGE_LIMIT) break;
@@ -802,24 +869,33 @@ function buildDashboard(jobs, internships) {
 
 const SOE_TABLE = 'tbllTNyaMiYmRlv4';
 
-async function exportSOE() {
-  const workDir = await mkdtemp(path.join(tmpdir(), 'campusjobs-soe-'));
-  const outFile = path.join(workDir, 'soe.ndjson');
-  await execFileAsync(LARK_CLI, [
-    'base', '+record-list',
-    '--base-token', BASE_TOKEN,
-    '--table-id', SOE_TABLE,
-    '--limit', '2000',
-    '--format', 'ndjson',
-    '--output', outFile,
-    '--as', 'user',
-  ], { maxBuffer: 64 * 1024 * 1024, timeout: 300000, windowsHide: true });
+async function exportSOE(appToken = null) {
+  let records;
+  if (appToken) {
+    records = await fetchBitableRecordsViaApp(SOE_TABLE, appToken);
+    process.stdout.write(`  SOE 应用直读: ${records.length} 条记录\n`);
+  } else {
+    const workDir = await mkdtemp(path.join(tmpdir(), 'campusjobs-soe-'));
+    const outFile = path.join(workDir, 'soe.ndjson');
+    await execFileAsync(LARK_CLI, [
+      'base', '+record-list',
+      '--base-token', BASE_TOKEN,
+      '--table-id', SOE_TABLE,
+      '--limit', '2000',
+      '--format', 'ndjson',
+      '--output', outFile,
+      '--as', 'user',
+    ], { maxBuffer: 64 * 1024 * 1024, timeout: 300000, windowsHide: true });
 
-  const text = await readFile(outFile, 'utf8');
+    const text = await readFile(outFile, 'utf8');
+    records = [];
+    for (const line of text.split(/\r?\n/).filter(Boolean)) {
+      try { records.push(JSON.parse(line)); } catch { /* 跳过坏行 */ }
+    }
+  }
+
   const items = [];
-  for (const line of text.split(/\r?\n/).filter(Boolean)) {
-    let r;
-    try { r = JSON.parse(line); } catch { continue; }
+  for (const r of records) {
     for (const [c, l] of [[r['公司'], r['链接']], [r['公司2'], r['链接2']]]) {
       const company = cleanLabel(c || '');
       if (!company) continue;
@@ -1068,9 +1144,18 @@ async function main() {
   const facets = {};
   const data = {};
 
+  // 优先用自建应用直读多维表格（CI 无 lark-cli），失败或未配置时回退 lark-cli
+  let appToken = null;
+  try {
+    appToken = await feishuTenantToken();
+  } catch (e) {
+    process.stdout.write(`  ⚠ 应用凭证获取失败，回退 lark-cli：${e.message}\n`);
+  }
+  if (appToken) process.stdout.write('  · 使用飞书自建应用直读多维表格\n');
+
   for (const table of TABLES) {
     process.stdout.write(`导出 ${table.key} (${table.tableId})…\n`);
-    const { rows: rawRows, details: rawDetails } = await exportTable(table);
+    const { rows: rawRows, details: rawDetails } = await exportTable(table, appToken);
     let rows = rawRows;
     let details = rawDetails;
     if (table.key === 'jobs') {
@@ -1097,7 +1182,7 @@ async function main() {
   process.stdout.write(`  → facets.json / dashboard.json / changelog.json（新增 ${changelog.addedCount} / 下架 ${changelog.removedCount}）\n`);
 
   process.stdout.write(`导出央国企名录…\n`);
-  const soe = await exportSOE();
+  const soe = await exportSOE(appToken);
   await writeFile(path.join(DATA_DIR, 'soe.json'), JSON.stringify(soe), 'utf8');
   process.stdout.write(`  → soe.json (${soe.length} 条)\n`);
 
