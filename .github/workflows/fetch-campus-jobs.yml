@@ -137,8 +137,11 @@ jobs:
 
       - name: 触发镜像站并行部署
         if: env.SKIP_DEPLOY != 'true'
+        continue-on-error: true
         run: |
           if [ -z "$MIRROR_PAT" ]; then echo "未配置 MIRROR_PAT，跳过镜像触发"; exit 0; fi
+          # checkout 注入的 extraheader 会用 github-actions[bot] 覆盖 URL 里的 PAT，推送前清除
+          git config --unset-all http.https://github.com/.extraheader || true
           MIRROR_URL="https://x-access-token:${MIRROR_PAT}@github.com/UPkZ9bC2K8MEvghe/campus-jobs-site.git"
           git remote add mirror "$MIRROR_URL" 2>/dev/null || git remote set-url mirror "$MIRROR_URL"
           git push mirror HEAD:master --force
