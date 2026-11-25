@@ -2,7 +2,13 @@
 (() => {
   'use strict';
 
-  const DATA_BASE = 'data/';
+  // 数据同时发布在公开镜像；pages.dev 在部分网络下会卡住大文件，镜像优先、同源兜底
+  const DATA_SOURCES = [
+    'https://upkz9bc2k8mevghe.github.io/campus-jobs-site/data/',
+    'https://cdn.jsdelivr.net/gh/UPkZ9bC2K8MEvghe/campus-jobs-site@master/data/',
+    'data/',
+  ];
+  let dataBase = DATA_SOURCES[0];
   const PAGE_SIZE = 60;
   const DETAIL_SHARDS = 16; // 必须与 scripts/export-data.mjs 的 SHARD_COUNT 一致
   const NATIONWIDE = '__nationwide__';
@@ -472,19 +478,21 @@
   }
 
   /* ---------- 加载 ---------- */
-  async function loadJSON(name, timeout = 20000) {
+  async function loadJSON(name, timeout = 8000) {
     let lastErr;
-    for (let attempt = 0; attempt < 2; attempt += 1) {
+    const bases = [dataBase, ...DATA_SOURCES.filter((base) => base !== dataBase)];
+    for (const base of bases) {
       const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), timeout);
+      const limit = base === 'data/' ? Math.max(timeout, 20000) : timeout;
+      const timer = setTimeout(() => controller.abort(), limit);
       try {
-        const suffix = attempt ? `?retry=${Date.now()}` : '';
-        const res = await fetch(`${DATA_BASE}${name}${suffix}`, { signal: controller.signal });
+        const res = await fetch(`${base}${name}`, { signal: controller.signal });
         if (!res.ok) throw new Error(`${name} 加载失败: ${res.status}`);
-        return await res.json();
+        const data = await res.json();
+        dataBase = base;
+        return data;
       } catch (err) {
         lastErr = err.name === 'AbortError' ? new Error(`${name} 加载超时`) : err;
-        if (attempt || !(err.name === 'AbortError' || err instanceof TypeError)) throw lastErr;
       } finally {
         clearTimeout(timer);
       }
