@@ -1,0 +1,2258 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>求职工具箱 · CareerKit — 安静、专业、有用</title>
+<meta name="description" content="一套安静但专业的求职工具：简历 ATS 检测、求职追踪、面试训练、薪资参考、公司背调。所有计算在本地完成，不存储你的数据。">
+<style>
+/* =========================================================
+   求职工具箱 CareerKit — 高级感设计系统
+   灵感：Linear / Figma / Vercel / 无印良品
+   ========================================================= */
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  /* 背景与表面 */
+  --bg:         #F8F7F4;
+  --bg-elev:    #FFFFFF;
+  --bg-subtle:  #F0EEEA;
+
+  /* 文字 */
+  --text:       #1A1A1A;
+  --text-dim:   #4A4A4A;
+  --text-faint: #8A8A8A;
+  --text-line:  #E5E3DF;
+
+  /* 主色 — 克制的蓝绿色 */
+  --accent:     #2D6A4F;
+  --accent-soft:#E8F0EC;
+
+  /* 状态色 — 低饱和 */
+  --ok:         #2D6A4F;
+  --warn:       #B8860B;
+  --bad:        #B23A48;
+  --info:       #3D5A80;
+
+  /* 排版 */
+  --font-display: 'Fraunces', 'Times New Roman', 'Songti SC', serif;
+  --font-body:    'Inter', -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-mono:    'JetBrains Mono', 'SF Mono', Consolas, monospace;
+
+  /* 圆角 */
+  --r-sm:  6px;
+  --r-md:  10px;
+  --r-lg:  16px;
+
+  /* 阴影 — 非常柔和 */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.06);
+  --shadow-lg: 0 16px 48px rgba(0,0,0,0.08);
+
+  /* 过渡 */
+  --ease: cubic-bezier(.2,.8,.2,1);
+}
+
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+/* —— 顶部导航 —— */
+.topbar {
+  position: sticky; top:0; z-index:50;
+  background: rgba(248,247,244,0.8);
+  backdrop-filter: saturate(180%) blur(12px);
+  -webkit-backdrop-filter: saturate(180%) blur(12px);
+  border-bottom: 1px solid var(--text-line);
+}
+.topbar-inner {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.brand {
+  display: flex; align-items: baseline; gap: 10px;
+  text-decoration: none; color: var(--text);
+}
+.brand-logo {
+  width: 28px; height: 28px;
+  background: var(--text);
+  border-radius: 6px;
+  position: relative;
+}
+.brand-logo::after {
+  content: ''; position: absolute;
+  left: 7px; top: 7px; width: 14px; height: 14px;
+  background: var(--bg); border-radius: 3px;
+}
+.brand-name {
+  font-family: var(--font-display);
+  font-size: 17px; font-weight: 600; letter-spacing: -0.01em;
+}
+.brand-sub { font-size: 12px; color: var(--text-faint); }
+.top-links { display: flex; gap: 24px; font-size: 13px; color: var(--text-dim); }
+.top-links a { color: inherit; text-decoration: none; }
+.top-links a:hover { color: var(--text); }
+
+/* —— Hero —— */
+.hero {
+  max-width: 1160px; margin: 0 auto;
+  padding: 96px 24px 72px;
+  text-align: center;
+  position: relative;
+}
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(45,106,79,0.06) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(61,90,128,0.05) 0%, transparent 50%);
+  pointer-events: none;
+}
+.hero-tag {
+  display: inline-block;
+  font-size: 12px; color: var(--text-dim);
+  padding: 5px 14px;
+  border: 1px solid var(--text-line);
+  border-radius: 100px;
+  margin-bottom: 28px;
+  letter-spacing: 0.04em;
+}
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(36px, 6vw, 64px);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin-bottom: 20px;
+  color: var(--text);
+}
+.hero-title em {
+  font-style: italic;
+  color: var(--accent);
+}
+.hero-lead {
+  font-size: 17px;
+  color: var(--text-dim);
+  max-width: 540px;
+  margin: 0 auto 40px;
+}
+.hero-meta {
+  display: flex; justify-content: center; gap: 40px; flex-wrap: wrap;
+  padding-top: 32px;
+  border-top: 1px solid var(--text-line);
+  max-width: 480px; margin: 0 auto;
+}
+.hero-meta strong {
+  font-family: var(--font-display);
+  font-size: 28px; font-weight: 600; color: var(--text);
+  display: block;
+}
+.hero-meta span { font-size: 12px; color: var(--text-faint); }
+
+/* —— 分类 —— */
+.section { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
+.section-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  margin-bottom: 28px;
+}
+.section-title {
+  font-family: var(--font-display);
+  font-size: 22px; font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.section-title small { font-family: var(--font-body); font-size: 13px; font-weight: 400; color: var(--text-faint); margin-left: 10px; }
+
+.categories {
+  display: flex; gap: 8px; flex-wrap: wrap;
+  padding: 6px; background: var(--bg-subtle);
+  border-radius: 12px;
+  width: fit-content;
+  margin-bottom: 32px;
+}
+.cat-pill {
+  padding: 7px 18px;
+  font-size: 13px; font-weight: 500;
+  background: transparent; border: none; border-radius: 8px;
+  color: var(--text-dim); cursor: pointer;
+  transition: all .2s var(--ease);
+  font-family: var(--font-body);
+}
+.cat-pill:hover { color: var(--text); }
+.cat-pill.active {
+  background: var(--bg-elev);
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
+}
+
+/* —— 工具卡片 —— */
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 16px;
+}
+.tool-card {
+  background: var(--bg-elev);
+  border: 1px solid var(--text-line);
+  border-radius: var(--r-lg);
+  padding: 28px;
+  cursor: pointer;
+  transition: all .25s var(--ease);
+  position: relative;
+  display: flex; flex-direction: column;
+}
+.tool-card:hover {
+  transform: translateY(-2px);
+  border-color: #D8D6D2;
+  box-shadow: var(--shadow-md);
+}
+.tc-top {
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 14px;
+}
+.tc-icon {
+  width: 40px; height: 40px;
+  background: var(--accent-soft);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.tc-title { font-size: 15px; font-weight: 600; letter-spacing: -0.005em; }
+.tc-badge {
+  margin-left: auto;
+  font-size: 11px; padding: 3px 9px;
+  background: var(--bg-subtle); color: var(--text-dim);
+  border-radius: 6px;
+  font-weight: 500; letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+.tc-badge.hot { background: #FDF0EF; color: var(--bad); }
+.tc-desc {
+  font-size: 13.5px; color: var(--text-dim);
+  line-height: 1.55;
+  flex: 1;
+}
+.tc-footer {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--text-line);
+  font-size: 12px; color: var(--text-faint);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.tc-arrow { transition: transform .2s var(--ease); }
+.tool-card:hover .tc-arrow { transform: translateX(3px); }
+
+/* —— Modal —— */
+.modal-mask {
+  position: fixed; inset: 0; z-index: 100;
+  background: rgba(26,26,26,0.35);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: none; align-items: center; justify-content: center;
+  padding: 24px;
+  animation: fadeIn .2s var(--ease);
+}
+.modal-mask.active { display: flex; }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+@keyframes slideUp { from{opacity:0; transform:translateY(16px)} to{opacity:1; transform:translateY(0)} }
+
+.modal {
+  background: var(--bg-elev);
+  border-radius: var(--r-lg);
+  width: 100%; max-width: 680px;
+  max-height: 86vh; overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+  animation: slideUp .25s var(--ease);
+}
+.modal-head {
+  padding: 22px 28px;
+  border-bottom: 1px solid var(--text-line);
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; background: var(--bg-elev); z-index: 1;
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+}
+.modal-head h2 {
+  font-family: var(--font-display);
+  font-size: 19px; font-weight: 600; letter-spacing: -0.01em;
+}
+.close {
+  width: 32px; height: 32px;
+  border: 1px solid var(--text-line);
+  background: var(--bg-elev);
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-dim); font-size: 15px;
+  transition: all .15s var(--ease);
+}
+.close:hover { background: var(--bg-subtle); color: var(--text); }
+.modal-body { padding: 28px; }
+
+/* —— 表单 —— */
+label { display:block; font-size:13px; font-weight:500; color:var(--text-dim); margin-bottom:7px; }
+textarea, input[type=text], input[type=number], select {
+  width: 100%;
+  padding: 11px 14px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  background: var(--bg-elev);
+  border: 1px solid var(--text-line);
+  border-radius: var(--r-sm);
+  color: var(--text);
+  transition: all .15s var(--ease);
+}
+textarea {
+  font-family: var(--font-mono);
+  font-size: 13px; line-height: 1.6;
+  min-height: 160px; resize: vertical;
+}
+textarea:focus, input:focus, select:focus {
+  outline: none; border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(45,106,79,0.1);
+}
+.row { display:flex; gap:12px; margin-bottom:14px; flex-wrap:wrap; }
+.col { flex:1; min-width:130px; }
+
+/* —— 按钮 —— */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 10px 20px;
+  font-size: 13.5px; font-weight: 600;
+  font-family: var(--font-body);
+  background: var(--text); color: var(--bg);
+  border: none; border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: all .15s var(--ease);
+}
+.btn:hover { background: #333; transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+.btn.ghost {
+  background: transparent; color: var(--text);
+  border: 1px solid var(--text-line);
+}
+.btn.ghost:hover { background: var(--bg-subtle); color: var(--text); }
+.btn.ghost-danger { color: var(--bad); border-color: #E8D5D8; }
+.btn.ghost-danger:hover { background: #FDF0EF; }
+.btn-sm { padding: 6px 14px; font-size: 12.5px; }
+
+/* —— 输出区 —— */
+.output {
+  background: var(--bg);
+  border: 1px solid var(--text-line);
+  border-radius: var(--r-md);
+  padding: 18px 20px;
+  margin-top: 16px;
+  font-family: var(--font-mono);
+  font-size: 13px; line-height: 1.7;
+  white-space: pre-wrap; word-break: break-word;
+  max-height: 380px; overflow-y: auto;
+  color: var(--text-dim);
+}
+
+/* —— ATS 仪表盘 —— */
+.ats-score-wrap {
+  display: flex; align-items: center; justify-content: center; gap: 48px;
+  padding: 32px 24px;
+  background: var(--bg);
+  border: 1px solid var(--text-line);
+  border-radius: var(--r-lg);
+  margin: 20px 0;
+}
+.ats-ring { position: relative; width: 140px; height: 140px; }
+.ats-ring svg { transform: rotate(-90deg); }
+.ats-ring-bg { fill: none; stroke: var(--text-line); stroke-width: 10; }
+.ats-ring-fg { fill: none; stroke-width: 10; stroke-linecap: round; transition: stroke-dashoffset .8s var(--ease); }
+.ats-ring-center {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.ats-num {
+  font-family: var(--font-display);
+  font-size: 44px; font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.ats-label { font-size: 11px; color: var(--text-faint); letter-spacing: 0.05em; text-transform: uppercase; }
+.ats-meta { font-size: 13px; color: var(--text-dim); line-height: 2; }
+.ats-meta b { color: var(--text); font-weight: 600; }
+
+/* —— 关键词 —— */
+.kw-group { margin: 20px 0; }
+.kw-group h4 {
+  font-size: 13px; font-weight: 600; color: var(--text-dim);
+  margin-bottom: 10px;
+}
+.kw-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.kw-chip {
+  padding: 5px 12px; border-radius: 100px;
+  font-size: 12.5px; font-weight: 500;
+  border: 1px solid transparent;
+}
+.kw-chip.ok { background: var(--accent-soft); color: var(--ok); border-color: #D4E4DB; }
+.kw-chip.bad { background: #FDF0EF; color: var(--bad); border-color: #E8D5D8; }
+.kw-chip.info { background: #EEF1F6; color: var(--info); border-color: #D8DEE8; }
+
+/* —— 追踪表格 —— */
+.summary-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+.summary-card {
+  flex: 1; min-width: 110px;
+  background: var(--bg-elev); border: 1px solid var(--text-line);
+  border-radius: var(--r-md);
+  padding: 16px; text-align: center;
+}
+.summary-card .num {
+  font-family: var(--font-display); font-size: 28px; font-weight: 600;
+  color: var(--text); line-height: 1;
+}
+.summary-card .lbl { font-size: 12px; color: var(--text-faint); margin-top: 4px; }
+
+table.track { width: 100%; border-collapse: collapse; }
+table.track th {
+  text-align: left;
+  font-size: 11.5px; font-weight: 600;
+  color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.06em;
+  padding: 12px 10px 8px;
+  border-bottom: 1px solid var(--text-line);
+}
+table.track td {
+  padding: 12px 10px;
+  border-bottom: 1px solid var(--text-line);
+  font-size: 13.5px;
+}
+table.track tr:hover td { background: rgba(0,0,0,0.015); }
+select.status-sel {
+  padding: 5px 10px; font-size: 12px; font-weight: 500;
+  border-radius: 6px; border: 1px solid var(--text-line);
+  background: var(--bg-elev);
+}
+.status-applied { background: #EEF1F6; color: var(--info); }
+.status-interview { background: #FBF6E6; color: var(--warn); }
+.status-offer { background: var(--accent-soft); color: var(--ok); }
+.status-rejected { background: #FDF0EF; color: var(--bad); }
+
+/* —— 面试题 —— */
+.qa-block {
+  background: var(--bg-elev);
+  border: 1px solid var(--text-line);
+  border-radius: var(--r-md);
+  padding: 18px 20px;
+  margin-bottom: 12px;
+}
+.qa-q {
+  font-size: 14.5px; font-weight: 600;
+  display: flex; align-items: flex-start; gap: 12px;
+  color: var(--text);
+}
+.qa-num {
+  flex-shrink: 0;
+  width: 22px; height: 22px;
+  background: var(--bg-subtle); color: var(--text-dim);
+  border-radius: 50%;
+  font-family: var(--font-mono); font-size: 11px;
+  display: flex; align-items: center; justify-content: center;
+  margin-top: 2px;
+}
+.qa-tip {
+  margin-top: 10px; padding: 10px 14px;
+  background: var(--bg); border-left: 2px solid var(--text-line);
+  font-size: 12.5px; color: var(--text-dim); line-height: 1.6;
+  border-radius: 0 6px 6px 0;
+}
+
+/* —— 风险卡 —— */
+.risk-box {
+  padding: 20px; border-radius: var(--r-md);
+  border: 1px solid var(--text-line);
+  margin-bottom: 16px;
+}
+.risk-low  { background: var(--accent-soft); border-color: #D4E4DB; }
+.risk-mid  { background: #FBF6E6; border-color: #ECE1B8; }
+.risk-high { background: #FDF0EF; border-color: #E8D5D8; }
+.risk-title {
+  font-family: var(--font-display); font-size: 18px; font-weight: 600;
+  margin-bottom: 4px;
+}
+.risk-sub { font-size: 12px; color: var(--text-faint); }
+
+.checklist li {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--text-line);
+  font-size: 13.5px; color: var(--text-dim);
+  list-style: none;
+  display: flex; align-items: flex-start; gap: 10px;
+}
+.checklist li:last-child { border-bottom: none; }
+.checklist li::before {
+  content: '○'; color: var(--text-faint); flex-shrink: 0;
+}
+
+/* —— 薪资表 —— */
+table.salary { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+table.salary th {
+  padding: 12px 14px 8px;
+  text-align: left; font-weight: 600;
+  color: var(--text-faint); font-size: 11.5px;
+  text-transform: uppercase; letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--text-line);
+}
+table.salary td {
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--text-line);
+}
+table.salary tr:hover td { background: rgba(0,0,0,0.015); }
+
+/* —— Toast —— */
+.toast {
+  position: fixed; bottom: 32px; left: 50%;
+  transform: translate(-50%, 120%);
+  background: var(--text); color: var(--bg);
+  padding: 11px 22px; border-radius: var(--r-sm);
+  font-size: 13px; font-weight: 500;
+  box-shadow: var(--shadow-md);
+  opacity: 0; transition: all .25s var(--ease);
+  z-index: 200;
+}
+.toast.show { transform: translate(-50%, 0); opacity: 1; }
+
+/* —— Footer —— */
+footer {
+  border-top: 1px solid var(--text-line);
+  margin-top: 80px; padding: 48px 24px;
+  text-align: center; color: var(--text-faint); font-size: 12.5px;
+}
+
+/* —— 响应式 —— */
+@media (max-width: 640px) {
+  .hero { padding: 64px 20px 48px; }
+  .hero-meta { gap: 28px; }
+  .tools-grid { grid-template-columns: 1fr; }
+  .modal-body { padding: 22px; }
+  .ats-score-wrap { flex-direction: column; gap: 24px; }
+  .top-links { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== Topbar ===== -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="#" class="brand">
+      <div class="brand-logo"></div>
+      <div>
+        <div class="brand-name">CareerKit</div>
+      </div>
+      <span class="brand-sub">· 安静的求职工具箱</span>
+    </a>
+    <nav class="top-links">
+      <a href="#tools">全部工具</a>
+      <a href="#about">关于</a>
+      <a href="mailto:hello@example.com">反馈</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ===== Hero ===== -->
+<section class="hero">
+  <div class="hero-tag">2026 · 10 个工具 · 全部本地运行</div>
+  <h1 class="hero-title">
+    让求职这件事，<br>回到 <em>专业</em> 和 <em>从容</em>。
+  </h1>
+  <p class="hero-lead">
+    没有刺眼的霓虹渐变，没有AI生成的废话营销语。
+    只是一套安静但有用的工具 — 帮你精准投递、系统追踪、从容面试。
+  </p>
+  <div class="hero-meta">
+    <div><strong>10</strong><span>实用工具</span></div>
+    <div><strong>本地</strong><span>计算不出网</span></div>
+    <div><strong>免费</strong><span>无广告无会员</span></div>
+  </div>
+</section>
+
+<!-- ===== Tools ===== -->
+<section class="section" id="tools">
+  <div class="section-head">
+    <h2 class="section-title">工具<small>Tools</small></h2>
+  </div>
+  <div class="categories" id="cats"></div>
+  <div class="tools-grid" id="grid"></div>
+</section>
+
+<footer>
+  CareerKit · 为认真对待求职的人做的工具 · 所有数据保存在你的浏览器本地
+</footer>
+
+<!-- ===== Modal ===== -->
+<div class="modal-mask" id="mask">
+  <div class="modal" id="modal">
+    <div class="modal-head">
+      <h2 id="mtitle">工具</h2>
+      <button class="close" onclick="closeModal()" aria-label="关闭">✕</button>
+    </div>
+    <div class="modal-body" id="mbody"></div>
+  </div>
+</div>
+
+<!-- ===== Toast ===== -->
+<div class="toast" id="toast">已复制</div>
+
+<script>
+/* =========================================================
+   CareerKit — 全部工具实现
+   ========================================================= */
+
+const CATS = [
+  { id:'all',      name:'全部' },
+  { id:'resume',   name:'简历' },
+  { id:'track',    name:'追踪' },
+  { id:'interview',name:'面试' },
+  { id:'research', name:'调研' },
+  { id:'docs',     name:'文档' },
+];
+
+const TOOLS = [
+  { id:'ats',     cat:'resume',    icon:'🎯', title:'ATS 匹配度检测',     desc:'你的简历在 JD 关键词上命中了多少？量化出来。',                  hot:true, fn:toolATS },
+  { id:'kw',      cat:'resume',    icon:'🔑', title:'JD 关键词提取',      desc:'从职位描述里抽出 ATS 真正在意的技能词。',                                fn:toolKW },
+  { id:'opt',     cat:'resume',    icon:'✂️', title:'简历体检',           desc:'字数、弱动词、量化数据、必备板块 — 逐项过一遍。',                         fn:toolOpt },
+  { id:'tracker', cat:'track',     icon:'📊', title:'求职追踪看板',       desc:'像管理销售线索一样管理你的每一次投递。数据只在本地。',                      fn:toolTracker },
+  { id:'iv',      cat:'interview', icon:'🎤', title:'面试题生成',         desc:'岗位 × 年限 × 公司类型 — 生成技术面、行为面、高频必问题。',                fn:toolIV },
+  { id:'intro',   cat:'interview', icon:'💬', title:'自我介绍润色',       desc:'30 秒 / 2 分钟 / 5 分钟三档。STAR 框架引导。',                           fn:toolIntro },
+  { id:'risk',    cat:'research',  icon:'🛡️', title:'公司背调清单',       desc:'输入公司名，生成一份求职风险自查清单和红旗警告。',                        fn:toolRisk },
+  { id:'salary',  cat:'research',  icon:'💰', title:'薪资参考',           desc:'九大城市 · 互联网行业薪资范围表。',                                      fn:toolSalary },
+  { id:'cover',   cat:'docs',      icon:'✉️', title:'求职信生成',         desc:'结构化生成。记得替换[括号里]的内容。',                                  fn:toolCover },
+  { id:'refer',   cat:'docs',      icon:'🔗', title:'内推话术模板',       desc:'三种场景，复制就能发。',                                                fn:toolRefer },
+];
+
+/* ---------- 初始化 ---------- */
+document.addEventListener('DOMContentLoaded', () => {
+  // categories
+  document.getElementById('cats').innerHTML = CATS.map(c =>
+    `<button class="cat-pill${c.id==='all'?' active':''}" data-cat="${c.id}">${c.name}</button>`
+  ).join('');
+  document.querySelectorAll('.cat-pill').forEach(p =>
+    p.addEventListener('click', () => {
+      document.querySelectorAll('.cat-pill').forEach(x => x.classList.remove('active'));
+      p.classList.add('active');
+      render(p.dataset.cat);
+    })
+  );
+  render('all');
+
+  // mask click + escape
+  document.getElementById('mask').addEventListener('click', e => {
+    if (e.target.id === 'mask') closeModal();
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+});
+
+function render(cat) {
+  const list = cat === 'all' ? TOOLS : TOOLS.filter(t => t.cat === cat);
+  document.getElementById('grid').innerHTML = list.map(t => `
+    <div class="tool-card" onclick="openTool('${t.id}')">
+      <div class="tc-top">
+        <div class="tc-icon">${t.icon}</div>
+        <div class="tc-title">${t.title}</div>
+        ${t.hot ? '<span class="tc-badge hot">HOT</span>' : ''}
+      </div>
+      <div class="tc-desc">${t.desc}</div>
+      <div class="tc-footer">
+        <span>点击打开</span>
+        <span class="tc-arrow">→</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openTool(id) {
+  const t = TOOLS.find(x => x.id === id);
+  document.getElementById('mtitle').textContent = `${t.icon}  ${t.title}`;
+  const body = document.getElementById('mbody');
+  body.innerHTML = '';
+  t.fn(body);
+  document.getElementById('mask').classList.add('active');
+}
+function closeModal() { document.getElementById('mask').classList.remove('active'); }
+
+function toast(msg='已复制') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1800);
+}
+function cp(text) { navigator.clipboard.writeText(text).then(() => toast()); }
+
+/* =========================================================
+   工具 1: ATS 匹配度检测
+   ========================================================= */
+function toolATS(c) {
+  c.innerHTML = `
+    <div class="row">
+      <div class="col">
+        <label>你的简历（纯文本粘贴 · 越完整越准）</label>
+        <textarea id="ats-resume" placeholder="完整粘贴：教育背景 + 技能清单 + 工作经历 + 项目经验..."></textarea>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <label>目标 JD（完整职位描述 · 不要只贴关键词）</label>
+        <textarea id="ats-jd" placeholder="粘贴完整的职位描述，包括：岗位职责 + 任职要求 + 加分项..."></textarea>
+      </div>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <button class="btn" onclick="doATS()">🎯 运行多维度检测</button>
+      <button class="btn ghost btn-sm" onclick="atsExample()">加载示例简历 + JD</button>
+    </div>
+    <div id="ats-out"></div>
+  `;
+
+  /* ---------- 核心算法 ---------- */
+  window.doATS = () => {
+    const resumeRaw = document.getElementById('ats-resume').value;
+    const jdRaw     = document.getElementById('ats-jd').value;
+    if (!resumeRaw.trim() || !jdRaw.trim()) { toast('请先粘贴简历和 JD'); return; }
+
+    const algo = runATSAlgorithm(resumeRaw, jdRaw);
+    renderATSResult(algo);
+  };
+
+  window.atsExample = () => {
+    document.getElementById('ats-resume').value = `张三
+联系电话：138xxxxxxx · 邮箱：zhangsan@email.com
+
+教育背景
+北京航空航天大学 · 计算机科学与技术 · 本科 · 2020-2024
+
+专业技能
+熟练：JavaScript, TypeScript, React, Vue3, Node.js
+了解：Docker, MySQL, Python, Redis
+
+工作经历
+XX科技 · 前端工程师 · 2024.07 - 至今
+- 负责核心业务系统的前端架构设计
+- 使用 React + TypeScript 重构了老系统，代码体积减少 40%
+- 引入 Vite 构建工具，开发启动速度提升 80%
+- 优化 Webpack 构建配置，打包时间从 3 分钟降到 45 秒
+
+项目经验
+电商管理后台系统
+- 基于 React + Ant Design 搭建
+- 独立完成权限管理、数据可视化、报表导出等模块
+- 日均 UV 5 万，首屏加载时间 1.2s
+
+开源贡献
+GitHub: github.com/zhangsan · 1.2k stars
+一个轻量级的 React 组件库，已有 50+ 项目使用`;
+
+    document.getElementById('ats-jd').value = `岗位：高级前端工程师
+
+岗位职责
+1. 负责公司核心产品的前端架构设计和开发
+2. 使用 React / Vue 技术栈完成高质量业务组件
+3. 优化前端性能，提升用户体验和加载速度
+4. 推动团队的前端工程化建设（构建工具、代码规范、单元测试）
+5. 与后端、设计、产品紧密协作，保障项目交付质量
+
+任职要求
+- 计算机相关专业本科及以上学历，3 年以上前端开发经验
+- 精通 JavaScript / TypeScript，熟悉 React 或 Vue 框架原理
+- 熟悉 Node.js，能独立搭建基础服务
+- 熟悉 Web 性能优化方法，有大型项目优化经验
+- 熟悉 Docker、CI/CD 等工程化流程
+- 良好的沟通能力和团队协作精神
+
+加分项
+- 有大型 B 端或 SaaS 产品开发经验
+- 有开源项目贡献或技术博客
+- 熟悉微前端架构（qiankun / Module Federation）
+- 了解大模型 / AI 应用开发`;
+
+    toast('已加载示例');
+  };
+}
+
+/* =========================================================
+   ATS 核心算法 — 多维度可解释评分
+   
+   维度 1: 关键词命中率（按权重 · 同义词归并）   45 分
+   维度 2: 关键词频率加权                        15 分
+   维度 3: 板块加权（技能栏 > 项目 > 其他）      15 分
+   维度 4: JD 词密度（简历覆盖 JD 独特词汇）      10 分
+   维度 5: STAR 量化检查（动词 + 数字）           10 分
+   维度 6: 内容丰富度（字数 + 板块完整）           5 分
+   
+   合计: 100 分
+   ========================================================= */
+
+const ATS_THESAURUS = {
+  // 编程语言
+  'javascript':     ['js','ecmascript'],
+  'typescript':     ['ts'],
+  'golang':         ['go'],
+  'python':         ['py'],
+  // 前端框架
+  'react':          ['reactjs','react.js'],
+  'vue':            ['vuejs','vue.js','vue3','vue2'],
+  'angular':        ['angularjs','ng'],
+  'next.js':        ['nextjs','next'],
+  'node.js':        ['nodejs','node'],
+  'tailwind':       ['tailwindcss'],
+  // 后端
+  'spring boot':    ['springboot','spring'],
+  'express':        ['expressjs'],
+  'nest.js':        ['nestjs','nest'],
+  'fastapi':        ['fast api'],
+  'mysql':          ['mysql database'],
+  'postgresql':     ['postgres','pg'],
+  'mongodb':        ['mongo'],
+  'redis':          ['redis cache'],
+  // 云 / 运维
+  'docker':         ['docker容器'],
+  'kubernetes':     ['k8s','k-8s'],
+  'ci/cd':          ['cicd','ci cd','持续集成','持续交付'],
+  'jenkins':        ['jenkins ci'],
+  'terraform':      ['tf'],
+  // 数据 / AI
+  'pytorch':        ['torch','pt'],
+  'tensorflow':     ['tf'],
+  'llm':            ['大模型','large language model','gpt','claude','deepseek'],
+  '机器学习':       ['machine learning','ml'],
+  '深度学习':       ['deep learning','dl'],
+  '自然语言处理':   ['nlp'],
+  '计算机视觉':     ['cv'],
+  'sql':            ['sql查询'],
+  // 产品 / 业务
+  '产品经理':       ['pm','product manager'],
+  '数据分析':       ['数据','data analysis'],
+  '数据驱动':       ['data driven'],
+  'a/b测试':        ['ab测试','ab test','a b test'],
+  '用户调研':       ['user research','ur'],
+  '竞品分析':       ['competitive analysis'],
+  '项目管理':       ['pm','project management'],
+  // 软技能
+  '团队协作':       ['teamwork','team work','团队合作'],
+  '沟通':           ['communication','沟通能力','口头表达'],
+  '敏捷':           ['agile','scrum'],
+  '解决问题':       ['problem solving','problem-solving'],
+  '抗压':           ['pressure'],
+};
+
+const ATS_HARD_SKILLS = new Set([
+  'python','java','javascript','typescript','go','rust','c++','c#','php','ruby','swift','kotlin','scala','dart',
+  'react','vue','angular','next.js','nuxt','svelte','node.js','webpack','vite','tailwind','sass','redux','zustand',
+  'spring boot','django','flask','express','nest.js','fastapi','gin','grpc','rest','graphql',
+  'mysql','postgresql','mongodb','redis','elasticsearch','clickhouse',
+  'aws','azure','gcp','docker','kubernetes','k8s','jenkins','gitlab ci','github actions','ci/cd','terraform','linux','nginx',
+  'sql','spark','hadoop','flink','kafka','pytorch','tensorflow','llm','大模型','机器学习','深度学习',
+]);
+
+const ATS_SOFT_SKILLS = new Set([
+  '沟通','团队协作','项目管理','敏捷','解决问题','抗压','学习能力','领导力',
+  'problem solving','communication','teamwork','agile','scrum',
+]);
+
+// 简历板块识别关键词
+const ATS_SECTION_MARKERS = {
+  'skill':   ['技能','专业技能','技术栈','技术能力','skill','skills','technologies','tech stack','掌握','熟练'],
+  'project': ['项目','项目经验','项目描述','project','projects'],
+  'work':    ['工作经历','工作经验','职业经历','工作背景','experience','work experience','professional experience'],
+  'edu':     ['教育','教育背景','education','university','college','学校','学历'],
+};
+
+function runATSAlgorithm(resumeRaw, jdRaw) {
+  const resume = resumeRaw.toLowerCase();
+  const jd     = jdRaw.toLowerCase();
+
+  /* ---- Step 1: JD 关键词抽取（技能词典 + 通用名词去重） ---- */
+  const JD_SKILL_POOL = [
+    // 语言
+    ['python',1.0],['java',1.0],['javascript',1.0],['typescript',1.0],['go',1.0],['golang',1.0],
+    ['rust',1.0],['c++',1.0],['c#',1.0],['php',1.0],['ruby',1.0],['swift',1.0],['kotlin',1.0],['scala',1.0],['dart',1.0],
+    // 前端
+    ['react',1.0],['vue',1.0],['angular',1.0],['svelte',1.2],['next.js',1.0],['nuxt',1.2],['node.js',1.0],
+    ['webpack',1.2],['vite',1.2],['tailwind',1.2],['sass',1.0],['html',0.6],['css',0.6],['redux',1.0],['zustand',1.0],
+    // 后端
+    ['spring boot',1.2],['spring',1.0],['django',1.0],['flask',1.0],['express',1.0],['nest.js',1.2],
+    ['fastapi',1.2],['gin',1.2],['grpc',1.2],['graphql',1.0],['rest',0.7],['restful',0.7],
+    // 存储
+    ['mysql',1.0],['postgresql',1.2],['postgres',1.0],['mongodb',1.0],['redis',1.0],['elasticsearch',1.2],
+    ['clickhouse',1.2],['dynamodb',1.2],['oracle',0.8],['sqlite',0.7],
+    // 云 / 运维
+    ['aws',1.0],['azure',1.0],['gcp',1.0],['docker',1.0],['kubernetes',1.2],['k8s',1.2],
+    ['jenkins',1.0],['gitlab ci',1.2],['github actions',1.2],['ci/cd',1.0],['terraform',1.2],['linux',0.8],['nginx',1.0],
+    // 数据 / AI
+    ['sql',1.0],['spark',1.2],['hadoop',1.2],['flink',1.2],['airflow',1.2],['kafka',1.2],
+    ['pytorch',1.2],['tensorflow',1.2],['llm',1.2],['gpt',1.0],['bert',1.0],['nlp',1.0],['opencv',1.0],
+    ['机器学习',1.2],['深度学习',1.2],['大模型',1.2],['计算机视觉',1.2],['自然语言处理',1.2],
+    // 产品 / 运营
+    ['产品',0.8],['产品经理',1.0],['用户调研',1.0],['a/b测试',1.0],['数据分析',1.0],['数据驱动',1.0],
+    ['增长',0.8],['漏斗',0.8],['留存',0.8],['埋点',1.0],['prd',1.0],['竞品分析',1.0],
+    // 工程化加分
+    ['微前端',1.2],['qiankun',1.2],['module federation',1.5],['monorepo',1.2],['pnpm',1.2],['eslint',1.0],
+    ['单元测试',1.0],['jest',1.0],['vitest',1.0],['cypress',1.0],
+    // 软技能（低分权重）
+    ['沟通',0.4],['团队协作',0.4],['项目管理',0.5],['敏捷',0.5],['scrum',0.5],
+    ['解决问题',0.4],['抗压',0.3],['学习能力',0.3],['领导力',0.4],
+  ];
+
+  const UNIT = /\b(a|an|the|的|了|和|是|在|对|及|或|与|等|需要|要求|能够|具备|良好|优秀|熟悉|了解|掌握|熟练|优先|以及|相关|具备|作为|参与|负责|推动|设计|开发|优化|实现|使用)\b/g;
+
+  /* ---- 同义词归并：建立 alias → canonical 映射 ---- */
+  const aliasToCanonical = {};
+  Object.entries(ATS_THESAURUS).forEach(([canon, aliases]) => {
+    aliases.forEach(a => { aliasToCanonical[a.toLowerCase()] = canon.toLowerCase(); });
+    aliasToCanonical[canon.toLowerCase()] = canon.toLowerCase();
+  });
+
+  /* ---- Step 2: 从 JD 中找出所有被引用的技能词 ---- */
+  const jdHitSet = new Map(); // canonical → { raw, weight, freq }
+  JD_SKILL_POOL.forEach(([raw, weight]) => {
+    const canon = aliasToCanonical[raw.toLowerCase()] || raw.toLowerCase();
+    const re = new RegExp(raw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\b/g,'\\b'), 'gi');
+    let m, freq = 0;
+    while ((m = re.exec(jd)) !== null) {
+      freq++;
+      // 避免零宽匹配死循环
+      if (m.index === re.lastIndex) re.lastIndex++;
+    }
+    if (freq > 0) {
+      const existing = jdHitSet.get(canon);
+      if (existing) {
+        existing.freq = Math.max(existing.freq, freq);
+        existing.weight = Math.max(existing.weight, weight);
+      } else {
+        jdHitSet.set(canon, { raw, weight, freq });
+      }
+    }
+    // 额外：检查同义词
+    if (!freq && ATS_THESAURUS[canon]) {
+      ATS_THESAURUS[canon].forEach(alias => {
+        const reA = new RegExp(alias.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+        let m2, f2 = 0;
+        while ((m2 = reA.exec(jd)) !== null) {
+          f2++;
+          if (m2.index === reA.lastIndex) reA.lastIndex++;
+        }
+        if (f2 > 0) {
+          const existing = jdHitSet.get(canon);
+          if (existing) { existing.freq = Math.max(existing.freq, f2); existing.weight = Math.max(existing.weight, weight); }
+          else { jdHitSet.set(canon, { raw, weight, freq: f2 }); }
+        }
+      });
+    }
+  });
+
+  const jdKeywords = Array.from(jdHitSet.entries()).map(([k,v]) => ({ canon: k, ...v }));
+
+  /* ---- Step 3: 简历板块识别 ---- */
+  const sections = { skill:[], project:[], work:[], edu:[] };
+  const lines = resume.split(/\n|；|;/);
+  let currentSection = 'other';
+  lines.forEach(line => {
+    const l = line.trim().toLowerCase();
+    if (!l) return;
+    for (const [sec, markers] of Object.entries(ATS_SECTION_MARKERS)) {
+      if (markers.some(m => l.includes(m.toLowerCase()))) { currentSection = sec; break; }
+    }
+    if (sections[currentSection]) sections[currentSection].push(l);
+    else sections.project.push(l); // 默认归入项目/工作
+  });
+  const sectionText = Object.fromEntries(Object.entries(sections).map(([k,v]) => [k, v.join('\n')]));
+
+  // 板块权重表
+  const SECTION_WEIGHT = { skill: 1.6, project: 1.3, work: 1.1, edu: 0.9, other: 0.5 };
+
+  /* ---- Step 4: 简历中每个 JD 关键词的命中情况 ---- */
+  const matches = jdKeywords.map(kw => {
+    // 主词匹配
+    const canonRe = new RegExp(kw.canon.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+    let canonFreq = 0, cm;
+    while ((cm = canonRe.exec(resume)) !== null) { canonFreq++; if (cm.index === canonRe.lastIndex) canonRe.lastIndex++; }
+
+    // 同义词匹配（去重）
+    let aliasFreq = 0;
+    if (ATS_THESAURUS[kw.canon]) {
+      ATS_THESAURUS[kw.canon].forEach(alias => {
+        if (alias.toLowerCase() === kw.canon) return;
+        const aRe = new RegExp(alias.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+        let am;
+        while ((am = aRe.exec(resume)) !== null) { aliasFreq++; if (am.index === aRe.lastIndex) aRe.lastIndex++; }
+      });
+    }
+    const totalFreq = Math.max(canonFreq, aliasFreq);
+
+    // 板块分布
+    const hitSections = [];
+    for (const [sec, text] of Object.entries(sectionText)) {
+      const sRe = new RegExp(kw.canon.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+      if (sRe.test(text)) hitSections.push(sec);
+    }
+
+    return {
+      ...kw,
+      totalFreq,
+      canonHit: canonFreq > 0,
+      aliasHit: aliasFreq > 0 && canonFreq === 0,
+      hit: totalFreq > 0,
+      hitSections,
+      // 板块加权得分
+      sectionScore: hitSections.length > 0
+        ? hitSections.reduce((s, sec) => s + (SECTION_WEIGHT[sec] || 0.8), 0)
+        : 0,
+    };
+  });
+
+  /* ---- Step 5: 六个维度的评分 ---- */
+
+  // 维度 1: 关键词命中率（45 分）
+  // 硬技能权重高、软技能权重低；缺失的硬技能扣分多
+  const hardHits   = matches.filter(m => m.hit && ATS_HARD_SKILLS.has(m.canon)).length;
+  const hardTotal  = matches.filter(m => ATS_HARD_SKILLS.has(m.canon)).length;
+  const softHits   = matches.filter(m => m.hit && ATS_SOFT_SKILLS.has(m.canon)).length;
+  const softTotal  = matches.filter(m => ATS_SOFT_SKILLS.has(m.canon)).length;
+  const hardRate   = hardTotal ? hardHits / hardTotal : 1;
+  const softRate   = softTotal ? softHits / softTotal : 1;
+  const d1 = Math.round((hardRate * 0.7 + softRate * 0.3) * 45);
+
+  // 维度 2: 频率加权（15 分）
+  // 命中的关键词平均频率；JD 里高频词在简历也高频出现 → 得分高
+  const hitMatches = matches.filter(m => m.hit);
+  let freqScore = 0;
+  hitMatches.forEach(m => {
+    // 简历频率 vs JD 频率：简历 >= JD → 满分；简历是 JD 的 0.5x → 半分
+    const ratio = Math.min(m.totalFreq / Math.max(m.freq, 1), 2); // 2x 封顶
+    freqScore += Math.min(ratio, 1.5);
+  });
+  const freqMax = hitMatches.length * 1.5;
+  const d2 = hitMatches.length ? Math.round((freqScore / freqMax) * 15) : 0;
+
+  // 维度 3: 板块加权（15 分）
+  // 关键词出现在正确的板块里得分：技能栏 > 项目 > 工作 > 教育
+  const sectionScoreSum = hitMatches.reduce((s, m) => s + m.sectionScore, 0);
+  // 理论最大值：每个命中在 skill 板块 → 每个 1.6 分
+  const sectionMax = hitMatches.length * 1.6;
+  const d3 = hitMatches.length ? Math.round(Math.min(sectionScoreSum / sectionMax, 1) * 15) : 0;
+
+  // 维度 4: JD 词密度（10 分）
+  // 简历覆盖了 JD 里多少独特的通用词汇（排除停用词）
+  const jdWords = new Set(
+    jd
+      .replace(UNIT, ' ')
+      .match(/[\u4e00-\u9fa5]{2,}|[a-zA-Z]+/g)
+      ?.map(w => w.toLowerCase())
+      .filter(w => w.length > 2 && !UNIT.test(w)) || []
+  );
+  const resWords = new Set(resume.match(/[\u4e00-\u9fa5]{2,}|[a-zA-Z]+/g)?.map(w => w.toLowerCase()) || []);
+  let overlap = 0;
+  jdWords.forEach(w => { if (resWords.has(w)) overlap++; });
+  const density = jdWords.size ? overlap / jdWords.size : 0;
+  const d4 = Math.round(Math.min(density * 2, 1) * 10);
+
+  // 维度 5: STAR 量化检查（10 分）
+  // 简历里有多少个"动词 + 数字 + 结果"的模式
+  const strongVerbs = /(主导|设计|开发|优化|推动|搭建|实现|重构|负责|交付|领导|发起|发布)/g;
+  const hasMetrics  = /\d+(\.\d+)?\s*(%|万|k|人|次|倍|ms|s|小时|天|个|条|元)|[+-]?\d+(\.\d+)?%/.test(resume);
+  const verbCount   = (resume.match(strongVerbs) || []).length;
+  const metricCount = (resume.match(/\d+(\.\d+)?\s*(%|万|k|倍|人|ms|s)/g) || []).length;
+  const starsRaw    = Math.min(
+    (verbCount >= 5 ? 1 : verbCount / 5) * 0.5 +
+    (metricCount >= 3 ? 1 : metricCount / 3) * 0.5,
+    1
+  );
+  const d5 = Math.round(starsRaw * 10);
+
+  // 维度 6: 内容丰富度（5 分）
+  const wc = resume.replace(/\s/g, '').length;
+  const wcScore = Math.min(wc / 1500, 1); // 1500 字满分
+  const hasSkill  = sectionText.skill.length > 30;
+  const hasProj   = sectionText.project.length > 50;
+  const hasWork   = sectionText.work.length > 30;
+  const hasEdu    = sectionText.edu.length > 20;
+  const secScore  = (hasSkill + hasProj + hasWork + hasEdu) / 4;
+  const d6 = Math.round((wcScore * 0.4 + secScore * 0.6) * 5);
+
+  // 总分
+  const total = Math.min(100, Math.max(0, d1 + d2 + d3 + d4 + d5 + d6));
+
+  /* ---- Step 6: 生成可解释的建议 ---- */
+  const missingHard   = matches.filter(m => !m.hit && ATS_HARD_SKILLS.has(m.canon));
+  const missingSoft   = matches.filter(m => !m.hit && ATS_SOFT_SKILLS.has(m.canon));
+  const aliasOnlyHits = matches.filter(m => m.aliasHit); // 用同义词命中的 —— 建议用主词
+  const weakSectionHits = hitMatches.filter(m => !m.hitSections.includes('skill') && !m.hitSections.includes('project'));
+
+  const suggestions = [];
+  if (missingHard.length > 0) {
+    suggestions.push({
+      type: 'critical',
+      text: `补充缺失的硬技能：${missingHard.slice(0,5).map(m=>m.raw).join('、')}${missingHard.length>5?'...':''} — 优先放进"专业技能"栏和相关项目描述里`,
+    });
+  }
+  if (aliasOnlyHits.length > 0) {
+    suggestions.push({
+      type: 'info',
+      text: `有 ${aliasOnlyHits.length} 个关键词用同义词命中：${aliasOnlyHits.slice(0,3).map(m=>m.raw).join('、')} — 直接用 JD 里出现的那个术语会更稳`,
+    });
+  }
+  if (weakSectionHits.length > 0 && hasSkill) {
+    suggestions.push({
+      type: 'info',
+      text: `有 ${weakSectionHits.length} 个关键词没出现在"技能栏"里 — 把 ${weakSectionHits.slice(0,3).map(m=>m.raw).join('、')} 也加进技能清单`,
+    });
+  }
+  if (!hasMetrics || metricCount < 2) {
+    suggestions.push({
+      type: 'warn',
+      text: '项目经历里缺少量化数据 — 每个项目建议至少有一个数字（%、K、人、倍、ms）',
+    });
+  }
+  if (verbCount < 3) {
+    suggestions.push({
+      type: 'warn',
+      text: '项目描述的动词不够有力 — 多用"主导 / 设计 / 优化 / 重构"这类强动词',
+    });
+  }
+  if (d4 < 6) {
+    suggestions.push({
+      type: 'info',
+      text: `JD 里有一些通用词汇简历没覆盖到 — 把 JD 的核心描述改写进自己的项目里（不要照抄，用自己的经历重新表达）`,
+    });
+  }
+
+  return {
+    total,
+    dims: [
+      { name: '关键词命中率',     score: d1, max: 45,
+        desc: `硬技能命中 ${hardHits}/${hardTotal} · 软技能 ${softHits}/${softTotal}` },
+      { name: '关键词频率加权',   score: d2, max: 15,
+        desc: `命中词的简历频率 vs JD 频率` },
+      { name: '板块加权',         score: d3, max: 15,
+        desc: `关键词出现在"技能/项目"板块得分更高` },
+      { name: 'JD 词密度',        score: d4, max: 10,
+        desc: `简历覆盖 JD 独特词汇的比例` },
+      { name: 'STAR 量化',        score: d5, max: 10,
+        desc: `强动词 ${verbCount} 个 · 量化数据 ${metricCount} 处` },
+      { name: '内容丰富度',       score: d6, max: 5,
+        desc: `${wc} 字 · ${(hasSkill?'技能':'—')} ${hasProj?'项目':'—'} ${hasWork?'工作':'—'} ${hasEdu?'教育':'—'}` },
+    ],
+    matches, jdKeywords,
+    hardRate, softRate,
+    hitMatches,
+    missingHard, missingSoft,
+    aliasOnlyHits, weakSectionHits,
+    suggestions,
+    sections: { hasSkill, hasProj, hasWork, hasEdu, wc },
+  };
+}
+
+/* ---------- 渲染结果 ---------- */
+function renderATSResult(a) {
+  const { total, dims, matches, suggestions, missingHard, missingSoft, sections } = a;
+
+  const strokeColor = total >= 75 ? '#2D6A4F' : total >= 50 ? '#B8860B' : '#B23A48';
+  const R = 60, C = 2 * Math.PI * R;
+
+  let html = '';
+
+  // 总分仪表盘
+  html += `
+    <div class="ats-score-wrap">
+      <div class="ats-ring">
+        <svg width="140" height="140" viewBox="0 0 140 140">
+          <circle class="ats-ring-bg" cx="70" cy="70" r="${R}"/>
+          <circle class="ats-ring-fg" cx="70" cy="70" r="${R}"
+            stroke="${strokeColor}"
+            stroke-dasharray="${C}"
+            stroke-dashoffset="${C * (1 - total/100)}"/>
+        </svg>
+        <div class="ats-ring-center">
+          <div class="ats-num" style="color:${strokeColor}">${total}</div>
+          <div class="ats-label">ATS 匹配分</div>
+        </div>
+      </div>
+      <div class="ats-meta">
+        <div><b>${matches.filter(m=>m.hit).length}</b> 命中 / <b>${matches.length}</b> JD 关键词</div>
+        <div>硬技能命中率 <b style="color:${a.hardRate>=0.8?'var(--ok)':a.hardRate>=0.5?'var(--warn)':'var(--bad)'}">${Math.round(a.hardRate*100)}%</b></div>
+        <div>软技能命中率 <b>${Math.round(a.softRate*100)}%</b></div>
+        <div style="margin-top:8px;color:${strokeColor}">
+          ${total>=75?'✅ 大概率通过 ATS 筛选':total>=50?'⚠️ 建议针对性优化缺失项':'❌ 很可能被刷'}
+        </div>
+      </div>
+    </div>`;
+
+  // 六个维度得分条
+  html += `<h4 style="margin:28px 0 12px">📊 六维度拆解</h4>`;
+  dims.forEach(d => {
+    const pct = Math.round(d.score / d.max * 100);
+    const barColor = pct >= 75 ? 'var(--ok)' : pct >= 50 ? 'var(--warn)' : 'var(--bad)';
+    html += `
+      <div style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px">
+          <span><b>${d.name}</b> · ${d.desc}</span>
+          <span style="color:${barColor};font-family:var(--font-mono);font-weight:600">${d.score}/${d.max}</span>
+        </div>
+        <div style="background:var(--bg-subtle);height:8px;border-radius:4px;overflow:hidden">
+          <div style="height:100%;width:${pct}%;background:${barColor};border-radius:4px;transition:width .6s var(--ease)"></div>
+        </div>
+      </div>`;
+  });
+
+  // 命中详情（按类别分组）
+  const foundList = matches.filter(m => m.hit);
+  html += `<h4 style="margin:28px 0 12px">✅ 已命中关键词（${foundList.length}/${matches.length}）</h4>`;
+  html += `<div class="kw-list">`;
+  foundList.forEach(m => {
+    const sectionTag = m.hitSections.length ? ` [${m.hitSections.join('/')}]` : '';
+    const freqTag = m.totalFreq > 1 ? ` ×${m.totalFreq}` : '';
+    const aliasTag = m.aliasHit ? ' 🔄' : '';
+    html += `<span class="kw-chip ok" title="${m.raw}${sectionTag}${freqTag}${aliasTag}">${m.raw}${freqTag}</span>`;
+  });
+  html += `</div>`;
+
+  // 缺失硬技能（重点）
+  if (missingHard.length) {
+    html += `<h4 style="margin:24px 0 12px;color:var(--bad)">❌ 缺失的硬技能（高优先级补充）</h4>`;
+    html += `<div class="kw-list">`;
+    missingHard.forEach(m => {
+      const weightTag = m.weight >= 1.2 ? ' ★' : '';
+      html += `<span class="kw-chip bad">${m.raw}${weightTag}</span>`;
+    });
+    html += `</div>`;
+  }
+
+  if (missingSoft.length) {
+    html += `<h4 style="margin:20px 0 12px;color:var(--text-dim)">△ 缺失的软技能</h4>`;
+    html += `<div class="kw-list">`;
+    missingSoft.forEach(m => html += `<span class="kw-chip" style="background:var(--bg-subtle);color:var(--text-dim);border:1px dashed var(--text-line)">${m.raw}</span>`);
+    html += `</div>`;
+  }
+
+  // 建议
+  if (suggestions.length) {
+    html += `<h4 style="margin:28px 0 12px">💡 针对性优化建议（${suggestions.length} 条）</h4>`;
+    suggestions.forEach((s, i) => {
+      const colorMap = {
+        critical: { bg:'#FDF0EF',  border:'#E8D5D8', text:'var(--bad)' },
+        warn:     { bg:'#FBF6E6',  border:'#ECE1B8', text:'var(--warn)' },
+        info:     { bg:'#EEF1F6',  border:'#D8DEE8', text:'var(--info)' },
+      };
+      const c = colorMap[s.type] || colorMap.info;
+      html += `<div style="padding:12px 16px;background:${c.bg};border-left:3px solid ${c.text};border-radius:0 8px 8px 0;margin-bottom:10px;font-size:13.5px;color:var(--text)">
+        <span style="font-weight:600;color:${c.text}">#${i+1}</span>  ${s.text}
+      </div>`;
+    });
+  }
+
+  // 板块识别结果
+  html += `<div class="output" style="margin-top:24px;font-family:var(--font-body);line-height:1.8">
+🧠 简历板块识别
+──────────────────────
+字数：${sections.wc} 字
+板块：${sections.hasSkill?'✅ 技能':'❌ 技能缺失'}  ${sections.hasProj?'✅ 项目':'❌ 项目缺失'}  ${sections.hasWork?'✅ 工作':'❌ 工作缺失'}  ${sections.hasEdu?'✅ 教育':'❌ 教育缺失'}
+
+📌 原理说明
+──────────────────────
+1. 从 JD 中抽取技能词典覆盖的关键词（含同义词归并）
+2. 在简历里做多维度匹配：是否出现 + 出现频率 + 出现在哪个板块
+3. 硬技能命中率权重高于软技能
+4. 关键词出现在"技能栏/项目描述"权重高于出现在别处
+5. 加分项：动词 + 数字的 STAR 结构、JD 通用词覆盖率
+  </div>`;
+
+  html += `<button class="btn ghost btn-sm" style="margin-top:14px" onclick="cp(document.querySelector('#ats-out').innerText)">📋 复制完整分析</button>`;
+
+  document.getElementById('ats-out').innerHTML = html;
+}
+
+/* =========================================================
+   工具 2: JD 关键词提取
+   ========================================================= */
+function toolKW(c) {
+  c.innerHTML = `
+    <label>粘贴完整 JD</label>
+    <textarea id="kw-jd" placeholder="把职位描述完整贴过来..."></textarea>
+    <button class="btn" style="margin-top:12px" onclick="doKW()">提取关键词</button>
+    <div id="kw-out"></div>
+  `;
+
+  window.doKW = () => {
+    const jd = document.getElementById('kw-jd').value.toLowerCase();
+    if (!jd) { toast('请先粘贴 JD'); return; }
+
+    const CATS = [
+      ['编程语言',   ['python','java','javascript','typescript','go','rust','c++','c#','php','ruby','swift','kotlin','scala']],
+      ['前端技术',   ['react','vue','angular','svelte','next.js','nuxt','node.js','webpack','vite','tailwind','redux']],
+      ['后端技术',   ['spring','spring boot','django','flask','express','nest.js','fastapi','gin','grpc','graphql']],
+      ['数据库',     ['mysql','postgresql','postgres','mongodb','redis','oracle','elasticsearch','clickhouse','dynamodb']],
+      ['云 / DevOps',['aws','azure','gcp','docker','kubernetes','k8s','jenkins','terraform','linux','nginx','ci/cd']],
+      ['数据 / AI',  ['sql','spark','hadoop','flink','kafka','pytorch','tensorflow','llm','gpt','bert','nlp','机器学习','深度学习','大模型']],
+      ['业务 / 产品',['产品','产品经理','用户调研','数据分析','数据驱动','增长','埋点','prd','竞品分析','a/b测试']],
+      ['软技能',     ['沟通','团队协作','项目管理','敏捷','scrum','领导力','抗压','学习能力']],
+    ];
+
+    let html = '';
+    CATS.forEach(([name, words]) => {
+      const hit = words.filter(w => jd.includes(w));
+      if (hit.length) {
+        html += `<div class="kw-group">
+          <h4>${name} · ${hit.length} 项</h4>
+          <div class="kw-list">${hit.map(w=>`<span class="kw-chip info">${w}</span>`).join('')}</div>
+        </div>`;
+      }
+    });
+
+    // 高频词 Top15
+    const seg = jd.match(/[\u4e00-\u9fa5]+|[a-zA-Z]+/gi) || [];
+    const skip = new Set(['的','了','和','是','在','对','及','或','与','等','需要','要求','能够','具备','良好','优秀','熟悉','了解','公司','岗位','工作','经验','优先','以及','相关']);
+    const freq = {};
+    seg.forEach(w => { w = w.toLowerCase(); if (w.length>1 && !skip.has(w)) freq[w] = (freq[w]||0)+1; });
+    const top = Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,15);
+    if (top.length) {
+      html += `<div class="kw-group">
+        <h4>🔥 JD 高频词 TOP15</h4>
+        <div class="kw-list">${top.map(([w,n])=>`<span class="kw-chip info">${w} ×${n}</span>`).join('')}</div>
+      </div>`;
+    }
+
+    document.getElementById('kw-out').innerHTML = html || '<div class="output">没抽取到。JD 太短？</div>';
+  };
+}
+
+/* =========================================================
+   工具 3: 简历体检
+   ========================================================= */
+function toolOpt(c) {
+  c.innerHTML = `
+    <div class="row">
+      <div class="col"><label>目标岗位</label><input type="text" id="opt-role" placeholder="如：前端工程师"></div>
+    </div>
+    <label>简历正文</label>
+    <textarea id="opt-resume" placeholder="粘贴完整简历..."></textarea>
+    <button class="btn" style="margin-top:12px" onclick="doOpt()">体检</button>
+    <div id="opt-out"></div>
+  `;
+
+  window.doOpt = () => {
+    const r = document.getElementById('opt-resume').value;
+    const role = document.getElementById('opt-role').value.trim();
+    if (!r) { toast('请先粘贴简历'); return; }
+
+    const wordCount = r.length;
+    const issues = [], tips = [];
+
+    // 长度
+    if (wordCount < 300)   issues.push('简历过短，信息量不足');
+    if (wordCount > 2200)  issues.push('简历超过一页 A4（建议 1500 字以内）');
+
+    // 必备板块
+    if (!/教育|education|university|college/i.test(r)) issues.push('缺少教育背景');
+    if (!/工作|实习|经历|experience/i.test(r))          issues.push('缺少工作/实习经历板块');
+    if (!/技能|skill|掌握|熟悉/i.test(r))               issues.push('缺少技能清单');
+
+    // 量化数据
+    const hasMetrics = /\d+%|\d+万|\d+人|\d+k|\$\d+|¥\d+/.test(r);
+    if (!hasMetrics) issues.push('项目经历没有量化数据（"提升 50% 效率" vs "做了性能优化"）');
+
+    // 动词
+    const weak  = ['参与','协助','负责','了解','熟悉','跟着'];
+    const strong= ['主导','设计','开发','优化','推动','搭建','实现','重构'];
+    const wc = weak.filter(v => r.includes(v)).length;
+    const sc = strong.filter(v => r.includes(v)).length;
+    if (wc > sc) issues.push(`弱动词（${wc} 处）多于强动词（${sc} 处），多使用"主导/设计/优化"`);
+
+    // 岗位建议
+    if (role) {
+      if (/前端|FE/.test(role))       tips.push('前端：补充 GitHub 链接、项目 Demo URL、性能指标');
+      if (/后端|BE|服务端/.test(role)) tips.push('后端：补充系统架构图描述、QPS/并发、数据库规模');
+      if (/产品/.test(role))          tips.push('产品：补充数据驱动的决策案例、增长曲线、PRD 样例');
+      if (/数据|分析/.test(role))     tips.push('数据：补充 SQL 能力、可视化作品、业务洞察');
+      if (/运营/.test(role))          tips.push('运营：补充用户增长曲线、活动 ROI、爆款案例');
+    }
+
+    // 通用建议
+    tips.push('每份简历控制在一页 A4');
+    tips.push('技能矩阵分"精通 / 熟练 / 了解"三档');
+    tips.push('简历文件名：姓名_目标岗位_手机.pdf');
+    tips.push('PDF 导出前检查：可选中文字、无乱码、排版没错位');
+
+    let html = `
+      <div class="output">
+ 字数：${wordCount}
+ 量化数据：${hasMetrics?'✅':'❌'}
+ 动词 — 强 ${sc} / 弱 ${wc}
+      </div>`;
+
+    if (issues.length) {
+      html += `<h4 style="margin:20px 0 12px;color:var(--bad)">发现 ${issues.length} 个问题</h4>`;
+      issues.forEach(i => html += `<div style="padding:10px 14px;background:#FDF0EF;border-left:2px solid ${getComputedStyle(document.body).getPropertyValue('--bad')};border-radius:0 6px 6px 0;margin-bottom:8px;font-size:13.5px;color:var(--text)">${i}</div>`);
+    } else {
+      html += `<div class="output" style="background:var(--accent-soft);border-color:#D4E4DB;color:var(--ok);font-family:var(--font-body)">✅ 基础检查全部通过</div>`;
+    }
+
+    html += `<h4 style="margin:24px 0 12px;color:var(--accent)">优化建议</h4>`;
+    tips.forEach((t,i) => html += `<div style="padding:10px 14px;border-left:2px solid var(--accent);background:var(--bg-subtle);border-radius:0 6px 6px 0;margin-bottom:8px;font-size:13.5px">#${i+1}  ${t}</div>`);
+
+    document.getElementById('opt-out').innerHTML = html;
+  };
+}
+
+/* =========================================================
+   工具 4: 求职追踪看板
+   ========================================================= */
+function toolTracker(c) {
+  c.innerHTML = `
+    <p style="font-size:12.5px;color:var(--text-faint);margin-bottom:18px">
+      💾 数据保存在你浏览器的 localStorage，换设备不会同步。记得定期导出。
+    </p>
+
+    <div class="row">
+      <div class="col"><label>公司</label><input type="text" id="tr-co" placeholder="公司名"></div>
+      <div class="col"><label>岗位</label><input type="text" id="tr-ro" placeholder="如：前端工程师"></div>
+      <div class="col"><label>平台</label>
+        <select id="tr-pl">
+          <option>Boss 直聘</option><option>拉勾</option><option>猎聘</option>
+          <option>前程无忧</option><option>LinkedIn</option><option>官网</option><option>其他</option>
+        </select>
+      </div>
+      <div class="col"><label>薪资 (K)</label><input type="text" id="tr-sa" placeholder="如 15-25"></div>
+      <div class="col"><label>状态</label>
+        <select id="tr-st">
+          <option value="applied">已投递</option>
+          <option value="interview">面试中</option>
+          <option value="offer">拿到 Offer</option>
+          <option value="rejected">被拒</option>
+        </select>
+      </div>
+      <div class="col" style="flex:0 0 auto;display:flex;align-items:flex-end">
+        <button class="btn" onclick="trAdd()">添加</button>
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:16px">
+      <button class="btn ghost btn-sm" onclick="trExport()">导出 JSON</button>
+      <button class="btn ghost btn-sm" onclick="document.getElementById('tr-file').click()">导入</button>
+      <input type="file" id="tr-file" accept=".json" style="display:none" onchange="trImport(event)">
+      <button class="btn ghost btn-sm" style="margin-left:auto;color:var(--bad);border-color:#E8D5D8" onclick="trClear()">清空</button>
+    </div>
+
+    <div id="tr-body"></div>
+  `;
+
+  const KEY = 'careerKit_tracker';
+  const load = () => JSON.parse(localStorage.getItem(KEY) || '[]');
+  const save = l => { localStorage.setItem(KEY, JSON.stringify(l)); trRender(); };
+
+  window.trAdd = () => {
+    const co = document.getElementById('tr-co').value.trim();
+    const ro = document.getElementById('tr-ro').value.trim();
+    if (!co || !ro) { toast('公司和岗位必填'); return; }
+    const list = load();
+    list.unshift({
+      id: Date.now(),
+      company: co, role: ro,
+      platform: document.getElementById('tr-pl').value,
+      salary: document.getElementById('tr-sa').value.trim(),
+      status: document.getElementById('tr-st').value,
+      date: new Date().toISOString().slice(0,10),
+    });
+    save(list);
+    document.getElementById('tr-co').value = '';
+    document.getElementById('tr-ro').value = '';
+    document.getElementById('tr-sa').value = '';
+    toast('已添加');
+  };
+
+  window.trDel = id => {
+    if (!confirm('删除这条记录？')) return;
+    save(load().filter(x => x.id !== id));
+  };
+  window.trStatus = (id, val) => {
+    const list = load();
+    const it = list.find(x => x.id === id);
+    if (it) { it.status = val; save(list); }
+  };
+  window.trExport = () => {
+    const data = JSON.stringify(load(), null, 2);
+    const blob = new Blob([data], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `career-tracker-${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    toast('已导出');
+  };
+  window.trImport = e => {
+    const reader = new FileReader();
+    reader.onload = evt => {
+      try {
+        const data = JSON.parse(evt.target.result);
+        save([...data, ...load()]);
+        toast('导入成功');
+      } catch { toast('文件格式不对'); }
+    };
+    reader.readAsText(e.target.files[0]);
+  };
+  window.trClear = () => {
+    if (!confirm('确定清空所有求职记录？不可撤销')) return;
+    save([]);
+  };
+
+  const STATUS_LABEL = { applied:'已投递', interview:'面试中', offer:'Offer', rejected:'被拒' };
+
+  function trRender() {
+    const list = load();
+    const cnt = { applied:0, interview:0, offer:0, rejected:0 };
+    list.forEach(x => cnt[x.status]++);
+
+    let html = `
+      <div class="summary-row">
+        <div class="summary-card"><div class="num">${cnt.applied}</div><div class="lbl">已投递</div></div>
+        <div class="summary-card"><div class="num">${cnt.interview}</div><div class="lbl">面试中</div></div>
+        <div class="summary-card"><div class="num" style="color:var(--ok)">${cnt.offer}</div><div class="lbl">Offer</div></div>
+        <div class="summary-card"><div class="num">${cnt.rejected}</div><div class="lbl">被拒</div></div>
+      </div>`;
+
+    if (!list.length) {
+      html += `<div style="text-align:center;padding:48px 0;color:var(--text-faint)">
+        <div style="font-size:48px;margin-bottom:12px">📭</div>
+        还没有记录。加一条试试？
+      </div>`;
+      document.getElementById('tr-body').innerHTML = html;
+      return;
+    }
+
+    html += `<table class="track"><thead>
+      <tr><th>公司</th><th>岗位</th><th>平台</th><th>薪资</th><th>日期</th><th>状态</th><th></th></tr>
+    </thead><tbody>`;
+    list.forEach(it => {
+      html += `<tr>
+        <td style="font-weight:600">${it.company}</td>
+        <td>${it.role}</td>
+        <td style="color:var(--text-dim)">${it.platform}</td>
+        <td style="font-family:var(--font-mono);font-size:12.5px">${it.salary || '—'}</td>
+        <td style="color:var(--text-faint);font-size:12px">${it.date}</td>
+        <td>
+          <select class="status-sel status-${it.status}" onchange="trStatus(${it.id}, this.value)">
+            ${['applied','interview','offer','rejected'].map(s=>
+              `<option value="${s}" ${s===it.status?'selected':''}>${STATUS_LABEL[s]}</option>`
+            ).join('')}
+          </select>
+        </td>
+        <td style="text-align:right">
+          <button class="btn ghost btn-sm" style="border:none;padding:4px 8px;font-size:12px;color:var(--text-faint)" onclick="trDel(${it.id})">删除</button>
+        </td>
+      </tr>`;
+    });
+    html += '</tbody></table>';
+
+    // 简单漏斗转化率
+    if (cnt.applied > 0) {
+      const interviewRate = Math.round(cnt.interview / cnt.applied * 100);
+      const offerRate     = Math.round(cnt.offer / cnt.applied * 100);
+      html += `<div class="output" style="margin-top:16px">
+📊 漏斗数据
+───────────────
+ 投递 → 面试  ${cnt.applied} → ${cnt.interview}   转化率 ${interviewRate}%
+ 投递 → Offer ${cnt.applied} → ${cnt.offer}    转化率 ${offerRate}%
+      </div>`;
+    }
+
+    document.getElementById('tr-body').innerHTML = html;
+  }
+
+  trRender();
+}
+
+/* =========================================================
+   工具 5: AI 面试题生成
+   ========================================================= */
+function toolIV(c) {
+  c.innerHTML = `
+    <div class="row">
+      <div class="col">
+        <label>目标岗位</label>
+        <input type="text" id="iv-role" placeholder="如：前端工程师 / 产品经理">
+      </div>
+      <div class="col">
+        <label>工作年限</label>
+        <select id="iv-yr">
+          <option value="0">应届生 / 实习</option>
+          <option value="1-3">1-3 年</option>
+          <option value="3-5">3-5 年</option>
+          <option value="5+">5 年以上</option>
+        </select>
+      </div>
+      <div class="col">
+        <label>公司类型</label>
+        <select id="iv-co">
+          <option>互联网大厂</option><option>创业公司</option><option>传统企业</option><option>外企</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn" onclick="doIV()">生成</button>
+    <div id="iv-out"></div>
+  `;
+
+  // 题库 — 每个岗位 8 道技术 + 4 道行为
+  const BANK = {
+    '前端|FE': {
+      tech: [
+        '浏览器事件循环 — 宏任务和微任务的执行顺序',
+        'React 的 Fiber 架构和并发渲染在解决什么问题',
+        'Vue 3 Composition API 相比 Options API 的核心优势',
+        '从输入 URL 到页面渲染完成，中间发生了什么',
+        '跨域的几种方案，各自的适用场景',
+        'HTTP/2、HTTP/3 和 HTTP/1.1 的主要区别',
+        'Web 性能优化你有哪些实战经验',
+        '如果让你设计一个组件库，你会怎么组织',
+      ],
+      bhv: [
+        '讲一个你解决过的最难的线上问题',
+        '和后端接口对不上时你怎么推进',
+        '说一个你主动发起的技术优化',
+        '项目 deadline 前发现严重 bug 怎么办',
+      ],
+    },
+    '后端|服务端|BE': {
+      tech: [
+        'MySQL 的索引原理，什么情况会走不上索引',
+        'Redis 缓存穿透、击穿、雪崩分别是什么，怎么处理',
+        '消息队列的使用场景，如何保证消息不丢失',
+        '分布式系统的一致性问题 — CAP 和 BASE 怎么权衡',
+        '线上 OOM 你怎么排查',
+        'API 版本控制你会怎么设计',
+        '分库分表的常见方案和坑',
+        '从 0 设计一个高并发秒杀系统',
+      ],
+      bhv: [
+        '你做过的最有挑战的系统重构',
+        '线上 P0 故障的完整排查流程',
+        '和产品意见不一致你怎么处理',
+        '技术选型时你会权衡哪些因素',
+      ],
+    },
+    '产品|PM': {
+      tech: [
+        '你常用哪些用户调研方法，分别适合什么场景',
+        '讲一个数据驱动决策的产品迭代案例',
+        '如何确定需求优先级 — 你用什么框架',
+        '竞品分析你会看哪些维度',
+        'A/B 测试的正确打开方式 — 常见误区',
+        '上线一个功能后，你会看哪些指标判断成败',
+        '用户增长的核心模型是什么',
+        '说一个你把复杂问题拆解的经历',
+      ],
+      bhv: [
+        '资源不够但 deadline 不改怎么办',
+        '和研发/设计意见冲突怎么处理',
+        '需求被砍了，你的反应',
+        '一个你 0 到 1 搭起来的体系',
+      ],
+    },
+    '数据|分析|算法': {
+      tech: [
+        'SQL 中 JOIN 的几种方式和区别 — 写个例子',
+        '过拟合和欠拟合分别是什么，怎么解决',
+        'A/B 测试的样本量怎么估算',
+        '特征工程你常用哪些方法',
+        '协同过滤和基于内容的推荐有什么不同',
+        '树模型和神经网络的优缺点对比',
+        '数据不平衡问题 — 你怎么处理',
+        'Spark 和 Hadoop 的区别和适用场景',
+      ],
+      bhv: [
+        '业务方提了一个模糊需求，你怎么把它落地',
+        '模型上线后效果下降怎么排查',
+        '和业务方对指标定义不一致怎么办',
+        '说一个你用数据说服业务方的案例',
+      ],
+    },
+    '运营': {
+      tech: [
+        '你日常用哪些数据工具，怎么用的',
+        '用户生命周期的关键节点有哪些',
+        '一次活动策划的完整流程',
+        '私域流量怎么搭建和变现',
+        '如何评估一个推广渠道的 ROI',
+        '用户增长的 AARRR 模型你怎么理解',
+        '社群如何保持长期活跃',
+        '内容爆款的底层逻辑',
+      ],
+      bhv: [
+        '一次活动没达标，你怎么复盘',
+        '上级给的 KPI 完不成怎么办',
+        '跨部门协作配合不畅怎么推进',
+        '说一个你从 0 到 1 做起来的业务',
+      ],
+    },
+  };
+
+  const FALLBACK_TECH = [
+    '你这个岗位最核心的专业能力是什么 — 举一个你做过的例子',
+    '最近关注到这个领域有什么新趋势吗',
+    '这个岗位日常会遇到的最大挑战是什么',
+    '说一个你用过的最好用的工具 / 框架',
+    '你怎么看待这个行业未来 3 年的变化',
+    '一个你做过的从 0 到 1 的事情',
+    '你最近在学什么新东西',
+    '描述一个你最有成就感的项目',
+  ];
+  const FALLBACK_BHV = [
+    '一次最有挑战的跨团队合作',
+    '你和同事意见冲突时怎么办',
+    'deadline 很紧时你怎么排优先级',
+    '说一个你失败的经历，学到了什么',
+  ];
+
+  window.doIV = () => {
+    const role = document.getElementById('iv-role').value.trim();
+    const yr   = document.getElementById('iv-yr').value;
+    const co   = document.getElementById('iv-co').value;
+    if (!role) { toast('请先填目标岗位'); return; }
+
+    // 匹配题库
+    let matchedKey = null;
+    for (const k of Object.keys(BANK)) {
+      const pats = k.split('|');
+      if (pats.some(p => role.includes(p))) { matchedKey = k; break; }
+    }
+    const bank = matchedKey ? BANK[matchedKey] : { tech: FALLBACK_TECH, bhv: FALLBACK_BHV };
+
+    const tech  = [...bank.tech].sort(()=>Math.random()-.5).slice(0, 5);
+    const bhv   = [...bank.bhv].sort(()=>Math.random()-.5).slice(0, 3);
+
+    // 必问题（命中率 >90%）
+    const HOT = [
+      '做一个 2 分钟以内的自我介绍',
+      '为什么看机会？为什么想加入我们',
+      '你的职业规划是什么',
+      '说一个你的优势和一个不足',
+      '最有成就感 / 最有挫折的一件事',
+      '期望薪资 — 怎么算出来的',
+      '你有什么想了解我们的',
+    ];
+
+    let html = `
+      <div class="output">
+ 岗位：${role}
+ 年限：${yr}
+ 公司类型：${co}
+ 匹配到：${matchedKey ? matchedKey : '通用题库'}
+ 生成时间：${new Date().toLocaleString('zh-CN')}
+      </div>
+
+      <h4 style="margin:24px 0 12px">💻 技术 / 专业题（5 道）</h4>`;
+    tech.forEach((q,i) => html += `<div class="qa-block"><div class="qa-q"><span class="qa-num">${i+1}</span>${q}</div></div>`);
+
+    html += `<h4 style="margin:24px 0 12px">🗣️ 行为面试题（3 道 · 用 STAR 回答）</h4>`;
+    bhv.forEach((q,i) => html += `
+      <div class="qa-block">
+        <div class="qa-q"><span class="qa-num">${i+1}</span>${q}</div>
+        <div class="qa-tip">💡 STAR 框架：情境 Situation → 任务 Task → 行动 Action → 结果 Result，尽量量化</div>
+      </div>`);
+
+    html += `<h4 style="margin:24px 0 12px">🔥 高频必问题（命中率 >90%）</h4>`;
+    HOT.forEach((q,i) => html += `<div style="padding:10px 14px;border-bottom:1px solid var(--text-line);font-size:13.5px">
+      ${i+1}. ${q}
+    </div>`);
+
+    html += `<button class="btn ghost btn-sm" style="margin-top:18px" onclick="cp(document.querySelector('#iv-out').innerText)">复制全部</button>`;
+
+    document.getElementById('iv-out').innerHTML = html;
+  };
+}
+
+/* =========================================================
+   工具 6: 自我介绍润色
+   ========================================================= */
+function toolIntro(c) {
+  c.innerHTML = `
+    <div class="row">
+      <div class="col"><label>姓名</label><input type="text" id="si-name" placeholder="张三"></div>
+      <div class="col"><label>目标岗位</label><input type="text" id="si-role" placeholder="前端工程师"></div>
+      <div class="col"><label>工作年限</label><input type="text" id="si-yr" placeholder="3 年"></div>
+    </div>
+    <label>三个核心亮点（每行一个）</label>
+    <textarea id="si-hi" placeholder="主导过日活百万产品重构\n首屏加载从 3s 优化到 0.8s\nGitHub 1.2k stars 开源项目作者"></textarea>
+    <div class="row" style="margin-top:12px">
+      <div class="col">
+        <label>目标时长</label>
+        <select id="si-len">
+          <option value="30">30 秒 · 电梯 pitch</option>
+          <option value="120" selected>2 分钟 · 标准面试</option>
+          <option value="300">5 分钟 · 详细版</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn" onclick="doIntro()">生成</button>
+    <div id="si-out"></div>
+  `;
+
+  window.doIntro = () => {
+    const nm = document.getElementById('si-name').value || '我';
+    const role = document.getElementById('si-role').value || '目标岗位';
+    const yr = document.getElementById('si-yr').value || 'X';
+    const hi = document.getElementById('si-hi').value.split('\n').map(s=>s.trim()).filter(Boolean);
+    const len = document.getElementById('si-len').value;
+
+    if (!hi.length) { toast('请先填至少一个亮点'); return; }
+
+    let text;
+    if (len === '30') {
+      text = `面试官好，我是${nm}，有${yr}年${role}经验。最核心的优势是${hi[0]}。期待加入贵公司，谢谢！`;
+    } else if (len === '120') {
+      text = `面试官好，我是${nm}。
+
+首先简单介绍下背景：我有${yr}年${role}经验，专注于${role.replace(/工程师|经理|师/g,'').trim() || '这个方向'}。
+
+最有代表性的三件事：
+
+第一，${hi[0]}。
+
+第二，${hi[1] || '持续深耕专业，保持对新技术的敏感度。'}。
+
+${hi[2] ? '第三，' + hi[2] + '。' : ''}
+
+我关注贵公司很久了，特别是 [在这里加一句你对目标公司/产品的了解]，和我想深耕的方向高度契合。期待能把经验带过来。
+
+以上就是我的自我介绍，谢谢！`;
+    } else {
+      text = `面试官好，我是${nm}。很高兴有机会参加这次面试。
+
+【背景】
+我有${yr}年${role}经验。从入行到现在，核心成长路径是：从初级逐步成长为能独立负责核心模块/项目的角色。
+
+【核心亮点一】
+${hi[0]}
+这件事让我学会了 [补充：这件事的具体能力或认知提升]。
+
+【核心亮点二】
+${hi[1] || '持续学习与开源贡献'}
+${hi[1] ? '这段经历让我在专业上又上了一个台阶。' : '保持对前沿技术的关注，业余时间活跃在开源社区，把学到的分享出去。'}
+
+${hi[2] ? `【核心亮点三】\n${hi[2]}\n这段经历进一步强化了我的综合能力。\n` : ''}
+【为什么选择贵公司】
+我关注贵公司很久了。特别是 [加一个具体的点：某个产品/某项技术/某种理念]，这正是我希望深度参与的方向。
+
+我相信我的经验能为团队带来价值，也期待在这个平台获得更大成长。
+
+以上就是我的自我介绍，期待进一步沟通，谢谢！`;
+    }
+
+    document.getElementById('si-out').innerHTML = `
+      <div class="output" style="white-space:pre-wrap">${text}</div>
+      <button class="btn ghost btn-sm" style="margin-top:14px" onclick="cp(document.querySelector('#si-out .output').innerText)">复制</button>
+      <div class="output" style="margin-top:18px;background:var(--accent-soft);border-color:#D4E4DB;color:var(--ok);font-family:var(--font-body);line-height:1.7">
+💡 自我介绍黄金法则
+──────────────────────
+1. 钩子开头：用一个与众不同的点抓住注意力
+2. 数据说话：每个亮点后面尽量跟量化结果
+3. 匹配岗位：说和目标岗位最相关的经历
+4. 做过功课：一定要体现"我了解你们公司"
+5. 多练几遍：控制时长，流畅自然
+      </div>
+    `;
+  };
+}
+
+/* =========================================================
+   工具 7: 公司背调清单
+   ========================================================= */
+function toolRisk(c) {
+  c.innerHTML = `
+    <div class="row">
+      <div class="col"><label>公司名称</label><input type="text" id="cr-name" placeholder="如：阿里巴巴 / XX 科技"></div>
+      <div class="col" style="flex:0 0 auto;display:flex;align-items:flex-end">
+        <button class="btn" onclick="doRisk()">生成清单</button>
+      </div>
+    </div>
+    <div id="cr-out"></div>
+  `;
+
+  window.doRisk = () => {
+    const name = document.getElementById('cr-name').value.trim();
+    if (!name) { toast('请先填公司名'); return; }
+
+    // 启发式判断（非真实数据，提醒用户自己查）
+    const hiRisk = ['科技','信息','网络','传媒','文化','咨询','商贸','广告','营销'];
+    const isStart = hiRisk.some(k => name.includes(k)) || name.length > 6;
+    const level = isStart ? 'mid' : 'low';
+    const levelName = level === 'low' ? '低风险' : '重点关注';
+    const levelColor = level === 'low' ? 'var(--ok)' : 'var(--warn)';
+
+    const CHECKLIST_BASE = [
+      ['天眼查/企查查', '工商信息：成立年限、实缴资本、法人、经营范围'],
+      ['国家企业信用信息公示系统', '经营异常、行政处罚、严重违法'],
+      ['中国执行信息公开网', '公司和法人是否是失信被执行人 / 限制高消费'],
+      ['公开开庭公告', '有没有大量劳动合同纠纷（风险信号）'],
+      ['社交媒体', '搜"公司名 + 裁员/跑路/欠薪/加班"看是否有负面'],
+      ['脉脉 / 看准网', '在职员工真实评价（注意区分水军）'],
+      ['Boss/拉勾 JD', '同一个岗位长期挂着招 = 离职率高'],
+    ];
+
+    const ADDITIONAL = isStart ? [
+      ['融资情况', '最近一轮融资时间、金额、投资方。超过 18 个月没融资的创业公司要谨慎'],
+      ['核心团队', 'CEO / CTO 背景 — 是不是连续创业者、有没有成功退出过'],
+      ['业务真实性', '产品/服务有没有在真实运营？还是只有一个空壳官网'],
+    ] : [];
+
+    const RED_FLAGS = [
+      '要求先交钱（培训费、押金、服装费）— 直接拉黑',
+      '工商信息查不到 / 被列入经营异常名录',
+      '老板 / 法人有多个失信被执行人记录',
+      '合同签第三方劳务派遣而非本公司主体',
+      '办公地址在居民楼 / 商住两用楼且规模很小',
+      '面试全程画饼、回避具体业务问题、入职时间模糊',
+      '试用期不缴社保（劳动法规定必须缴）',
+    ];
+
+    let html = `
+      <div class="risk-box risk-${level}">
+        <div class="risk-title" style="color:${levelColor}">📊 ${name} · ${levelName}</div>
+        <div class="risk-sub">基于关键词启发式分析 · 请务必到天眼查/企查查/国家企业信用信息公示系统核实</div>
+      </div>
+
+      <h4 style="margin:20px 0 12px">🔍 必查清单</h4>
+      <ul class="checklist">
+        ${CHECKLIST_BASE.map(([where, what]) => `<li><div><b>${where}</b><br><span style="color:var(--text-dim)">${what}</span></div></li>`).join('')}
+      </ul>
+
+      ${ADDITIONAL.length ? `
+      <h4 style="margin:20px 0 12px;color:var(--warn)">⚡ 创业公司额外关注</h4>
+      <ul class="checklist">
+        ${ADDITIONAL.map(([where, what]) => `<li><div><b>${where}</b><br><span style="color:var(--text-dim)">${what}</span></div></li>`).join('')}
+      </ul>` : ''}
+
+      <h4 style="margin:24px 0 12px;color:var(--bad)">🚩 红旗警告（遇到任何一条直接 Pass）</h4>
+      ${RED_FLAGS.map(f => `<div style="padding:10px 14px;background:#FDF0EF;border-radius:6px;margin-bottom:8px;font-size:13.5px">${f}</div>`).join('')}
+    `;
+
+    document.getElementById('cr-out').innerHTML = html;
+  };
+}
+
+/* =========================================================
+   工具 8: 薪资参考
+   ========================================================= */
+function toolSalary(c) {
+  const DATA = {
+    '北京': [12,18, 20,35, 35,60, 60,100],
+    '上海': [12,18, 20,35, 35,60, 60,100],
+    '深圳': [11,17, 18,32, 32,55, 55,90],
+    '杭州': [10,16, 18,30, 30,50, 50,80],
+    '广州': [ 9,14, 15,25, 25,45, 45,70],
+    '成都': [ 7,12, 12,22, 22,38, 38,60],
+    '武汉': [ 6,10, 10,18, 18,30, 30,50],
+    '南京': [ 8,13, 15,25, 25,42, 42,70],
+    '西安': [ 6,10, 10,18, 18,30, 30,50],
+  };
+
+  c.innerHTML = `
+    <p style="font-size:12.5px;color:var(--text-faint);margin-bottom:18px">
+      互联网行业 · 月薪 K · 数据综合自 Boss直聘 / 拉勾 / 脉脉 / 看准网，仅供参考。
+    </p>
+    <div style="overflow-x:auto">
+      <table class="salary">
+        <thead>
+          <tr><th>城市</th><th>初级 1-3 年</th><th>中级 3-5 年</th><th>高级 5-8 年</th><th>专家 8 年+</th></tr>
+        </thead>
+        <tbody>
+          ${Object.entries(DATA).map(([city, v]) => `
+            <tr>
+              <td style="font-weight:600">${city}</td>
+              <td>${v[0]}-${v[1]} K</td>
+              <td>${v[2]}-${v[3]} K</td>
+              <td>${v[4]}-${v[5]} K</td>
+              <td>${v[6]}-${v[7]} K</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+    <div class="output" style="margin-top:20px;background:var(--accent-soft);border-color:#D4E4DB;color:var(--ok);font-family:var(--font-body);line-height:1.7">
+💰 薪资谈判要点
+──────────────────────
+1. 了解市场价区间，给自己定"心理价位"和"底线"
+2. 不要先报价，等对方先说范围
+3. 用竞品 offer 作为筹码（但不要编）
+4. 除了 base，还要算股票/期权/年终奖/五险一金/年假
+5. 试用期工资不得低于转正的 80%（劳动法）
+    </div>
+  `;
+}
+
+/* =========================================================
+   工具 9: 求职信生成
+   ========================================================= */
+function toolCover(c) {
+  c.innerHTML = `
+    <div class="row">
+      <div class="col"><label>你的姓名</label><input type="text" id="cv-name" placeholder="张三"></div>
+      <div class="col"><label>目标公司</label><input type="text" id="cv-co" placeholder="阿里巴巴"></div>
+      <div class="col"><label>目标岗位</label><input type="text" id="cv-role" placeholder="前端工程师"></div>
+    </div>
+    <label>一句话核心优势</label>
+    <textarea id="cv-adv" placeholder="3 年前端经验，主导过百万 DAU 产品架构升级，擅长性能优化"></textarea>
+    <button class="btn" onclick="doCover()">生成</button>
+    <div id="cv-out"></div>
+  `;
+
+  window.doCover = () => {
+    const nm = document.getElementById('cv-name').value || '我';
+    const co = document.getElementById('cv-co').value || '贵公司';
+    const role = document.getElementById('cv-role').value || '该岗位';
+    const adv = document.getElementById('cv-adv').value.trim() || '丰富的相关经验';
+
+    const tpl = `尊敬的 ${co} 招聘负责人：
+
+您好！
+
+我是 ${nm}，怀着对 ${co} 的向往，郑重地申请 ${role} 一职。
+
+【为什么选择 ${co}】
+在过去的时间里，我一直关注着 ${co} 的发展。贵公司在行业内的创新和产品理念让我深受触动 —— 特别是 [在这里替换成你对目标公司/产品/某个具体业务的了解，一两句话就行]，这正是我希望深度参与的方向。
+
+【我能带来什么】
+${adv}。这些经历让我在专业能力之外，更培养了结果导向的思维和跨团队协作能力。我相信能和贵公司的业务形成良好的匹配。
+
+【下一步】
+附件中是我的简历，里面有更详细的经历和项目案例。我非常期待有机会与您进一步沟通。
+
+感谢您在百忙之中阅读这封求职信。
+
+此致
+敬礼！
+
+${nm}
+${new Date().toLocaleDateString('zh-CN')}`;
+
+    document.getElementById('cv-out').innerHTML = `
+      <div class="output" style="white-space:pre-wrap">${tpl}</div>
+      <button class="btn ghost btn-sm" style="margin-top:14px" onclick="cp(document.querySelector('#cv-out .output').innerText)">复制</button>
+      <div class="output" style="margin-top:18px;background:var(--accent-soft);border-color:#D4E4DB;color:var(--ok);font-family:var(--font-body);line-height:1.7">
+✉️ 求职信要点
+──────────────────────
+1. 一页 A4 以内，HR 只有 30 秒
+2. 一定要体现"你了解我们"（做功课！）
+3. 重点讲"我能带来什么"，不是"我想要什么"
+4. 和简历互补，不要完全重复
+5. PDF 格式最佳
+      </div>
+    `;
+  };
+}
+
+/* =========================================================
+   工具 10: 内推话术
+   ========================================================= */
+function toolRefer(c) {
+  c.innerHTML = `
+    <div class="row">
+      <div class="col"><label>公司名</label><input type="text" id="rf-co" placeholder="字节跳动"></div>
+      <div class="col"><label>目标岗位</label><input type="text" id="rf-role" placeholder="高级前端工程师"></div>
+      <div class="col"><label>一句话亮点</label><input type="text" id="rf-spot" placeholder="3 年前端，React 专家"></div>
+    </div>
+    <button class="btn" onclick="doRefer()">生成</button>
+    <div id="rf-out"></div>
+  `;
+
+  window.doRefer = () => {
+    const co = document.getElementById('rf-co').value || '贵公司';
+    const role = document.getElementById('rf-role').value || '相关岗位';
+    const spot = document.getElementById('rf-spot').value || '有相关经验';
+
+    const tpls = [
+      ['熟人 / 校友',
+`Hi XX，好久不见！😊
+
+我最近在看新机会，特别想试试 ${co} 的 ${role} 方向。${spot}，感觉和你们团队应该挺匹配的。
+
+方便的话能不能帮我内推一下？简历我马上发你，非常感谢！🙏`],
+      ['脉脉 / LinkedIn 陌生人',
+`您好，我叫 XX，${spot}。关注到您在 ${co} 工作，我对 ${co} 的 ${role} 岗位非常感兴趣。
+
+我的背景是：[1-2 句话补充]
+
+附件是我的简历，如果方便的话希望能帮我推荐一下，非常感谢！`],
+      ['群里 @ 陌生人',
+`@XX 打扰啦～我是 XX，想投 ${co} 的 ${role} 岗位，${spot}。
+
+方便帮我内推一下吗？简历：[链接]，感谢！`],
+    ];
+
+    document.getElementById('rf-out').innerHTML = tpls.map(([name, text]) => `
+      <div class="qa-block">
+        <div class="qa-q">📨 ${name}</div>
+        <div class="qa-tip" style="white-space:pre-wrap;font-family:inherit">${text}</div>
+        <button class="btn ghost btn-sm" style="margin-top:10px" onclick="cp(\`${text.replace(/`/g,'\\`')}\`)">复制</button>
+      </div>
+    `).join('');
+  };
+}
+</script>
+<script>
+/* ===== campus-jobs 联动桥：接收岗位 JD、记住简历 ===== */
+(function () {
+  var PREFILL = 'campus-jobs-ats-prefill', RESUME = 'campus-jobs-resume';
+  function get(k) { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } }
+  function restoreResume() {
+    var el = document.getElementById('ats-resume'), saved = get(RESUME);
+    if (el && saved && !el.value.trim()) el.value = saved;
+  }
+  // 在 ATS 文本框输入简历时自动保存，下次从任意岗位进入都能复用
+  document.addEventListener('input', function (e) {
+    if (e.target && (e.target.id === 'ats-resume' || e.target.id === 'opt-resume')) {
+      try { localStorage.setItem(RESUME, e.target.value); } catch (err) {}
+    }
+  });
+  var rawOpen = window.openTool;
+  window.openTool = function (id) {
+    // 追踪看板已合并到主站「我的投递」：在主站内时直接跳过去
+    if (id === 'tracker' && window.parent !== window) {
+      window.parent.postMessage({ type: 'cj-open-apps' }, location.origin);
+      return;
+    }
+    rawOpen(id);
+    if (id === 'ats') restoreResume();
+    if (id === 'iv') enhanceIV();
+    if (id === 'opt') { var o = document.getElementById('opt-resume'), s = get(RESUME); if (o && s && !o.value.trim()) o.value = s; }
+  };
+  /* ---- 面试题生成：接入站内题库（公司真题 company-questions.json + 通用题 questions.json） ---- */
+  var DATA = '../../data/', bankCache = {};
+  function loadData(name) {
+    if (!bankCache[name]) bankCache[name] = fetch(DATA + name).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).catch(function () { bankCache[name] = null; return null; });
+    return bankCache[name];
+  }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (ch) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]; }); }
+  function ckey(s) { return String(s || '').replace(/[\s（）()·\-—_]/g, '').replace(/(股份)?有限(责任)?公司|集团|控股/g, '').toLowerCase(); }
+  function findCompany(data, name) {
+    var k = ckey(name); if (!k || !data || !data.companies) return null;
+    var best = null;
+    Object.keys(data.companies).forEach(function (n) {
+      var q = ckey(n); if (!q || !(data.companies[n] || []).length) return;
+      if (k.indexOf(q) === 0 || q.indexOf(k) === 0) {
+        if (q === '京东' && k.indexOf('京东方') === 0) return;
+        if (!best || q.length > ckey(best).length) best = n;
+      }
+    });
+    return best ? { name: best, list: data.companies[best] } : null;
+  }
+  var TRACK_CATS = [
+    [/产品/, ['🎯 个人能力类', '🔧 问题解决类', '👥 团队合作类']],
+    [/开发|研发|算法|测试|运维|数据|后端|前端|客户端|嵌入式|硬件|工程师/, ['🔧 问题解决类', '📚 学习成长类', '🎯 个人能力类']],
+    [/运营|内容|新媒体/, ['💼 工作态度类', '👥 团队合作类', '🔧 问题解决类']],
+    [/市场|销售|商务|客户/, ['🌟 价值观念类', '🎯 个人能力类', '💬 其他常见问题']],
+    [/财务|会计|审计|金融|银行|风控/, ['💼 工作态度类', '🌟 价值观念类', '🔧 问题解决类']],
+  ];
+  function roleTokens(role) {
+    var t = String(role || '').toLowerCase();
+    var base = t.split(/[\s,，、/]+/).filter(function (x) { return x.length >= 2; });
+    ['前端','后端','算法','测试','产品','运营','数据','java','python','c++','go','客户端','嵌入式','硬件','销售','财务','设计','安全','运维','大模型'].forEach(function (k) { if (t.indexOf(k) >= 0) base.push(k); });
+    return base;
+  }
+  function enhanceIV() {
+    var roleEl = document.getElementById('iv-role');
+    if (!roleEl || document.getElementById('iv-company')) return;
+    var col = roleEl.closest('.col');
+    var box = document.createElement('div'); box.className = 'col';
+    box.innerHTML = '<label>目标公司（可选 · 接站内面经真题）</label><input type="text" id="iv-company" list="iv-company-list" placeholder="如：美团 / 华为 / 招商银行"><datalist id="iv-company-list"></datalist>';
+    col.parentNode.insertBefore(box, col);
+    loadData('company-questions.json').then(function (d) {
+      if (!d || !d.companies) return;
+      var dl = document.getElementById('iv-company-list'); if (!dl) return;
+      dl.innerHTML = Object.keys(d.companies).slice(0, 600).map(function (n) { return '<option value="' + esc(n) + '">'; }).join('');
+    });
+    var rawIV = window.doIV;
+    window.doIV = function () {
+      rawIV();
+      var out = document.getElementById('iv-out'); if (!out || !out.innerHTML) return;
+      var company = (document.getElementById('iv-company') || {}).value || '';
+      var role = roleEl.value.trim();
+      var holder = document.createElement('div'); holder.id = 'iv-site';
+      holder.innerHTML = '<div class="qa-tip" style="margin-top:20px">正在加载站内题库…</div>';
+      var copyBtn = out.querySelector('button'); out.insertBefore(holder, copyBtn || null);
+      Promise.all([company ? loadData('company-questions.json') : Promise.resolve(null), loadData('questions.json')]).then(function (res) {
+        var html = '';
+        var hit = company ? findCompany(res[0], company) : null;
+        if (company && hit) {
+          var toks = roleTokens(role);
+          var list = hit.list.map(function (q, i) {
+            var s = 0, lq = String(q.q).toLowerCase();
+            toks.forEach(function (t) { if (lq.indexOf(t) >= 0) s += 2; });
+            return { q: q, s: s, i: i };
+          }).sort(function (a, b) { return b.s - a.s || a.i - b.i; }).slice(0, 10);
+          html += '<h4 style="margin:24px 0 12px">🏢 ' + esc(hit.name) + ' 面经真题（' + list.length + ' / 共 ' + hit.list.length + ' 道 · 网友回忆版）</h4>';
+          list.forEach(function (o, i) {
+            html += '<div class="qa-block"><div class="qa-q"><span class="qa-num">' + (i + 1) + '</span>' + esc(o.q.q) + '</div>' +
+              '<div class="qa-tip">来源：' + (o.q.url ? '<a href="' + esc(o.q.url) + '" target="_blank" rel="noopener">' + esc(o.q.src || '原文') + ' ↗</a>' : esc(o.q.src || '')) + '</div></div>';
+          });
+        } else if (company) {
+          html += '<div class="qa-tip" style="margin-top:20px">站内暂未收录「' + esc(company) + '」的面经真题，下方给出通用高频题。</div>';
+        }
+        var all = (res[1] && res[1].questions) || [];
+        if (all.length) {
+          var cats = ['📋 基础信息类', '🚀 职业规划类', '🎯 个人能力类'];
+          TRACK_CATS.some(function (t) { if (t[0].test(role)) { cats = t[1]; return true; } return false; });
+          var pick = [];
+          cats.forEach(function (cat) {
+            var pool = all.filter(function (q) { return q.category === cat; }).sort(function () { return Math.random() - .5; });
+            pick = pick.concat(pool.slice(0, 2));
+          });
+          html += '<h4 style="margin:24px 0 12px">📚 站内题库 · 带参考答案（' + pick.length + ' 道）</h4>';
+          pick.forEach(function (q, i) {
+            html += '<details class="qa-block"><summary class="qa-q" style="cursor:pointer"><span class="qa-num">' + (i + 1) + '</span>' + esc(String(q.q).replace(/^\d+\.\s*/, '')) + '<span style="margin-left:8px;font-size:12px;color:var(--text-faint)">' + esc(q.category) + '</span></summary>' +
+              '<div class="qa-tip" style="white-space:pre-wrap">' + esc(q.a || q.snippet || '') + '</div></details>';
+          });
+        }
+        holder.innerHTML = html || '<div class="qa-tip" style="margin-top:20px">站内题库加载失败（离线或单独打开工具页时可能出现）。</div>';
+      });
+    };
+  }
+
+  function applyPrefill() {
+    var raw = get(PREFILL); if (!raw) return;
+    var p; try { p = JSON.parse(raw); } catch (e) { p = null; }
+    try { localStorage.removeItem(PREFILL); } catch (e) {}
+    if (!p || Date.now() - (p.ts || 0) > 10 * 60 * 1000) return;
+    if (p.tool === 'iv') {
+      window.openTool('iv');
+      var ce = document.getElementById('iv-company'), re2 = document.getElementById('iv-role');
+      if (ce) ce.value = p.company || '';
+      if (re2) re2.value = p.role || '';
+      if (re2 && re2.value && typeof window.doIV === 'function') window.doIV();
+      return;
+    }
+    if (p.tool === 'ats-open') {
+      window.openTool('ats');
+      if (typeof toast === 'function') toast('粘贴简历和 JD 后点「运行多维度检测」');
+      return;
+    }
+    if (!p.jd) return;
+    window.openTool('ats');
+    var jd = document.getElementById('ats-jd'); if (jd) jd.value = p.jd;
+    var t = document.getElementById('mtitle'); if (t && p.company) t.textContent = '🎯  ATS 匹配度检测 · ' + p.company;
+    var resume = document.getElementById('ats-resume');
+    if (resume && resume.value.trim() && typeof window.doATS === 'function') {
+      window.doATS();
+      var out = document.getElementById('ats-out'); if (out) out.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      if (resume) { resume.focus(); resume.placeholder = '先在这里粘贴一次你的简历（会保存在本机），然后点「运行多维度检测」。已自动填入「' + (p.company || '该岗位') + '」的 JD →'; }
+      if (typeof toast === 'function') toast('已填入岗位 JD，粘贴简历后即可检测');
+    }
+  }
+  window.addEventListener('message', function (e) {
+    if (e.origin === location.origin && e.data && e.data.type === 'cj-ats-prefill') applyPrefill();
+  });
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(applyPrefill, 0); });
+  else setTimeout(applyPrefill, 0);
+})();
+</script>
+</body>
+</html>

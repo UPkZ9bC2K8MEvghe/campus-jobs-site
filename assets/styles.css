@@ -99,25 +99,7 @@ button { font-family: inherit; cursor: pointer; }
   max-width: 460px;
 }
 
-.visit-counter {
-  flex: 0 0 auto;
-  display: inline-flex;
-  align-items: baseline;
-  gap: 4px;
-  padding: 6px 10px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: #fff;
-  color: var(--muted);
-  font-size: 12px;
-  white-space: nowrap;
-}
 
-.visit-counter b {
-  color: var(--ink);
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-}
 
 .search-box input {
   width: 100%;
@@ -1430,3 +1412,40 @@ a.soe-card:hover {
   .scroll-jump.scroll-top { bottom: 62px; }
 }
 
+
+
+/* ---------- 求职工具视图（iframe 嵌入） ---------- */
+#toolsPane { padding: 12px 16px 0; }
+.tools-switch { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
+.tools-btn { border: 1px solid rgba(127,127,127,.35); background: transparent; color: inherit; padding: 6px 14px; border-radius: 999px; cursor: pointer; font: inherit; }
+.tools-btn[aria-selected="true"] { background: #2b59ff; border-color: #2b59ff; color: #fff; }
+.tools-open { margin-left: auto; font-size: 13px; color: #2b59ff; text-decoration: none; }
+.tools-frame { display: block; width: 100%; height: calc(100vh - 170px); min-height: 560px; border: 0; border-radius: 12px; background: #fff; }
+@media (max-width: 720px) { #toolsPane { padding: 8px 8px 0; } .tools-frame { height: calc(100vh - 150px); border-radius: 8px; } }
+
+/* 岗位详情 · ATS 联动 */
+.detail-section.ats-link { border-left: 3px solid #2b59ff; padding-left: 12px; }
+.detail-section.ats-link .link-btn { cursor: pointer; border: 0; font: inherit; }
+
+/* 我的投递 · 站外投递 */
+.ext-app { margin: 10px 0 14px; border: 1px dashed rgba(127,127,127,.4); border-radius: 10px; padding: 8px 12px; }
+.ext-app summary { cursor: pointer; color: #2b59ff; font-size: 14px; }
+.ext-app-form { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.ext-app-form input, .ext-app-form select { flex: 1 1 140px; padding: 6px 10px; border: 1px solid rgba(127,127,127,.35); border-radius: 8px; background: transparent; color: inherit; font: inherit; }
+.badge.ext { background: rgba(43,89,255,.12); color: #2b59ff; }
+.app-del { margin-left: auto; border: 0; background: transparent; color: #c0392b; cursor: pointer; font-size: 12px; }
+
+/* 列表卡片 · 简历匹配分 */
+.badge.resume-match { font-weight: 600; }
+.badge.resume-match::before { content: '📄 '; }
+
+.chip.quick.disabled { opacity: .55; }
+
+.resume-th { margin-left: -4px; padding: 3px 6px; border: 1px solid rgba(127,127,127,.35); border-radius: 999px; background: transparent; color: inherit; font: inherit; font-size: 12px; cursor: pointer; }
+
+/* 访问量（独立访客） */
+.visit-counter { flex: 0 0 auto; display: inline-flex; align-items: baseline; gap: 4px; padding: 6px 10px; border: 1px solid var(--line); border-radius: 999px; background: #fff; color: var(--muted); font-size: 12px; white-space: nowrap; }
+.visit-counter[hidden] { display: none; }
+.visit-counter b { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+.visit-counter .visit-today { margin-left: 6px; padding-left: 8px; border-left: 1px solid var(--line); }
+@media (max-width: 720px) { .visit-counter .visit-today { display: none; } }

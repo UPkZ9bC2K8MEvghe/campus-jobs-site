@@ -9,6 +9,7 @@
 - 数据看板：https://campus-jobs.pages.dev/?view=dashboard，行业、城市、批次等分布统计
 - 央国企名录：https://campus-jobs.pages.dev/?view=soe，央国企与事业单位官方招聘入口
 - 求职资料：https://campus-jobs.pages.dev/?view=docs，包含面试题库、面经分享
+- 求职工具：https://campus-jobs.pages.dev/?view=tools ，ATS 简历匹配、JD 关键词、简历体检、面试题、求职信等（独立页 /tools/career/、/tools/ai/）
 - 全部企业索引：https://campus-jobs.pages.dev/companies/ ，按企业名与行业浏览，每家一个静态详情页
 
 ## 筛选链接规则（可直接构造）
@@ -20,6 +21,8 @@
 - `?y=2027`：按届次筛选
 - `?d=本科,硕士`：按学历筛选
 - `?st=open`：只看未截止；默认即为未截止
+- `?view=tools&ct=iv&company=美团&role=后端开发`：直接打开求职工具的面试题生成并预填公司 / 岗位（附该公司面经真题）
+- `?view=tools&ct=ats`：直接打开简历 ATS 匹配度检测
 - 例：https://campus-jobs.pages.dev/?i=IT/互联网/游戏&c=北京
 
 ## 数据文件（JSON，可直接引用）

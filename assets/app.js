@@ -14,8 +14,10 @@
   const NATIONWIDE = '__nationwide__';
   const STORAGE_KEY = 'campus-jobs-state-v2';
   const FAV_KEY = 'campus-jobs-favorites';
+  // 求职工具：iframe 嵌入的独立工具页（来源：12/career-tools、12/ai-tools）
+  const TOOL_PAGES = { career: 'tools/career/index.html', ai: 'tools/ai/index.html' };
   const LIST_VIEWS = new Set(['jobs', 'internships']);
-  const ALL_VIEWS = new Set(['jobs', 'internships', 'apps', 'events', 'dashboard', 'soe', 'docs']);
+  const ALL_VIEWS = new Set(['jobs', 'internships', 'apps', 'events', 'dashboard', 'soe', 'docs', 'tools']);
   const QUICK_FILTERS = [
     { key: 'open', label: '未截止' },
     { key: 'official', label: '官网直招' },
@@ -23,12 +25,18 @@
     { key: 'private', label: '民企' },
     { key: 'fav', label: '我的收藏' },
     { key: 'hot', label: '热门岗位' },
+    { key: 'resume', label: '简历匹配 ≥60%' },
   ];
+  // 简历匹配阈值（可调，本机记忆；URL 参数 rt 可覆盖）
+  const RESUME_TH_KEY = 'campus-jobs-resume-threshold';
+  const RESUME_TH_OPTIONS = [40, 60, 80];
+  let resumeThreshold = 60;
+  try { const v = Number(localStorage.getItem(RESUME_TH_KEY)); if (RESUME_TH_OPTIONS.includes(v)) resumeThreshold = v; } catch { /* ignore */ }
   // 热门榜每个视图保留的条数（按规则评分取头部）
   const HOT_TOP = { jobs: 60, internships: 40 };
   const STATUS_LABELS = {
     urgent: '7 天内截止', asap: '尽快投递', test: '有笔试', over: '已截止',
-    open: '只看未截止', official: '只看官网', soe: '只看央国企', private: '只看民企', fav: '只看收藏', hot: '只看热门',
+    open: '只看未截止', official: '只看官网', soe: '只看央国企', private: '只看民企', fav: '只看收藏', hot: '只看热门', resume: '简历匹配 ≥60%',
   };
   const FILTER_GROUPS = ['years', 'cities', 'batches', 'industries', 'ownership', 'degrees'];
   // F1 投递进度：本地状态机（仅存本机 localStorage）
@@ -104,7 +112,7 @@
     ownership: $('filter-ownership'), degrees: $('filter-degree'), status: $('filter-status'),
     soeGrid: $('soeGrid'), soeTotal: $('soeTotal'), docBody: $('docBody'),
     // 新增功能元素（F1/F3/F5/F9/F11/F12）
-    appsPane: $('appsPane'), appsList: $('appsList'), appsStats: $('appsStats'), countApps: $('countApps'),
+    appsPane: $('appsPane'), toolsPane: $('toolsPane'), appsList: $('appsList'), appsStats: $('appsStats'), countApps: $('countApps'),
     exportFavIcs: $('exportFavIcs'), exportEventsIcs: $('exportEventsIcs'), clearApps: $('clearApps'),
     majorInput: $('majorInput'), majorOnly: $('majorOnly'),
     shareBtn: $('shareBtn'),
@@ -354,6 +362,7 @@
     const params = new URLSearchParams();
     params.set('view', state.view);
     if (state.view === 'docs') params.set('doc', state.doc);
+    if (state.view === 'tools' && state.tool && state.tool !== 'career') params.set('tool', state.tool);
     if (state.q.trim()) params.set('q', state.q.trim());
     if (LIST_VIEWS.has(state.view)) {
       if (state.years.size) params.set('y', [...state.years].join(','));
@@ -364,6 +373,7 @@
       if (state.degrees.size) params.set('d', [...state.degrees].join(','));
       if (state.status.size) params.set('st', [...state.status].join(','));
       if (state.sort !== 'updated') params.set('sort', state.sort);
+      if (state.status.has('resume') && resumeThreshold !== 60) params.set('rt', String(resumeThreshold));
     }
     if (ui.current) params.set('job', ui.current.id);
     const url = params.toString() ? `?${params}` : location.pathname;
@@ -383,6 +393,20 @@
     const p = new URLSearchParams(location.search);
     state.view = ALL_VIEWS.has(p.get('view')) ? p.get('view') : 'jobs';
     state.doc = ['usage', 'interview', 'experience'].includes(p.get('doc')) ? p.get('doc') : 'interview';
+    state.tool = TOOL_PAGES[p.get('tool')] ? p.get('tool') : (state.tool || 'career');
+    if (RESUME_TH_OPTIONS.includes(Number(p.get('rt')))) setResumeThreshold(Number(p.get('rt')));
+    // 深链直达求职工具：?view=tools&ct=iv|ats&company=公司&role=岗位（企业静态页按钮使用）
+    const ct = p.get('ct');
+    if (ct === 'iv' || ct === 'ats') {
+      try {
+        localStorage.setItem('campus-jobs-ats-prefill', JSON.stringify({
+          tool: ct === 'iv' ? 'iv' : 'ats-open',
+          company: (p.get('company') || '').slice(0, 80), role: (p.get('role') || '').slice(0, 80), ts: Date.now(),
+        }));
+      } catch { /* ignore */ }
+      state.view = 'tools';
+      state.tool = 'career';
+    }
     state.q = p.get('q') || '';
     state.years = new Set((p.get('y') || '').split(',').filter(Boolean));
     state.cities = new Set((p.get('c') || '').split(',').filter(Boolean));
@@ -412,6 +436,124 @@
     return false;
   }
 
+  /* ---------- ATS 联动：岗位详情 → 求职工具箱 ---------- */
+  const ATS_PREFILL_KEY = 'campus-jobs-ats-prefill';
+  const RESUME_KEY = 'campus-jobs-resume';
+  function stripHtml(html) {
+    const d = document.createElement('div');
+    d.innerHTML = String(html || '');
+    return (d.textContent || '').replace(/\n{3,}/g, '\n\n').trim();
+  }
+  function buildJobJD(r) {
+    const parts = [`公司：${r.company || ''}`];
+    if ((r.positions || []).length) parts.push(`招聘岗位：${r.positions.join('、')}`);
+    if (r.majors) parts.push(`专业要求：${r.majors}`);
+    if ((r.degree || []).length) parts.push(`学历要求：${r.degree.join('、')}`);
+    if ((r.industries || []).length) parts.push(`行业：${r.industries.join('、')}`);
+    if ((r.cities || []).length) parts.push(`工作地点：${r.cities.join('、')}`);
+    const note = stripHtml(r.note);
+    if (note) parts.push(`\n岗位说明 / 公告正文：\n${note.slice(0, 6000)}`);
+    return parts.join('\n');
+  }
+  function atsSectionHtml(r) {
+    let hasResume = false;
+    try { hasResume = !!(localStorage.getItem(RESUME_KEY) || '').trim(); } catch { /* ignore */ }
+    const thin = !stripHtml(r.note) && !(r.positions || []).length;
+    return `<section class="detail-section ats-link"><h3>简历匹配度<span class="section-source">ATS 检测 · 本地计算不上传</span></h3>
+      <p class="muted" style="margin:0 0 10px">${hasResume ? '已保存你的简历，点击后会自动给出这个岗位的匹配分和缺失关键词。' : '第一次使用时粘贴一次简历，之后会记住，打开任意岗位都能一键检测。'}${thin ? '（该岗位公告信息较少，结果仅供参考）' : ''}</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="link-btn primary" type="button" id="atsFromJob">🎯 用这个岗位测 ATS 匹配度</button>
+      <button class="link-btn" type="button" id="ivFromJob">🗣️ 生成这家公司的面试题</button></div></section>`;
+  }
+  async function openIVWithJob(r) {
+    try {
+      localStorage.setItem(ATS_PREFILL_KEY, JSON.stringify({ tool: 'iv', company: r.company || '', role: (r.positions || [])[0] || '', id: r.id, ts: Date.now() }));
+    } catch { toast('浏览器存储不可用'); return; }
+    state.tool = 'career';
+    if (state.view !== 'tools') await switchView('tools');
+    else { if (el.drawer.classList.contains('open')) closeDrawer(); renderTools(); }
+    const frame = document.getElementById('toolsFrame');
+    try { frame?.contentWindow?.postMessage({ type: 'cj-ats-prefill' }, location.origin); } catch { /* ignore */ }
+  }
+  async function openATSWithJob(r) {
+    try {
+      localStorage.setItem(ATS_PREFILL_KEY, JSON.stringify({ jd: buildJobJD(r), company: r.company || '', id: r.id, ts: Date.now() }));
+    } catch { toast('浏览器存储不可用，无法传递 JD'); return; }
+    state.tool = 'career';
+    if (state.view !== 'tools') await switchView('tools');
+    else { if (el.drawer.classList.contains('open')) closeDrawer(); renderTools(); }
+    // iframe 已加载时直接通知；首次加载则由工具页 DOMContentLoaded 自行读取
+    const frame = document.getElementById('toolsFrame');
+    try { frame?.contentWindow?.postMessage({ type: 'cj-ats-prefill' }, location.origin); } catch { /* ignore */ }
+  }
+
+  window.addEventListener('message', (e) => {
+    if (e.origin !== location.origin || !e.data) return;
+    if (e.data.type === 'cj-open-apps') switchView('apps');
+  });
+
+  /* ---------- 访问量统计（一台电脑 + 一个 IP 计 1 次） ---------- */
+  const DEVICE_KEY = 'campus-jobs-device-id';
+  function deviceId() {
+    try {
+      let id = localStorage.getItem(DEVICE_KEY);
+      if (!id) {
+        id = (crypto.randomUUID ? crypto.randomUUID() : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 12)}`);
+        localStorage.setItem(DEVICE_KEY, id);
+      }
+      return id;
+    } catch { return ''; }
+  }
+  async function trackVisit() {
+    const box = document.getElementById('visitCounter');
+    if (!box) return;
+    try {
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), 5000);
+      const res = await fetch('/api/visit', {
+        method: 'POST', signal: ctrl.signal,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ device: deviceId() }),
+      });
+      clearTimeout(timer);
+      if (!res.ok) return; // 镜像站 / 本地预览没有后端：保持隐藏
+      const d = await res.json();
+      if (typeof d.total !== 'number') return;
+      document.getElementById('visitTotal').textContent = d.total.toLocaleString('zh-CN');
+      document.getElementById('visitToday').textContent = (d.today || 0).toLocaleString('zh-CN');
+      box.hidden = false;
+    } catch { /* 统计失败不影响页面 */ }
+  }
+  // 首屏渲染完成后再统计，不占用关键加载时间
+  if (document.readyState === 'complete') setTimeout(trackVisit, 1500);
+  else window.addEventListener('load', () => setTimeout(trackVisit, 1500), { once: true });
+
+  /* ---------- 求职工具（iframe） ---------- */
+  let toolsBound = false;
+  function renderTools() {
+    const frame = document.getElementById('toolsFrame');
+    if (!frame) return;
+    const key = TOOL_PAGES[state.tool] ? state.tool : 'career';
+    state.tool = key;
+    const src = TOOL_PAGES[key];
+    // 仅在首次进入或切换工具时设置 src，避免重复加载
+    if (frame.dataset.tool !== key) { frame.src = src; frame.dataset.tool = key; }
+    const open = document.getElementById('toolsOpenNew');
+    if (open) open.href = src.replace('index.html', '');
+    for (const b of document.querySelectorAll('#toolsSwitch [data-tool]')) {
+      b.setAttribute('aria-selected', String(b.dataset.tool === key));
+    }
+    if (!toolsBound) {
+      toolsBound = true;
+      document.getElementById('toolsSwitch')?.addEventListener('click', (e) => {
+        const b = e.target.closest('[data-tool]');
+        if (!b || b.dataset.tool === state.tool) return;
+        state.tool = b.dataset.tool;
+        writeState();
+        renderTools();
+      });
+    }
+  }
+
   /* ---------- 视图切换 ---------- */
   function applyView() {
     const isList = LIST_VIEWS.has(state.view);
@@ -421,6 +563,7 @@
     el.eventsPane.hidden = state.view !== 'events';
     el.docsPane.hidden = state.view !== 'docs';
     el.appsPane.hidden = state.view !== 'apps';
+    if (el.toolsPane) el.toolsPane.hidden = state.view !== 'tools';
     el.docsSubTabs.hidden = state.view !== 'docs';
     el.searchBox.style.display = (isList || state.view === 'soe') ? '' : 'none';
 
@@ -439,6 +582,7 @@
     soe: ['央国企名录 · 校招信息查询', '央国企与事业单位官方招聘官网入口名录，可直接跳转企业官方招聘页面。'],
     events: ['高校宣讲会日历 · 校招信息查询', '汇总北京大学、北京航空航天大学、北京理工大学等高校就业网公开的宣讲会与招聘会信息，按时间与学校浏览。'],
     docs: ['求职资料 · 校招信息查询', '面试题库与面经分享，帮助应届生完成校招投递准备。'],
+    tools: ['求职工具 · 校招信息查询', 'ATS 简历匹配度检测、JD 关键词提取、简历体检、面试题生成、自我介绍润色、求职信与内推话术等免费求职工具，数据仅保存在本机浏览器。'],
     apps: ['我的投递 · 校招信息查询', '在收藏基础上跟踪投递进度：已收藏 → 已投递 → 笔试/面试 → Offer → 已拒，记录投递时间与备注，按截止时间排序，数据仅保存在本机浏览器。'],
   };
 
@@ -473,6 +617,7 @@
     else if (view === 'events') await renderEvents();
     else if (view === 'docs') renderDocs();
     else if (view === 'apps') await renderApps();
+    else if (view === 'tools') renderTools();
     else await renderListView();
     window.scrollTo({ top: 0 });
   }
@@ -676,10 +821,58 @@
       const btn = chip(f.label, count, state.status.has(f.key), () => onQuickFilter(f.key), 'quick');
       if (f.key === 'hot') btn.title = '综合更新时间、截止状态、招聘规模、企业性质排序的头部岗位';
       el.quickFilters.appendChild(btn);
+      if (f.key === 'resume') {
+        const ready = !!resumeKeywords();
+        btn.title = ready ? `只看与你保存的简历关键词匹配度 ≥ ${resumeThreshold}% 的岗位` : '先在「求职工具 → ATS 匹配度检测」里粘贴一次简历';
+        if (!ready) btn.classList.add('disabled');
+        else {
+          const sel = document.createElement('select');
+          sel.className = 'resume-th';
+          sel.title = '简历匹配阈值';
+          sel.setAttribute('aria-label', '简历匹配阈值');
+          sel.innerHTML = RESUME_TH_OPTIONS.map((v) => `<option value="${v}"${v === resumeThreshold ? ' selected' : ''}>≥${v}%</option>`).join('');
+          sel.addEventListener('click', (e) => e.stopPropagation());
+          sel.addEventListener('change', () => {
+            setResumeThreshold(Number(sel.value));
+            if (!state.status.has('resume')) { state.status.add('resume'); state.sort = 'resume'; el.sortSelect.value = state.sort; }
+            onFilterChange();
+          });
+          el.quickFilters.appendChild(sel);
+        }
+      }
     }
   }
 
+  function setResumeThreshold(v) {
+    if (!RESUME_TH_OPTIONS.includes(v)) return;
+    resumeThreshold = v;
+    try { localStorage.setItem(RESUME_TH_KEY, String(v)); } catch { /* ignore */ }
+    syncResumeLabel();
+  }
+  function syncResumeLabel() {
+    const label = `简历匹配 ≥${resumeThreshold}%`;
+    STATUS_LABELS.resume = label;
+    const qf = QUICK_FILTERS.find((x) => x.key === 'resume');
+    if (qf) qf.label = '简历匹配';
+  }
+  syncResumeLabel();
+
   function onQuickFilter(key) {
+    if (key === 'resume') {
+      if (!resumeKeywords() && !state.status.has('resume')) {
+        toast('还没有保存简历：先去「求职工具」粘贴一次简历');
+        state.tool = 'career';
+        switchView('tools');
+        return;
+      }
+      // 打开时顺带按简历匹配排序，关闭时恢复
+      const on = !state.status.has('resume');
+      if (on) { state.status.add('resume'); state.sort = 'resume'; }
+      else { state.status.delete('resume'); if (state.sort === 'resume') state.sort = 'updated'; }
+      el.sortSelect.value = state.sort;
+      onFilterChange();
+      return;
+    }
     if (key !== 'hot') {
       toggle(state.status, key);
       return;
@@ -773,6 +966,7 @@
     if (state.status.has('private') && row.ownership !== '民企') return false;
     if (state.status.has('fav') && !favorites.has(row.id)) return false;
     if (state.status.has('hot') && !ensureHot(state.view).has(row.id)) return false;
+    if (state.status.has('resume') && resumeKeywords() && !((resumeScore(row) ?? -1) >= resumeThreshold)) return false;
 
     const includeStatus = ['urgent', 'over', 'asap', 'test'].filter((k) => state.status.has(k));
     if (includeStatus.length) {
@@ -811,6 +1005,9 @@
     if (state.sort === 'hot') {
       const hot = ensureHot(state.view);
       copy.sort((a, b) => (hot.get(b.id) || 0) - (hot.get(a.id) || 0) || (b.updatedAt || '').localeCompare(a.updatedAt || ''));
+    } else if (state.sort === 'resume') {
+      const v = (r) => { const x = resumeScore(r); return x == null ? -1 : x; };
+      copy.sort((a, b) => v(b) - v(a) || (b.updatedAt || '').localeCompare(a.updatedAt || ''));
     } else if (state.sort === 'company') copy.sort((a, b) => a.company.localeCompare(b.company, 'zh'));
     else if (state.sort === 'deadline') {
       const group = (r) => { const d = daysUntil(r.deadline); if (d == null) return 1; return d >= 0 ? 0 : 2; };
@@ -847,6 +1044,7 @@
         ${ensureHot(state.view).has(row.id) ? '<span class="badge hot">热门</span>' : ''}
         <span class="badge ownership">${esc(row.ownership)}</span>
         ${score ? matchBadge(score) : ''}
+        ${resumeBadge(resumeScore(row))}
         ${appSt && appSt !== 'saved' ? `<span class="badge st-${appSt}">${APP_STATUS_LABELS[appSt]}</span>` : ''}
         ${positionCount > 1 ? `<span class="badge positions">${positionCount} 个岗位</span>` : ''}
         ${yearLabels ? `<span class="badge year">${esc(yearLabels)}</span>` : ''}
@@ -1093,6 +1291,11 @@
     });
     // F1 投递进度区交互
     bindDrawerAppStatus(r);
+    // 求职工具联动：一键把本岗位 JD 送进 ATS 匹配度检测
+    appendDrawerSection(atsSectionHtml(r), () => {
+      el.drawerBody.querySelector('#atsFromJob')?.addEventListener('click', () => openATSWithJob(r));
+      el.drawerBody.querySelector('#ivFromJob')?.addEventListener('click', () => openIVWithJob(r));
+    });
     // F4/F7/F8/F10 异步加载并追加：相似推荐 / 近期宣讲会 / 面试题 / 面经
     renderDrawerExtras(r, tab);
   }
@@ -1336,10 +1539,124 @@
     return `<span class="badge ${cls}">匹配 ${score}%</span>`;
   }
 
+  /* ---- 列表卡片 · 简历匹配分（轻量版 ATS，复用求职工具箱保存的简历） ---- */
+  const RESUME_POOL = [
+    // 技术
+    'python', 'java', 'javascript', 'typescript', 'golang', 'rust', 'c++', 'c#', 'php', 'kotlin', 'swift', 'scala', 'matlab',
+    'react', 'vue', 'angular', 'node.js', 'spring', 'django', 'flask', 'mysql', 'redis', 'mongodb', 'oracle', 'sql',
+    'linux', 'docker', 'kubernetes', 'k8s', 'aws', 'hadoop', 'spark', 'flink', 'kafka', 'pytorch', 'tensorflow', 'opencv',
+    'llm', 'nlp', 'plc', 'cad', 'solidworks', 'fpga', 'verilog', 'stm32', 'excel', 'ps', 'spss', 'sas',
+    '前端', '后端', '全栈', '客户端', '安卓', 'ios', '测试', '运维', '算法', '数据分析', '数据挖掘', '大数据', '机器学习', '深度学习',
+    '大模型', '人工智能', '计算机视觉', '自然语言处理', '嵌入式', '硬件', '芯片', '集成电路', '半导体', '射频', '单片机', '网络安全', '信息安全',
+    // 专业 / 方向
+    '计算机', '软件工程', '电子', '通信', '电气', '自动化', '机械', '车辆', '材料', '化工', '化学', '物理', '数学', '统计',
+    '土木', '建筑', '测绘', '地质', '采矿', '能源', '动力', '水利', '交通', '航空', '航天', '船舶', '环境', '生物', '医学', '药学', '护理', '食品',
+    '金融', '经济', '会计', '财务', '审计', '税务', '法学', '法律', '市场营销', '人力资源', '工商管理', '物流', '供应链', '采购',
+    '新闻', '传播', '广告', '中文', '英语', '日语', '翻译', '设计', '视觉', '交互', 'ui', '产品经理', '运营', '销售', '客户经理', '咨询', '教育', '师范',
+  ];
+  const asciiRe = (w) => new RegExp(`(^|[^a-z0-9+#.])${w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}($|[^a-z0-9+#])`);
+  const RESUME_POOL_RE = RESUME_POOL.map((w) => [w, /^[a-z0-9+#. ]+$/.test(w) ? asciiRe(w) : null]);
+  const hasKw = (text, [w, re]) => (re ? re.test(text) : text.includes(w));
+  const resumeCache = { raw: null, kws: null, scores: new Map() };
+  function resumeKeywords() {
+    let raw = '';
+    try { raw = localStorage.getItem(RESUME_KEY) || ''; } catch { /* ignore */ }
+    if (raw !== resumeCache.raw) {
+      resumeCache.raw = raw;
+      resumeCache.scores.clear();
+      const t = raw.toLowerCase();
+      resumeCache.kws = raw.trim() ? new Set(RESUME_POOL_RE.filter((k) => hasKw(t, k)).map((k) => k[0])) : null;
+    }
+    return resumeCache.kws;
+  }
+  // 返回 0~100；JD 侧可识别关键词少于 2 个时返回 null（信息不足不打分）
+  function resumeScore(row) {
+    const kws = resumeKeywords();
+    if (!kws || !kws.size) return null;
+    if (resumeCache.scores.has(row.id)) return resumeCache.scores.get(row.id);
+    const jd = [(row.positions || []).join(' '), row.majors || '', (row.industries || []).join(' '), row.sm || '', String(row.note || '').slice(0, 4000)]
+      .join(' ').toLowerCase();
+    let total = 0, hit = 0;
+    for (const k of RESUME_POOL_RE) {
+      if (!hasKw(jd, k)) continue;
+      total++;
+      if (kws.has(k[0])) hit++;
+    }
+    const score = total >= 2 ? Math.round((hit / total) * 100) : null;
+    resumeCache.scores.set(row.id, score);
+    return score;
+  }
+  function resumeBadge(score) {
+    if (score == null) return '';
+    const cls = score >= 60 ? 'match-high' : score >= 30 ? 'match-mid' : 'match-low';
+    return `<span class="badge resume-match ${cls}" title="根据你在「求职工具」里保存的简历估算的关键词匹配度，点开岗位可做完整 ATS 检测">简历 ${score}%</span>`;
+  }
+  // 在求职工具里修改简历后（同源 iframe 会触发 storage 事件），刷新列表上的分数
+  window.addEventListener('storage', (e) => {
+    if (e.key !== RESUME_KEY) return;
+    resumeKeywords();
+    if (LIST_VIEWS.has(state.view)) { renderQuickFilters(); if (ui.filtersView === state.view) applyDynamicCounts(); renderResults(); }
+  });
+
   /* ---- F1 我的投递视图 ---- */
+  /* ---- 站外投递（合并自求职工具箱的「求职追踪看板」） ---- */
+  const TRACKER_KEY = 'careerKit_tracker';
+  const TRACKER_MIGRATED_KEY = 'campus-jobs-tracker-migrated';
+  const isExtId = (id) => String(id).startsWith('ext-');
+  function addExternalApp({ company, role, platform = '', salary = '', status = 'applied', date = '', note = '' }, idSeed) {
+    const id = `ext-${idSeed || Date.now().toString(36) + Math.random().toString(36).slice(2, 6)}`;
+    if (apps[id]) return false;
+    const now = new Date().toISOString();
+    apps[id] = {
+      status: APP_STATUS_LABELS[status] ? status : 'applied',
+      appliedAt: date || todayStr(), note, updatedAt: now,
+      external: true, company: company || '', role: role || '', platform, salary,
+    };
+    return true;
+  }
+  // 一次性迁移：把 career-tools 旧看板（localStorage: careerKit_tracker）导入「我的投递」
+  function migrateCareerTracker() {
+    try {
+      if (localStorage.getItem(TRACKER_MIGRATED_KEY)) return;
+      const list = JSON.parse(localStorage.getItem(TRACKER_KEY) || '[]');
+      let n = 0;
+      if (Array.isArray(list)) {
+        for (const it of list) {
+          if (!it || !it.company) continue;
+          if (addExternalApp({ company: it.company, role: it.role, platform: it.platform, salary: it.salary, status: it.status, date: it.date }, `ct${it.id}`)) n++;
+        }
+      }
+      localStorage.setItem(TRACKER_MIGRATED_KEY, new Date().toISOString());
+      if (n) { saveApps(); setTimeout(() => toast(`已把求职工具箱里的 ${n} 条投递记录合并到「我的投递」`), 800); }
+    } catch { /* ignore */ }
+  }
+  function externalRow(id) {
+    const a = apps[id];
+    return {
+      id, external: true, company: a.company || '未命名公司', positions: a.role ? [a.role] : [],
+      ownership: a.platform || '站外投递', cities: [], degree: [], deadline: null,
+      deadlineText: a.salary ? `薪资 ${a.salary}K` : '站外投递', updatedAt: a.updatedAt || '',
+    };
+  }
+  function bindExternalForm() {
+    const form = document.getElementById('extAppForm');
+    if (!form || form.dataset.bound) return;
+    form.dataset.bound = '1';
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const fd = new FormData(form);
+      const company = String(fd.get('company') || '').trim();
+      const role = String(fd.get('role') || '').trim();
+      if (!company || !role) { toast('公司和岗位必填'); return; }
+      addExternalApp({ company, role, platform: String(fd.get('platform') || ''), salary: String(fd.get('salary') || '').trim(), status: String(fd.get('status') || 'applied') });
+      saveApps(); updateAppsCount(); form.reset(); toast('已添加站外投递'); renderApps();
+    });
+  }
+
   async function renderApps() {
     await Promise.all([loadTab('jobs').catch(() => {}), loadTab('internships').catch(() => {})]);
-    const rows = Object.keys(apps).map((id) => findRowById(id)?.row).filter(Boolean);
+    bindExternalForm();
+    const rows = Object.keys(apps).map((id) => (isExtId(id) ? externalRow(id) : findRowById(id)?.row)).filter(Boolean);
     const rank = (r) => { const d = daysUntil(r.deadline); if (d == null) return 2; return d < 0 ? 3 : d <= 7 ? 0 : 1; };
     rows.sort((a, b) => {
       const ra = rank(a), rb = rank(b);
@@ -1379,6 +1696,7 @@
         <span>城市 <b>${esc(cityText)}</b></span>
         <span>学历 <b>${esc((row.degree || []).join('/') || '—')}</b></span>
         ${rec?.appliedAt ? `<span>投递于 <b>${rec.appliedAt}</b></span>` : ''}
+        ${row.external ? `<span class="badge ext">站外</span><button type="button" class="app-del" data-del="${esc(row.id)}" title="删除这条记录">删除</button>` : ''}
       </div>
       <div class="app-status-pick">${statusPick}</div>
       <div class="app-note" contenteditable="true" data-note="${esc(row.id)}" data-empty="${rec?.note ? 'false' : 'true'}">${esc(rec?.note || NOTE_PLACEHOLDER)}</div>
@@ -1388,6 +1706,12 @@
     el.appsList.querySelectorAll('.app-card').forEach((card) => {
       card.addEventListener('click', (e) => {
         if (e.target.closest('.app-status-pick') || e.target.closest('.app-note')) return;
+        const del = e.target.closest('[data-del]');
+        if (del) {
+          if (window.confirm('删除这条站外投递记录？')) { delete apps[del.dataset.del]; saveApps(); updateAppsCount(); renderApps(); }
+          return;
+        }
+        if (isExtId(card.dataset.id)) return;
         const found = findRowById(card.dataset.id);
         if (found) openDrawer(found.row, found.tab);
       });
@@ -1808,6 +2132,7 @@
       else if (state.view === 'events') await renderEvents();
       else if (state.view === 'docs') renderDocs();
       else if (state.view === 'apps') await renderApps();
+      else if (state.view === 'tools') renderTools();
     } catch (err) {
       el.cardList.innerHTML = `<div class="empty"><strong>数据加载失败</strong>${esc(err.message)}</div>`;
     }
@@ -1934,6 +2259,7 @@
 
     loadFavorites();
     loadApps();
+    migrateCareerTracker();
     loadProfile();
     updateAppsCount();
     // F1：刷新/关页前把正在编辑的备注落盘，避免未失焦就丢失
@@ -1958,6 +2284,7 @@
     else if (state.view === 'events') await renderEvents();
     else if (state.view === 'docs') renderDocs();
     else if (state.view === 'apps') await renderApps();
+      else if (state.view === 'tools') renderTools();
 
     hotReady.then(() => {
       cache.hot.jobs = null;

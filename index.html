@@ -151,8 +151,8 @@
         <input id="searchInput" type="search" placeholder="搜索公司、岗位、专业、城市…" autocomplete="off" aria-label="关键词搜索">
         <button class="search-clear" id="searchClear" title="清空搜索" aria-label="清空搜索">×</button>
       </div>
-      <div class="visit-counter" title="全站累计页面浏览量（PV）">
-        访问量 <b><span id="busuanzi_value_site_pv">—</span></b>
+      <div class="visit-counter" id="visitCounter" hidden title="独立访客：同一台电脑 + 同一 IP 只计一次">
+        访客 <b id="visitTotal">—</b><span class="visit-today">今日 +<b id="visitToday">0</b></span>
       </div>
     </div>
     <nav class="tabs" role="tablist" aria-label="主导航">
@@ -163,6 +163,7 @@
       <button class="tab" role="tab" data-view="dashboard" aria-selected="false">数据看板</button>
       <button class="tab" role="tab" data-view="soe" aria-selected="false">央国企名录</button>
       <button class="tab" role="tab" data-view="docs" aria-selected="false">求职资料</button>
+      <button class="tab" role="tab" data-view="tools" aria-selected="false">求职工具</button>
     </nav>
     <nav class="sub-tabs" id="docsSubTabs" role="tablist" aria-label="资料子栏目" hidden>
       <button class="sub-tab" data-doc="interview" aria-selected="true">面试题库</button>
@@ -215,6 +216,7 @@
         <option value="hot">按热门度</option>
         <option value="deadline">按截止时间</option>
         <option value="company">按公司名称</option>
+        <option value="resume">按简历匹配</option>
       </select>
     </div>
     <div class="card-list" id="cardList"></div>
@@ -252,6 +254,16 @@
   <article class="doc-body" id="docBody"><div class="loading">正在加载…</div></article>
 </section>
 
+<!-- 求职工具视图（iframe 嵌入 tools/ 下的独立工具页，首次进入时才加载） -->
+<section class="page-pane" id="toolsPane" hidden>
+  <nav class="tools-switch" id="toolsSwitch" role="tablist" aria-label="工具分类">
+    <button class="tools-btn" data-tool="career" aria-selected="true">求职工具箱</button>
+    <button class="tools-btn" data-tool="ai" aria-selected="false">效率小工具</button>
+    <a class="tools-open" id="toolsOpenNew" href="tools/career/" target="_blank" rel="noopener">新窗口打开 ↗</a>
+  </nav>
+  <iframe class="tools-frame" id="toolsFrame" title="求职工具" loading="lazy"></iframe>
+</section>
+
 <!-- 我的投递视图 -->
 <section class="page-pane" id="appsPane" hidden>
   <div class="apps-head">
@@ -263,6 +275,17 @@
       <button class="copy-btn danger" id="clearApps" type="button">清空投递记录</button>
     </div>
   </div>
+  <details class="ext-app">
+    <summary>＋ 添加站外投递（Boss 直聘 / 拉勾 / 猎聘 / 内推等不在本站的岗位）</summary>
+    <form id="extAppForm" class="ext-app-form" autocomplete="off">
+      <input name="company" placeholder="公司（必填）" required>
+      <input name="role" placeholder="岗位（必填）" required>
+      <select name="platform"><option>Boss 直聘</option><option>拉勾</option><option>猎聘</option><option>前程无忧</option><option>牛客</option><option>LinkedIn</option><option>官网</option><option>内推</option><option>其他</option></select>
+      <input name="salary" placeholder="薪资 K，如 15-25">
+      <select name="status"><option value="applied">已投递</option><option value="saved">已收藏</option><option value="test">笔试</option><option value="interview">面试</option><option value="offer">Offer</option><option value="rejected">已拒</option></select>
+      <button class="copy-btn primary" type="submit">添加</button>
+    </form>
+  </details>
   <div class="apps-stats" id="appsStats"></div>
   <div id="appsList"><div class="loading">正在加载…</div></div>
 </section>
@@ -302,8 +325,7 @@
   <div class="drawer-body" id="drawerBody"></div>
 </aside>
 
-<script src="assets/app.js?v=33"></script>
-<script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script src="assets/app.js?v=42"></script>
 <noscript>
   <div class="noscript-note">
     <h2>校招信息查询</h2>

@@ -130,6 +130,51 @@ for (const map of [byIndustry, byCity]) {
   for (const list of map.values()) list.sort((a, b) => b.total - a.total || a.company.localeCompare(b.company, 'zh-CN'));
 }
 
+// 求职工具（来自 12/career-tools）静态化：公司背调清单 + 内推话术 + 面经真题入口
+const companyQuestions = await readFile(path.join(ROOT, 'data/company-questions.json'), 'utf8')
+  .then((t) => JSON.parse(t).companies || {}).catch(() => ({}));
+const ckey = (s) => String(s || '').replace(/[\s（）()·\-—_]/g, '').replace(/(股份)?有限(责任)?公司|集团|控股/g, '').toLowerCase();
+const cqIndex = Object.entries(companyQuestions).map(([n, l]) => [ckey(n), n, (l || []).length]).filter((x) => x[0] && x[2]);
+function questionCount(company) {
+  const k = ckey(company);
+  let best = null;
+  for (const [qk, name, n] of cqIndex) {
+    if (!k.startsWith(qk)) continue;
+    if (qk === '京东' && k.startsWith('京东方')) continue;
+    if (!best || qk.length > best[0].length) best = [qk, name, n];
+  }
+  return best ? { name: best[1], n: best[2] } : null;
+}
+const enc = encodeURIComponent;
+function toolsCardHtml(company, main, firstRole) {
+  const q = enc(company);
+  const soe = /央国企|事业单位|银行/.test(main.ownership || '');
+  const checks = [
+    [`<a href="https://www.tianyancha.com/search?key=${q}" rel="nofollow noopener" target="_blank">天眼查</a> / <a href="https://www.qcc.com/web/search?key=${q}" rel="nofollow noopener" target="_blank">企查查</a>`, '成立年限、实缴资本、法人、经营范围、股东结构'],
+    ['<a href="https://www.gsxt.gov.cn/" rel="nofollow noopener" target="_blank">国家企业信用信息公示系统</a>', '经营异常、行政处罚、严重违法失信名单'],
+    ['<a href="https://zxgk.court.gov.cn/" rel="nofollow noopener" target="_blank">中国执行信息公开网</a>', '公司与法人是否为失信被执行人 / 限制高消费'],
+    [`<a href="https://www.baidu.com/s?wd=${enc(company + ' 裁员 欠薪 劳动纠纷')}" rel="nofollow noopener" target="_blank">负面舆情搜索</a>`, '搜「公司名 + 裁员 / 欠薪 / 加班」看是否有集中负面'],
+    [`<a href="https://www.nowcoder.com/search/all?query=${q}" rel="nofollow noopener" target="_blank">牛客网</a> / 脉脉 / 看准网`, '在职员工评价、面经、薪资爆料（注意甄别水军）'],
+    ...(soe ? [['官方渠道核验', '央国企 / 银行 / 事业单位请以集团官网、国资委或人社部门公告为准，谨防冒名招聘'],]
+      : [['融资与业务', '非上市民企看最近一轮融资时间与业务是否真实运营，18 个月以上未融资的创业公司需谨慎']]),
+  ];
+  const flags = ['要求先交钱（培训费、押金、服装费）', '工商信息查不到或被列入经营异常名录', '劳动合同签第三方劳务派遣而非本公司主体', '试用期不缴社保、回避具体岗位职责'];
+  const role = firstRole || '相关岗位';
+  const tpls = [
+    ['师兄师姐 / 校友', `师兄/师姐好！我是 XX 大学 XX 专业 2027 届的 XX，看到 ${company} 正在招 ${role}，非常想试试。\n我的情况：[1-2 句：专业 + 核心技能/实习亮点]。\n方便的话能帮我内推一下吗？简历我马上发您，非常感谢！`],
+    ['脉脉 / 领英陌生人', `您好，冒昧打扰！我是 XX 大学 2027 届应届生 XX，关注到您在 ${company} 工作，对贵司 ${role} 岗位非常感兴趣。\n我的背景：[1-2 句话]。附件是我的简历，如方便能否帮忙内推？无论结果都非常感谢！`],
+    ['求职群 @ 内推人', `@XX 打扰啦～我是 2027 届的 XX，想投 ${company} 的 ${role}，[一句话亮点]。方便的话求个内推码/内推链接，感谢！`],
+  ];
+  const qc = questionCount(company);
+  return `<section class="card tools-card"><h2>求职准备工具</h2>
+<details open><summary>🔍 ${esc(company)} 背调清单</summary><ol>${checks.map(([w, t]) => `<li><b>${w}</b>：${esc(t)}</li>`).join('')}</ol>
+<p class="flag">🚩 遇到以下任一情况建议直接放弃：${flags.map(esc).join('；')}。</p></details>
+<details><summary>📨 内推话术模板（${tpls.length} 套）</summary>${tpls.map(([n, t]) => `<p style="margin:10px 0 0"><b>${esc(n)}</b> <button class="cp" type="button">复制</button></p><pre>${esc(t.replace(/\\n/g, '\n'))}</pre>`).join('')}</details>
+<p style="margin:10px 0 0"><a class="btn" href="${SITE}/?view=tools&amp;ct=iv&amp;company=${q}${firstRole ? `&amp;role=${enc(firstRole)}` : ''}" rel="nofollow">🗣️ ${qc ? `${esc(qc.name)} 面经真题（${qc.n} 道）+ 面试题` : `生成 ${esc(company)} 面试题`}</a><a class="btn ghost" href="${SITE}/?view=tools&amp;ct=ats" rel="nofollow">🎯 简历 ATS 匹配度检测</a></p>
+</section>`;
+}
+const COPY_JS = `<script>document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('.tools-card .cp');if(!b)return;var pre=b.parentNode.nextElementSibling;if(!pre)return;navigator.clipboard&&navigator.clipboard.writeText(pre.textContent).then(function(){b.textContent='已复制';setTimeout(function(){b.textContent='复制'},1500)})});</script>`;
+
 await rm(OUT, { recursive: true, force: true });
 await mkdir(OUT, { recursive: true });
 
@@ -187,6 +232,12 @@ li{margin:2px 0}
 .jump.up{bottom:70px}
 .jump:hover{background:#3b5bdb;color:#fff}
 @media (max-width:640px){.jump{right:12px;bottom:14px;width:38px;height:38px}.jump.up{bottom:60px}}
+.tools-card details{border-top:1px dashed #e5e8ef;padding:8px 0}
+.tools-card summary{cursor:pointer;font-weight:600}
+.tools-card ol{margin:6px 0 0;padding-left:20px;font-size:14px}
+.tools-card pre{white-space:pre-wrap;background:#f6f7f9;border-radius:8px;padding:10px 12px;font:13px/1.7 inherit;margin:6px 0}
+.tools-card .cp{border:1px solid #d5d9e2;background:#fff;border-radius:6px;padding:2px 10px;font-size:12px;cursor:pointer}
+.tools-card .flag{color:#b23a48}
 </style>
 <script type="application/ld+json">${JSON.stringify(ld)}</script>
 </head>
@@ -251,7 +302,9 @@ ${openJobs ? `<section class="card"><h2>校招岗位（${openJobs}）</h2><ul>${
 ${openInterns ? `<section class="card"><h2>实习岗位（${openInterns}）</h2><ul>${positionList(rec.internships)}</ul></section>` : ''}
 ${majors.length ? `<section class="card"><h2>专业要求</h2><p>${majors.map((m) => esc(m)).join('<br>')}</p></section>` : ''}
 ${indLinks ? `<section class="card"><h2>同行业企业（${esc(industries[0])}）</h2><p class="rel">${indLinks}</p></section>` : ''}
-${cityLinks ? `<section class="card"><h2>${esc(cities[0])} 同城招聘企业</h2><p class="rel">${cityLinks}</p></section>` : ''}`;
+${toolsCardHtml(company, main, (rec.jobs[0] || rec.internships[0])?.positions?.[0])}
+${cityLinks ? `<section class="card"><h2>${esc(cities[0])} 同城招聘企业</h2><p class="rel">${cityLinks}</p></section>` : ''}
+${COPY_JS}`;
 
   const ld = {
     '@context': 'https://schema.org',
@@ -352,6 +405,9 @@ const urls = [
   { loc: `${SITE}/?view=internships`, lastmod: todayStr },
   { loc: `${SITE}/?view=soe`, lastmod: todayStr },
   { loc: `${SITE}/?view=dashboard`, lastmod: todayStr },
+  { loc: `${SITE}/?view=tools`, lastmod: todayStr },
+  { loc: `${SITE}/tools/career/`, lastmod: todayStr },
+  { loc: `${SITE}/tools/ai/`, lastmod: todayStr },
   ...records.map((r) => ({ loc: r.url, lastmod: r.lastmod })),
 ];
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>

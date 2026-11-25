@@ -9,3 +9,6 @@ playwright-report/
 *.log
 .DS_Store
 Thumbs.db
+
+# 本地改动备份（求职工具接入过程中生成）
+_backup_before_*/

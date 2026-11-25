@@ -1,10 +1,11 @@
 /* 校招信息查询站 Service Worker：应用外壳缓存 + 数据网络优先 */
-const VERSION = 'v33';
+const VERSION = 'v42';
 const SHELL = `campus-jobs-shell-${VERSION}`;
 const DATA = `campus-jobs-data-${VERSION}`;
 const SHELL_FILES = [
   './', './index.html', './assets/app.js', './assets/styles.css',
   './manifest.webmanifest', './icon.svg', './icon-192.png', './icon-512.png',
+  './tools/career/index.html', './tools/ai/index.html',
 ];
 
 self.addEventListener('install', (event) => {
@@ -26,6 +27,7 @@ self.addEventListener('fetch', (event) => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
   if (url.origin !== location.origin) return;
+  if (url.pathname.startsWith('/api/')) return; // 接口不缓存
 
   if (req.mode === 'navigate') {
     event.respondWith(networkFirst(req, SHELL, './index.html'));

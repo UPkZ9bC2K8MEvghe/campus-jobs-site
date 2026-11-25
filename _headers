@@ -32,3 +32,6 @@
 
 /sw.js
   Cache-Control: public, max-age=0, must-revalidate
+# 访问量接口不缓存
+/api/*
+  Cache-Control: no-store
