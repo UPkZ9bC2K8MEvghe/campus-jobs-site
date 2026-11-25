@@ -158,6 +158,16 @@ async function writeSearchIndex(tableKey, rows) {
   await writeFile(path.join(DATA_DIR, `${tableKey}-search.json`), JSON.stringify(rows.map((row) => row.sm || '')), 'utf8');
 }
 
+async function needsCompactUpgrade() {
+  try {
+    const payload = JSON.parse(await readFile(path.join(DATA_DIR, 'jobs.json'), 'utf8'));
+    await readFile(path.join(DATA_DIR, 'jobs-search.json'), 'utf8');
+    return payload.v !== 3;
+  } catch {
+    return true;
+  }
+}
+
 function pushUnique(target, values) {
   for (const v of values || []) if (v != null && v !== '' && !target.includes(v)) target.push(v);
 }
@@ -1306,7 +1316,12 @@ async function main() {
   if (process.argv.includes('--incremental')) {
     probe = await incrementalProbe(appToken);
     process.stdout.write(`  · 增量探针：${probe.reason}\n`);
-    if (probe.skip) {
+    // v2 详情分片不含完整岗位，不能就地升级，必须全量重读飞书恢复岗位后再写 v3
+    if (probe && await needsCompactUpgrade()) {
+      process.stdout.write('检测到 v2 紧凑数据，改为全量导出…\n');
+      probe = { ...probe, mode: 'full', skip: false };
+    }
+    if (probe?.skip) {
       await exportDocs();
       if (probe.supplementChanged) {
         process.stdout.write('官网补充数据变化，复用飞书数据并重新合并…\n');
