@@ -2,8 +2,8 @@ name: 每日更新并部署
 
 on:
   schedule:
-    # 每天 09:00（北京时间 = UTC 01:00）跑一次
-    - cron: '0 1 * * *'
+    # 每天 02:00（北京时间 = UTC 前一天 18:00）跑一次
+    - cron: '0 18 * * *'
   workflow_dispatch: {}
 
 permissions:
