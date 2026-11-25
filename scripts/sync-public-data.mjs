@@ -8,7 +8,7 @@ import path from 'node:path';
 const SITE = (process.env.SYNC_SOURCE || 'https://campus-jobs.pages.dev').replace(/\/$/, '');
 const SHARDS = 16;
 const FILES = [
-  'jobs.json', 'internships.json', 'facets.json', 'dashboard.json', 'soe.json',
+  'jobs.json', 'internships.json', 'jobs-search.json', 'internships-search.json', 'facets.json', 'dashboard.json', 'soe.json',
   'changelog.json', 'docs.json', 'questions.json', 'reviews.json', 'external-hot.json',
   ...Array.from({ length: SHARDS }, (_, i) => `jobs-detail-${i}.json`),
   ...Array.from({ length: SHARDS }, (_, i) => `internships-detail-${i}.json`),
@@ -32,8 +32,8 @@ async function download(name) {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const text = await res.text();
       const payload = JSON.parse(text); // SPA 回退会返回 HTML，这里会直接抛错
-      if (TABLES.has(name) && !(payload && payload.v === 2 && Array.isArray(payload.r))) {
-        throw new Error('数据格式不是 v2 紧凑格式');
+      if (TABLES.has(name) && !(payload && [2, 3].includes(payload.v) && Array.isArray(payload.r))) {
+        throw new Error('数据格式不是 v2/v3 紧凑格式');
       }
       return text;
     } catch (e) {

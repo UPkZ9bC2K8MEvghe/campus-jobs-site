@@ -55,6 +55,7 @@
 
   const cache = {
     jobs: null, internships: null,
+    search: { jobs: null, internships: null },
     detail: { jobs: [], internships: [] },
     facets: null, dashboard: null, soe: null, docs: null, changelog: null, events: null,
     reviews: null, questions: null, companyQuestions: null,
@@ -119,7 +120,7 @@
   // 解码列表紧凑格式（scripts/export-data.mjs 的 encodeRows），列顺序必须一致
   function decodeRows(payload) {
     if (Array.isArray(payload)) return payload; // 兼容旧格式
-    if (!payload || payload.v !== 2 || !Array.isArray(payload.r)) return [];
+    if (!payload || ![2, 3].includes(payload.v) || !Array.isArray(payload.r)) return [];
     const { d, r } = payload;
     const pick = (k, i) => (i >= 0 && d[k][i] !== undefined ? d[k][i] : '');
     const list = (k, arr) => (arr || []).map((i) => pick(k, i)).filter((v) => v !== '');
@@ -140,8 +141,9 @@
         deadline: a[12] === undefined ? null : a[12],
         deadlineText: a[13] || '',
         updatedAt: a[14] || '',
-        sm: a[15] || '',
+        sm: payload.v === 2 ? (a[15] || '') : '',
       };
+      if (payload.v === 3) row.positionCount = a[22] ?? row.positions.length;
       if (a[16]) row.source = a[16];
       if (a[17]) row.sourceName = a[17];
       if (a[18]) row.sourceUrl = a[18];
@@ -195,7 +197,7 @@
     if (deadlineDays != null && deadlineDays >= 0) score += deadlineDays <= 7 ? 22 : 14;
     else if (deadlineDays == null && /尽快/.test(row.deadlineText || '')) score += 12;
 
-    score += Math.min(row.positions.length, 50) * 0.8; // 招聘规模
+    score += Math.min(row.positionCount ?? row.positions.length, 50) * 0.8; // 招聘规模
     score += Math.min(row.cities.length, 8);           // 覆盖城市
     if (row.ownership === '央国企') score += 8;
     else if (row.ownership === '外企') score += 6;
@@ -224,7 +226,7 @@
 
   function searchText(row) {
     if (row.__s) return row.__s;
-    row.__s = [row.company, (row.positions || []).join(' '), row.cities.join(' '), row.industries.join(' '), row.sm || '', row.note || '']
+    row.__s = [row.company, (row.positions || []).join(' '), row.cities.join(' '), row.industries.join(' '), row.__search || row.sm || '', row.note || '']
       .join(' ').toLowerCase();
     return row.__s;
   }
@@ -441,6 +443,18 @@
     if (meta) meta.setAttribute('content', desc);
   }
 
+  async function renderListView() {
+    try {
+      await loadTab(state.view);
+      renderFilters();
+      renderResults();
+      scheduleSearchIndex(state.view);
+    } catch (err) {
+      el.cardList.innerHTML = `<div class="empty"><strong>数据加载失败</strong>${esc(err.message)}<br>请检查网络后刷新重试。</div>`;
+      el.loading.textContent = '';
+    }
+  }
+
   async function switchView(view) {
     if (view === state.view) return;
     if (el.drawer.classList.contains('open')) closeDrawer();
@@ -453,19 +467,29 @@
     else if (view === 'events') await renderEvents();
     else if (view === 'docs') renderDocs();
     else if (view === 'apps') await renderApps();
-    else {
-      await loadTab(view);
-      renderFilters();
-      renderResults();
-    }
+    else await renderListView();
     window.scrollTo({ top: 0 });
   }
 
   /* ---------- 加载 ---------- */
-  async function loadJSON(name) {
-    const res = await fetch(`${DATA_BASE}${name}`);
-    if (!res.ok) throw new Error(`${name} 加载失败: ${res.status}`);
-    return res.json();
+  async function loadJSON(name, timeout = 20000) {
+    let lastErr;
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), timeout);
+      try {
+        const suffix = attempt ? `?retry=${Date.now()}` : '';
+        const res = await fetch(`${DATA_BASE}${name}${suffix}`, { signal: controller.signal });
+        if (!res.ok) throw new Error(`${name} 加载失败: ${res.status}`);
+        return await res.json();
+      } catch (err) {
+        lastErr = err.name === 'AbortError' ? new Error(`${name} 加载超时`) : err;
+        if (attempt || !(err.name === 'AbortError' || err instanceof TypeError)) throw lastErr;
+      } finally {
+        clearTimeout(timer);
+      }
+    }
+    throw lastErr;
   }
 
   async function loadFacets() {
@@ -484,7 +508,7 @@
 
   async function loadTab(tab) {
     if (cache[tab]) return cache[tab];
-    el.loading.textContent = '正在加载数据…';
+    if (state.view === tab) el.loading.textContent = '正在加载数据…';
     const raw = await loadJSON(`${tab}.json`);
     cache[tab] = decodeRows(raw);
     if (tab === 'jobs') {
@@ -498,6 +522,23 @@
       el.footerTotal.textContent = (jobN + openCount(cache.internships)).toLocaleString('zh-CN');
     }
     return cache[tab];
+  }
+
+  async function loadSearchIndex(tab) {
+    if (cache.search[tab] || !cache[tab]) return;
+    const index = await loadJSON(`${tab}-search.json`);
+    if (!Array.isArray(index)) throw new Error(`${tab}-search.json 格式无效`);
+    cache.search[tab] = index;
+    cache[tab].forEach((row, i) => {
+      row.__search = index[i] || '';
+      row.__s = null;
+    });
+  }
+
+  function scheduleSearchIndex(tab) {
+    loadSearchIndex(tab).catch(() => {}).then(() => {
+      if (state.view === tab && (state.q || profile.major)) renderResults();
+    });
   }
 
   /* ---------- 外部热榜：加载牛客等第三方热度数据源（Phase 1） ---------- */
@@ -783,9 +824,10 @@
     const cities = row.cities.length ? row.cities.slice(0, 3).join(' / ') : (row.nationwide ? '全国多地' : '未注明');
     const cityText = row.nationwide && row.cities.length ? `${cities} 等 · 全国多地` : cities;
     // 同公司已合并成一条，岗位可能很多，卡片上只列前几个
+    const positionCount = row.positionCount ?? row.positions.length;
     const positionText = row.positions.length
-      ? (row.positions.length > 4
-        ? `${row.positions.slice(0, 4).join(' / ')} 等 ${row.positions.length} 个岗位`
+      ? (positionCount > 4
+        ? `${row.positions.slice(0, 4).join(' / ')} 等 ${positionCount} 个岗位`
         : row.positions.join(' / '))
       : '岗位信息详见公告';
     const score = matchScore(row);
@@ -798,7 +840,7 @@
         <span class="badge ownership">${esc(row.ownership)}</span>
         ${score ? matchBadge(score) : ''}
         ${appSt && appSt !== 'saved' ? `<span class="badge st-${appSt}">${APP_STATUS_LABELS[appSt]}</span>` : ''}
-        ${row.positions.length > 1 ? `<span class="badge positions">${row.positions.length} 个岗位</span>` : ''}
+        ${positionCount > 1 ? `<span class="badge positions">${positionCount} 个岗位</span>` : ''}
         ${yearLabels ? `<span class="badge year">${esc(yearLabels)}</span>` : ''}
         <span class="deadline ${meta.cls}">${esc(meta.text)}</span>
         <button class="compare-toggle${ui.compare.has(row.id) ? ' active' : ''}" data-compare="${esc(row.id)}" aria-label="加入对比" title="加入对比">⇄</button>
@@ -1274,7 +1316,7 @@
   function matchScore(row) {
     const tokens = majorTokens();
     if (!tokens.length) return 0;
-    const hay = [row.majors || '', (row.positions || []).join(' '), row.note || '', (row.industries || []).join(' '), row.sm || '']
+    const hay = [row.majors || '', (row.positions || []).join(' '), row.note || '', (row.industries || []).join(' '), row.__search || row.sm || '']
       .join(' ').toLowerCase();
     let hit = 0;
     for (const t of tokens) if (hay.includes(t)) hit++;
@@ -1389,10 +1431,14 @@
     el.compareBar.hidden = n === 0;
     if (el.compareCount) el.compareCount.textContent = n;
   }
-  function openCompareModal() {
+  async function openCompareModal() {
     if (ui.compare.size < 2) { toast('至少勾选 2 个岗位'); return; }
-    const rows = [...ui.compare].map((id) => findRowById(id)?.row).filter(Boolean);
-    if (rows.length < 2) { toast('请先加载岗位列表'); return; }
+    const found = [...ui.compare].map((id) => findRowById(id)).filter(Boolean);
+    if (found.length < 2) { toast('请先加载岗位列表'); return; }
+    const rows = await Promise.all(found.map(async ({ row, tab }) => {
+      try { return { ...row, ...await loadDetail(tab, row.id) }; }
+      catch { return row; }
+    }));
     const cols = Math.min(4, rows.length);
     const cells = rows.map((r) => {
       const meta = deadlineMeta(r);
@@ -1448,6 +1494,7 @@
       loadJSON('events.json').then((d) => { cache.events = d; }).catch(() => {}),
       loadJSON('questions.json').then((d) => { cache.questions = d; }).catch(() => {}),
       loadJSON('reviews.json').then((d) => { cache.reviews = d; }).catch(() => {}),
+      cache.companyQuestions ? Promise.resolve() : loadJSON('company-questions.json').then((d) => { cache.companyQuestions = d; }).catch(() => {}),
     ]);
     // 异步返回时若用户已切换到其它岗位，则放弃追加，避免内容串抽屉
     if (!ui.current || ui.current.id !== r.id) return;
@@ -1894,21 +1941,24 @@
     loadJSON('events.json')
       .then((d) => { cache.events = d; el.countEvents.textContent = (d.events || []).length || ''; })
       .catch(() => { /* 宣讲会为增量模块，失败不影响主列表 */ });
-    loadJSON('company-questions.json')
-      .then((d) => { cache.companyQuestions = d; })
-      .catch(() => { /* 面经题为增量模块，失败不影响主列表 */ });
 
-    // Phase 1：先加载外部热榜数据源（牛客公开热推等第三方热度源），热门打分再叠加外部信号
-    await loadExternalHot().catch(() => { /* 降级时外部热榜为空，仅用内部打分 */ });
+    const hotReady = loadExternalHot().catch(() => {});
 
-    if (LIST_VIEWS.has(state.view)) {
-      try { await loadTab(state.view); renderFilters(); renderResults(); }
-      catch (err) { el.cardList.innerHTML = `<div class="empty"><strong>数据加载失败</strong>${esc(err.message)}</div>`; el.loading.textContent = ''; }
-    } else if (state.view === 'dashboard') await renderDashboard();
+    if (LIST_VIEWS.has(state.view)) await renderListView();
+    else if (state.view === 'dashboard') await renderDashboard();
     else if (state.view === 'soe') await renderSOE();
     else if (state.view === 'events') await renderEvents();
     else if (state.view === 'docs') renderDocs();
     else if (state.view === 'apps') await renderApps();
+
+    hotReady.then(() => {
+      cache.hot.jobs = null;
+      cache.hot.internships = null;
+      if (LIST_VIEWS.has(state.view)) {
+        renderQuickFilters();
+        if (state.status.has('hot')) renderResults();
+      }
+    });
 
     const jobId = new URLSearchParams(location.search).get('job');
     if (jobId) await openJobById(jobId, { history: false });

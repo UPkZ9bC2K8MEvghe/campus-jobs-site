@@ -139,6 +139,25 @@ async function loadDetailShards(tableKey) {
   return all;
 }
 
+async function loadRowsWithDetails(tableKey) {
+  const payload = JSON.parse(await readFile(path.join(DATA_DIR, `${tableKey}.json`), 'utf8'));
+  const rows = decodeRows(payload);
+  const [details, search] = await Promise.all([
+    loadDetailShards(tableKey),
+    readFile(path.join(DATA_DIR, `${tableKey}-search.json`), 'utf8').then(JSON.parse).catch(() => []),
+  ]);
+  rows.forEach((row, i) => {
+    const detail = details[row.id] || {};
+    if (detail.positions?.length >= (row.positionCount ?? row.positions.length)) row.positions = detail.positions;
+    row.sm = search[i] || detail.search || row.sm || '';
+  });
+  return { rows, details };
+}
+
+async function writeSearchIndex(tableKey, rows) {
+  await writeFile(path.join(DATA_DIR, `${tableKey}-search.json`), JSON.stringify(rows.map((row) => row.sm || '')), 'utf8');
+}
+
 function pushUnique(target, values) {
   for (const v of values || []) if (v != null && v !== '' && !target.includes(v)) target.push(v);
 }
@@ -177,7 +196,17 @@ function collapseByCompany(rows, details = {}) {
     if (!groups.has(k)) groups.set(k, []);
     groups.get(k).push(row);
   }
-  if (groups.size === rows.length) return { rows, details, mergedGroups: 0 };
+  if (groups.size === rows.length) {
+    const outDetails = {};
+    for (const row of rows) {
+      const detail = { ...(details[row.id] || {}) };
+      const positions = detail.positions?.length >= row.positions.length ? detail.positions : row.positions;
+      if (positions?.length) detail.positions = positions;
+      if (row.sm) detail.search = row.sm;
+      if (Object.keys(detail).length) outDetails[row.id] = detail;
+    }
+    return { rows, details: outDetails, mergedGroups: 0 };
+  }
 
   const outRows = [];
   const outDetails = {};
@@ -188,9 +217,12 @@ function collapseByCompany(rows, details = {}) {
       const row = members[0];
       outRows.push(row);
       const detail = { ...(details[row.id] || {}) };
+      const positions = detail.positions?.length >= row.positions.length ? detail.positions : row.positions;
+      if (positions?.length) detail.positions = positions;
+      if (row.sm) detail.search = row.sm;
       // 单岗位官网企业也必须把正文留在详情分片，列表编码时再移除重复正文。
       // 备注统一补上岗位名称（幂等，重复合并不会叠加）
-      const singleNote = withPosLabel(detail.note || row.note, row.positions);
+      const singleNote = withPosLabel(detail.note || row.note, positions);
       if (singleNote) detail.note = singleNote;
       if (Object.keys(detail).length) outDetails[row.id] = detail;
       continue;
@@ -226,7 +258,9 @@ function collapseByCompany(rows, details = {}) {
     let sourceText = '';
 
     for (const m of members) {
-      pushUnique(positions, m.positions);
+      const d = details[m.id];
+      const memberPositions = d?.positions?.length >= (m.positionCount ?? m.positions.length) ? d.positions : m.positions;
+      pushUnique(positions, memberPositions);
       pushUnique(cities, m.cities);
       pushUnique(industries, m.industries);
       pushUnique(batches, m.batches);
@@ -237,7 +271,8 @@ function collapseByCompany(rows, details = {}) {
       if (m.writtenTest === true) writtenTest = true;
       else if (m.writtenTest === false && writtenTest == null) writtenTest = false;
       if (String(m.updatedAt || '') > updatedAt) updatedAt = String(m.updatedAt || '');
-      if (m.sm && !smParts.includes(m.sm)) smParts.push(m.sm);
+      const memberSearch = m.sm || d?.search || '';
+      if (memberSearch && !smParts.includes(memberSearch)) smParts.push(memberSearch);
       if (m.note) {
         const block = withPosLabel(m.note, m.positions);
         if (block && !notes.includes(block)) notes.push(block);
@@ -246,7 +281,6 @@ function collapseByCompany(rows, details = {}) {
       if (!sourceText && m.source) sourceText = m.source;
       if (!apply && m.apply) apply = m.apply;
 
-      const d = details[m.id];
       if (!d) continue;
       if (d.majors && !majorParts.includes(d.majors)) majorParts.push(d.majors);
       if (!announce && d.announce) announce = d.announce;
@@ -302,7 +336,7 @@ function collapseByCompany(rows, details = {}) {
     if (!row.majors) delete row.majors;
     outRows.push(row);
 
-    const detail = {};
+    const detail = { positions, search: row.sm };
     if (row.majors) detail.majors = row.majors;
     if (announce) detail.announce = announce;
     if (apply) detail.apply = apply;
@@ -315,8 +349,8 @@ function collapseByCompany(rows, details = {}) {
   return { rows: outRows, details: outDetails, mergedGroups };
 }
 
-/* ---------- 列表紧凑编码（v2） ----------
- * 行转为数组 + 字符串字典，去掉重复键名与重复城市/行业字符串。
+/* ---------- 列表紧凑编码（v3） ----------
+ * 行转为数组 + 字符串字典；列表只保留前 4 个岗位，完整岗位与搜索索引按需加载。
  * 前端 assets/app.js 的 decodeRows 必须与此处保持同一列顺序。
  */
 
@@ -336,11 +370,12 @@ function encodeRows(rows) {
   const arrs = (k, list) => (list || []).map((v) => at(k, v));
 
   const r = rows.map((x) => {
-    const a = [
+    const positions = x.positions || [];
+    return [
       x.id, x.company,
       at('o', x.ownership),
       arrs('i', x.industries),
-      x.positions || [],
+      positions.slice(0, 4),
       arrs('c', x.cities),
       x.nationwide ? 1 : 0,
       x.gradYears || [],
@@ -351,7 +386,7 @@ function encodeRows(rows) {
       x.deadline || null,
       x.deadlineText || '',
       x.updatedAt || '',
-      x.sm || '',
+      '',
       x.source || '',
       x.sourceName || '',
       x.sourceUrl || '',
@@ -359,18 +394,16 @@ function encodeRows(rows) {
       // 官网正文只存详情分片，避免大公司数千条 JD 在列表中重复占用体积。
       x.source === 'official' ? '' : (x.note || ''),
       x.majors || '',
+      positions.length,
     ];
-    // 可选列从第 16 列开始，尾部空值直接裁掉
-    while (a.length > 16 && (a[a.length - 1] === '' || a[a.length - 1] === null)) a.pop();
-    return a;
   });
 
-  return { v: 2, d, r };
+  return { v: 3, d, r };
 }
 
 function decodeRows(payload) {
   if (Array.isArray(payload)) return payload; // 兼容旧格式
-  if (!payload || payload.v !== 2 || !Array.isArray(payload.r)) return [];
+  if (!payload || ![2, 3].includes(payload.v) || !Array.isArray(payload.r)) return [];
   const { d, r } = payload;
   const pick = (k, i) => (i >= 0 && d[k][i] !== undefined ? d[k][i] : '');
   const list = (k, arr) => (arr || []).map((i) => pick(k, i)).filter((v) => v !== '');
@@ -392,8 +425,9 @@ function decodeRows(payload) {
       deadline: a[12] === undefined ? null : a[12],
       deadlineText: a[13] || '',
       updatedAt: a[14] || '',
-      sm: a[15] || '',
+      sm: payload.v === 2 ? (a[15] || '') : '',
     };
+    if (payload.v === 3) row.positionCount = a[22] ?? row.positions.length;
     if (a[16]) row.source = a[16];
     if (a[17]) row.sourceName = a[17];
     if (a[18]) row.sourceUrl = a[18];
@@ -429,7 +463,7 @@ function buildChangelog(prevRows, nextRows) {
 
 async function readPreviousJobs() {
   try {
-    return decodeRows(JSON.parse(await readFile(path.join(DATA_DIR, 'jobs.json'), 'utf8')));
+    return (await loadRowsWithDetails('jobs')).rows;
   } catch {
     return [];
   }
@@ -791,11 +825,7 @@ async function exportTable({ key, tableId, expected }, appToken = null) {
 }
 
 async function loadTableState(key) {
-  const payload = JSON.parse(await readFile(path.join(DATA_DIR, `${key}.json`), 'utf8'));
-  return {
-    rows: decodeRows(payload),
-    details: await loadDetailShards(key),
-  };
+  return loadRowsWithDetails(key);
 }
 
 async function exportTableIncremental(table, appToken, updatedSince) {
@@ -1211,19 +1241,17 @@ async function exportDocs() {
 
 async function mergeOnly() {
   // 先把已有数据按公司合并，保证重复执行也不会把合并结果拆回去
-  const prevJobsCollapsed = collapseByCompany(
-    await readPreviousJobs(),
-    await loadDetailShards('jobs'),
-  );
-  const internshipsCollapsed = collapseByCompany(
-    decodeRows(JSON.parse(await readFile(path.join(DATA_DIR, 'internships.json'), 'utf8'))),
-    await loadDetailShards('internships'),
-  );
+  const prevJobsState = await loadRowsWithDetails('jobs');
+  const internshipsState = await loadRowsWithDetails('internships');
+  const prevJobsCollapsed = collapseByCompany(prevJobsState.rows, prevJobsState.details);
+  const internshipsCollapsed = collapseByCompany(internshipsState.rows, internshipsState.details);
   const { rows, added } = mergeSupplement(prevJobsCollapsed.rows, await loadSupplement());
   const jobsCollapsed = collapseByCompany(rows, prevJobsCollapsed.details);
 
   await writeFile(path.join(DATA_DIR, 'jobs.json'), JSON.stringify(encodeRows(jobsCollapsed.rows)), 'utf8');
   await writeFile(path.join(DATA_DIR, 'internships.json'), JSON.stringify(encodeRows(internshipsCollapsed.rows)), 'utf8');
+  await writeSearchIndex('jobs', jobsCollapsed.rows);
+  await writeSearchIndex('internships', internshipsCollapsed.rows);
   await writeDetailShards('jobs', jobsCollapsed.details);
   await writeDetailShards('internships', internshipsCollapsed.details);
   const facets = { jobs: buildFacets(jobsCollapsed.rows), internships: buildFacets(internshipsCollapsed.rows) };
@@ -1322,6 +1350,7 @@ async function main() {
     if (collapsed.mergedGroups) process.stdout.write(`  ↳ 同公司合并 ${collapsed.mergedGroups} 组\n`);
     data[table.key] = rows;
     await writeFile(path.join(DATA_DIR, `${table.key}.json`), JSON.stringify(encodeRows(rows)), 'utf8');
+    await writeSearchIndex(table.key, rows);
     await writeDetailShards(table.key, details);
     facets[table.key] = buildFacets(rows);
     process.stdout.write(`  → ${table.key}.json (${rows.length} 条列表) + ${table.key}-detail-0..${SHARD_COUNT - 1}.json (${Object.keys(details).length} 条详情)\n`);

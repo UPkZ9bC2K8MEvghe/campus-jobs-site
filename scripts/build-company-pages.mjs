@@ -11,10 +11,20 @@ const pad = (n) => String(n).padStart(2, '0');
 const todayStr = `${TODAY.getFullYear()}-${pad(TODAY.getMonth() + 1)}-${pad(TODAY.getDate())}`;
 
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const SHARDS = 16;
+
+async function loadDetails(tab) {
+  const all = {};
+  for (let i = 0; i < SHARDS; i += 1) {
+    try { Object.assign(all, JSON.parse(await readFile(path.join(ROOT, 'data', `${tab}-detail-${i}.json`), 'utf8'))); }
+    catch (e) { if (e.code !== 'ENOENT') throw e; }
+  }
+  return all;
+}
 
 function decode(payload) {
   if (Array.isArray(payload)) return payload;
-  if (!payload || payload.v !== 2 || !Array.isArray(payload.r)) return [];
+  if (!payload || ![2, 3].includes(payload.v) || !Array.isArray(payload.r)) return [];
   const { d, r } = payload;
   const pick = (k, i) => (i >= 0 && d[k][i] !== undefined ? d[k][i] : '');
   const list = (k, arr) => (arr || []).map((i) => pick(k, i)).filter((v) => v !== '');
@@ -24,6 +34,7 @@ function decode(payload) {
     ownership: pick('o', a[2]),
     industries: list('i', a[3]),
     positions: (a[4] || []).filter(Boolean),
+    positionCount: payload.v === 3 ? (a[22] ?? (a[4] || []).length) : (a[4] || []).length,
     cities: list('c', a[5]),
     nationwide: !!a[6],
     gradYears: a[7] || [],
@@ -51,8 +62,18 @@ const normDate = (s) => {
 // 脏数据防护：把误当成企业名的表头/文档标题/Markdown 链接剔掉，避免生成垃圾页被收录
 const isJunkName = (name) => /\]\s*\(|https?:|www\.|必看|使用说明|表格说明/i.test(name);
 
-const jobs = decode(JSON.parse(await readFile(path.join(ROOT, 'data/jobs.json'), 'utf8')));
-const internships = decode(JSON.parse(await readFile(path.join(ROOT, 'data/internships.json'), 'utf8')));
+const [jobsPayload, internshipsPayload, jobsDetails, internshipsDetails] = await Promise.all([
+  readFile(path.join(ROOT, 'data/jobs.json'), 'utf8').then(JSON.parse),
+  readFile(path.join(ROOT, 'data/internships.json'), 'utf8').then(JSON.parse),
+  loadDetails('jobs'),
+  loadDetails('internships'),
+]);
+const hydrate = (rows, details) => rows.map((row) => {
+  const positions = details[row.id]?.positions;
+  return positions?.length >= row.positionCount ? { ...row, positions } : row;
+});
+const jobs = hydrate(decode(jobsPayload), jobsDetails);
+const internships = hydrate(decode(internshipsPayload), internshipsDetails);
 
 const groups = new Map();
 for (const [type, rows] of [['校招', jobs], ['实习', internships]]) {
@@ -365,7 +386,7 @@ const llmsFull = `# 校招信息查询 · 全量索引
 
 ## 数据结构（JSON）
 
-- ${SITE}/data/jobs.json：校招岗位（压缩格式 v2，含 company / positions / cities / batches / gradYears / degrees / deadline / updatedAt / sourceUrl）
+- ${SITE}/data/jobs.json：校招岗位（压缩格式 v2/v3，含 company / positions / cities / batches / gradYears / degrees / deadline / updatedAt / sourceUrl）
 - ${SITE}/data/internships.json：实习岗位（同上）
 - ${SITE}/data/facets.json：各筛选项实时计数
 - ${SITE}/data/dashboard.json：行业 / 城市 / 批次 / 企业性质分布

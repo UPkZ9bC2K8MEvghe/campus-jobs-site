@@ -41,8 +41,8 @@ function countBy(rows, pick) {
 }
 
 function checkRows(tab, payload) {
-  if (!payload || Array.isArray(payload) || payload.v !== 2 || !Array.isArray(payload.r)) {
-    fail(`${tab}.json 不是 v2 紧凑格式`);
+  if (!payload || Array.isArray(payload) || ![2, 3].includes(payload.v) || !Array.isArray(payload.r)) {
+    fail(`${tab}.json 不是 v2/v3 紧凑格式`);
     return [];
   }
   const dict = payload.d || {};
@@ -67,6 +67,7 @@ function checkRows(tab, payload) {
     if (!r.ownership) badField += 1;
     if (r.deadline != null && r.deadline !== '' && !DEADLINE_RE.test(r.deadline)) badDeadline += 1;
     if (!Array.isArray(r.positions) || !Array.isArray(r.cities) || !Array.isArray(r.industries) || !Array.isArray(r.gradYears) || !Array.isArray(r.batches) || !Array.isArray(r.degree)) badField += 1;
+    if (payload.v === 3 && (!Number.isInteger(r.positionCount) || r.positionCount < r.positions.length || r.positionCount > 10000)) badField += 1;
     if (r.writtenTest === true) written.true += 1;
     else if (r.writtenTest === false) written.false += 1;
     else if (r.writtenTest === null) written.null += 1;
@@ -223,6 +224,10 @@ async function main() {
   for (const tab of TABLES) {
     const payload = await readJSON(`${tab}.json`);
     tables[tab] = payload ? checkRows(tab, payload) : [];
+    const search = await readJSON(`${tab}-search.json`, { required: payload?.v === 3 });
+    if (payload?.v === 3 && (!Array.isArray(search) || search.length !== payload.r.length)) {
+      fail(`${tab}-search.json 必须与 ${tab}.json 行数一致`);
+    }
   }
   for (const tab of TABLES) await checkShards(tab, tables[tab]);
   checkFacets(await readJSON('facets.json'), tables);

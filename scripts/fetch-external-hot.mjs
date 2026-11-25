@@ -118,7 +118,7 @@ function hotScore(row) {
   const deadlineDays = daysUntil(row.deadline);
   if (deadlineDays != null && deadlineDays >= 0) score += deadlineDays <= 7 ? 22 : 14;
   else if (deadlineDays == null && /尽快/.test(row.deadlineText || '')) score += 12;
-  score += Math.min((row.positions || []).length, 50) * 0.8;
+  score += Math.min(row.positionCount ?? (row.positions || []).length, 50) * 0.8;
   score += Math.min((row.cities || []).length, 8);
   if (row.ownership === '央国企') score += 8;
   else if (row.ownership === '外企') score += 6;
@@ -144,13 +144,13 @@ async function readJSONSafe(file, fallback) {
 
 function decodeList(payload) {
   if (Array.isArray(payload)) return payload;
-  if (!payload || payload.v !== 2 || !Array.isArray(payload.r)) return [];
+  if (!payload || ![2, 3].includes(payload.v) || !Array.isArray(payload.r)) return [];
   const { d, r } = payload;
   const pick = (k, i) => (i >= 0 && d[k] && d[k][i] !== undefined ? d[k][i] : '');
   const list = (k, arr) => (arr || []).map((i) => pick(k, i)).filter((v) => v !== '');
   return r.map((a) => ({
     id: a[0], company: a[1], ownership: pick('o', a[2]), industries: list('i', a[3]),
-    positions: a[4] || [], cities: list('c', a[5]), nationwide: !!a[6], gradYears: a[7] || [],
+    positions: a[4] || [], positionCount: payload.v === 3 ? (a[22] ?? (a[4] || []).length) : (a[4] || []).length, cities: list('c', a[5]), nationwide: !!a[6], gradYears: a[7] || [],
     gradUnlimited: !!a[8], batches: list('b', a[9]), degree: list('g', a[10]),
     writtenTest: a[11] === 1 ? true : a[11] === 0 ? false : null,
     deadline: a[12] === undefined ? null : a[12], deadlineText: a[13] || '', updatedAt: a[14] || '', sm: a[15] || '',
