@@ -483,41 +483,72 @@
       <p class="muted" style="margin:8px 0">${thin ? '该岗位公告信息较少，结果仅供参考。' : ''}分数基于岗位公告中的关键词估算，完整六维评分请在 ATS 工具中查看。</p>
       ${actions}</section>`;
   }
-  async function openIVWithJob(r) {
+  /* 工具弹层：在当前页面直接打开，不切换视图、不改 URL */
+  let toolSheetBound = false;
+  function syncToolSheet() {
+    const key = TOOL_PAGES[state.tool] ? state.tool : 'career';
+    state.tool = key;
+    const frame = document.getElementById('toolSheetFrame');
+    if (frame && frame.dataset.tool !== key) { frame.src = TOOL_PAGES[key]; frame.dataset.tool = key; }
+    const open = document.getElementById('toolSheetNew');
+    if (open) open.href = TOOL_PAGES[key];
+    for (const b of document.querySelectorAll('#toolSheetSwitch [data-tool]')) {
+      b.setAttribute('aria-selected', String(b.dataset.tool === key));
+    }
+  }
+  function openToolSheet(tool = 'career') {
+    if (!TOOL_PAGES[tool]) tool = 'career';
+    state.tool = tool;
+    const sheet = document.getElementById('toolSheet');
+    if (!sheet) return;
+    sheet.hidden = false;
+    syncToolSheet();
+    document.body.style.overflow = 'hidden';
+    if (!toolSheetBound) {
+      toolSheetBound = true;
+      document.getElementById('toolSheetClose')?.addEventListener('click', closeToolSheet);
+      document.getElementById('toolSheetMask')?.addEventListener('click', closeToolSheet);
+      document.getElementById('toolSheetSwitch')?.addEventListener('click', (e) => {
+        const b = e.target.closest('[data-tool]');
+        if (!b || b.dataset.tool === state.tool) return;
+        state.tool = b.dataset.tool;
+        syncToolSheet();
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !sheet.hidden) closeToolSheet();
+      });
+    }
+    for (const t of el.tabs) t.setAttribute('aria-selected', String(t.dataset.view === 'tools'));
+  }
+  function closeToolSheet() {
+    const sheet = document.getElementById('toolSheet');
+    if (sheet) sheet.hidden = true;
+    document.body.style.overflow = '';
+    for (const t of el.tabs) t.setAttribute('aria-selected', String(t.dataset.view === state.view));
+  }
+  function startToolWithJob(prefill, errMsg) {
     try {
-      localStorage.setItem(ATS_PREFILL_KEY, JSON.stringify({ tool: 'iv', company: r.company || '', role: (r.positions || [])[0] || '', id: r.id, ts: Date.now() }));
-    } catch { toast('浏览器存储不可用'); return; }
-    state.tool = 'career';
-    if (state.view !== 'tools') await switchView('tools');
-    else { if (el.drawer.classList.contains('open')) closeDrawer(); renderTools(); }
-    const frame = document.getElementById('toolsFrame');
+      localStorage.setItem(ATS_PREFILL_KEY, JSON.stringify({ ...prefill, ts: Date.now() }));
+    } catch { toast(errMsg || '浏览器存储不可用'); return; }
+    if (el.drawer.classList.contains('open')) closeDrawer();
+    openToolSheet('career');
+    // iframe 已加载时直接通知；首次加载由工具页 DOMContentLoaded 自行读取
+    const frame = document.getElementById('toolSheetFrame');
     try { frame?.contentWindow?.postMessage({ type: 'cj-ats-prefill' }, location.origin); } catch { /* ignore */ }
   }
-  async function openATSWithJob(r) {
-    try {
-      localStorage.setItem(ATS_PREFILL_KEY, JSON.stringify({ jd: buildJobJD(r), company: r.company || '', id: r.id, ts: Date.now() }));
-    } catch { toast('浏览器存储不可用，无法传递 JD'); return; }
-    state.tool = 'career';
-    if (state.view !== 'tools') await switchView('tools');
-    else { if (el.drawer.classList.contains('open')) closeDrawer(); renderTools(); }
-    // iframe 已加载时直接通知；首次加载则由工具页 DOMContentLoaded 自行读取
-    const frame = document.getElementById('toolsFrame');
-    try { frame?.contentWindow?.postMessage({ type: 'cj-ats-prefill' }, location.origin); } catch { /* ignore */ }
+  function openIVWithJob(r) {
+    startToolWithJob({ tool: 'iv', company: r.company || '', role: (r.positions || [])[0] || '', id: r.id });
   }
-  async function openRiskWithCompany(r) {
-    try {
-      localStorage.setItem(ATS_PREFILL_KEY, JSON.stringify({ tool: 'risk', company: r.company || '', id: r.id, ts: Date.now() }));
-    } catch { toast('浏览器存储不可用'); return; }
-    state.tool = 'career';
-    if (state.view !== 'tools') await switchView('tools');
-    else { if (el.drawer.classList.contains('open')) closeDrawer(); renderTools(); }
-    const frame = document.getElementById('toolsFrame');
-    try { frame?.contentWindow?.postMessage({ type: 'cj-ats-prefill' }, location.origin); } catch { /* ignore */ }
+  function openATSWithJob(r) {
+    startToolWithJob({ jd: buildJobJD(r), company: r.company || '', id: r.id }, '浏览器存储不可用，无法传递 JD');
+  }
+  function openRiskWithCompany(r) {
+    startToolWithJob({ tool: 'risk', company: r.company || '', id: r.id });
   }
 
   window.addEventListener('message', (e) => {
     if (e.origin !== location.origin || !e.data) return;
-    if (e.data.type === 'cj-open-apps') switchView('apps');
+    if (e.data.type === 'cj-open-apps') { closeToolSheet(); switchView('apps'); }
   });
 
   /* ---------- 访问量统计（一台电脑 + 一个 IP 计 1 次） ---------- */
@@ -891,8 +922,7 @@
     if (key === 'resume') {
       if (!resumeKeywords() && !state.status.has('resume')) {
         toast('还没有保存简历：先去「求职工具」粘贴一次简历');
-        state.tool = 'career';
-        switchView('tools');
+        openToolSheet('career');
         return;
       }
       // 打开时顺带按简历匹配排序，关闭时恢复
@@ -1119,7 +1149,7 @@
       if (state.status.has('resume')) {
         if (!resumeKeywords()) {
           el.cardList.innerHTML = `<div class="empty"><strong>还没有保存简历</strong>先到「求职工具 → ATS 匹配度检测」粘贴一次简历，之后列表会自动显示匹配分。<div><button id="emptyResumeGo">去粘贴简历</button></div></div>`;
-          $('emptyResumeGo')?.addEventListener('click', () => { state.tool = 'career'; switchView('tools'); });
+          $('emptyResumeGo')?.addEventListener('click', () => openToolSheet('career'));
         } else {
           const lower = RESUME_TH_OPTIONS.filter((v) => v < resumeThreshold).pop();
           el.cardList.innerHTML = `<div class="empty"><strong>没有匹配度 ≥${resumeThreshold}% 的岗位</strong>当前简历与这批岗位的关键词重合较少，可以降低阈值看看。${lower ? `<div><button id="emptyResumeLower">降到 ≥${lower}%</button><button id="emptyResumeOff">关闭简历筛选</button></div>` : '<div><button id="emptyResumeOff">关闭简历筛选</button></div>'}</div>`;
@@ -2400,7 +2430,10 @@
 
   function bindEvents() {
     window.addEventListener('popstate', onPopState);
-    for (const tab of el.tabs) tab.addEventListener('click', () => { if (state.view !== tab.dataset.view) switchView(tab.dataset.view); });
+    for (const tab of el.tabs) tab.addEventListener('click', () => {
+      if (tab.dataset.view === 'tools') { openToolSheet(state.tool || 'career'); return; }
+      if (state.view !== tab.dataset.view) switchView(tab.dataset.view);
+    });
     for (const t of el.subTabs) t.addEventListener('click', () => { state.doc = t.dataset.doc; applyView(); writeState(); renderDocs(); });
 
     el.searchInput.addEventListener('input', () => {

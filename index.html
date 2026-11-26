@@ -325,7 +325,23 @@
   <div class="drawer-body" id="drawerBody"></div>
 </aside>
 
-<script src="assets/app.js?v=44"></script>
+<!-- 求职工具弹层：在当前页面直接打开，不切换视图、不改 URL -->
+<div class="tool-sheet" id="toolSheet" hidden>
+  <div class="tool-sheet-mask" id="toolSheetMask"></div>
+  <section class="tool-sheet-panel" role="dialog" aria-modal="true" aria-label="求职工具">
+    <header class="tool-sheet-head">
+      <nav class="tools-switch" id="toolSheetSwitch" role="tablist" aria-label="工具分类">
+        <button class="tools-btn" data-tool="career" aria-selected="true">求职工具箱</button>
+        <button class="tools-btn" data-tool="ai" aria-selected="false">效率小工具</button>
+      </nav>
+      <a class="tools-open" id="toolSheetNew" href="tools/career/" target="_blank" rel="noopener">新窗口打开 ↗</a>
+      <button class="tool-sheet-close" id="toolSheetClose" aria-label="关闭">×</button>
+    </header>
+    <iframe id="toolSheetFrame" title="求职工具"></iframe>
+  </section>
+</div>
+
+<script src="assets/app.js?v=45"></script>
 <noscript>
   <div class="noscript-note">
     <h2>校招信息查询</h2>
