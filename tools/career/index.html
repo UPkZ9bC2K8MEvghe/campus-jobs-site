@@ -485,6 +485,41 @@ select.status-sel {
 }
 .risk-sub { font-size: 12px; color: var(--text-faint); }
 
+/* —— 背调清单（结构化自查） —— */
+.cr-tip { font-size: 12.5px; color: var(--text-faint); line-height: 1.7; margin: -4px 0 16px; }
+.risk-progress { height: 6px; background: rgba(0,0,0,0.06); border-radius: 999px; overflow: hidden; margin: 12px 0 10px; }
+.risk-progress i { display: block; height: 100%; border-radius: 999px; transition: width .25s var(--ease); }
+.risk-redline { margin-top: 6px; padding: 8px 12px; border-radius: 6px; background: #FDF0EF; color: var(--bad); font-size: 12.5px; line-height: 1.6; }
+.risk-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+.risk-links { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px; margin-bottom: 20px; }
+.risk-link { display: block; padding: 10px 12px; border: 1px solid var(--text-line); border-radius: 8px; background: var(--bg); color: var(--text); text-decoration: none; transition: border-color .15s var(--ease), background .15s var(--ease); }
+.risk-link b { display: block; font-size: 13px; font-weight: 600; }
+.risk-link span { display: block; margin-top: 3px; font-size: 11.5px; color: var(--text-faint); line-height: 1.4; }
+.risk-link:hover { border-color: #C9C9C9; background: var(--bg-subtle); }
+.risk-site { padding: 12px 16px; margin-bottom: 20px; border: 1px dashed var(--text-line); border-radius: 8px; font-size: 12.5px; color: var(--text-dim); line-height: 1.9; }
+.risk-site a { color: var(--ok); }
+.risk-group { margin-bottom: 20px; }
+.risk-group > h4 { margin: 0 0 8px; font-size: 14px; }
+.risk-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--text-line); }
+.risk-item:last-child { border-bottom: 0; }
+.risk-item-main { flex: 1; min-width: 0; }
+.risk-item-label { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 13.5px; font-weight: 600; }
+.risk-red { padding: 1px 7px; border-radius: 999px; background: #FDF0EF; color: var(--bad); font-size: 10.5px; font-weight: 500; }
+.risk-item-how { margin-top: 4px; font-size: 12px; color: var(--text-faint); line-height: 1.6; }
+.risk-item-warn { margin-top: 5px; font-size: 12px; color: var(--bad); line-height: 1.6; }
+.risk-select { flex: 0 0 auto; margin-top: 2px; padding: 5px 8px; border: 1px solid var(--text-line); border-radius: 6px; background: var(--bg); color: var(--text-dim); font-family: inherit; font-size: 12px; cursor: pointer; }
+.risk-select.st-ok { color: var(--ok); border-color: #D4E4DB; background: var(--accent-soft); }
+.risk-select.st-bad { color: var(--bad); border-color: #E8D5D8; background: #FDF0EF; }
+.risk-select.st-na { color: var(--text-faint); }
+.risk-notes { margin-top: 22px; }
+.risk-notes textarea { width: 100%; min-height: 88px; resize: vertical; }
+.risk-conclusion { margin-top: 20px; padding: 16px 18px; border-radius: var(--r-md); background: var(--bg-subtle); color: var(--text-dim); font-size: 13px; line-height: 1.8; }
+.risk-conclusion b { color: var(--text); }
+@media (max-width: 560px) {
+  .risk-item { flex-direction: column; gap: 6px; }
+  .risk-select { align-self: flex-start; }
+}
+
 .checklist li {
   padding: 10px 0;
   border-bottom: 1px solid var(--text-line);
@@ -628,7 +663,7 @@ const TOOLS = [
   { id:'tracker', cat:'track',     icon:'📊', title:'求职追踪看板',       desc:'像管理销售线索一样管理你的每一次投递。数据只在本地。',                      fn:toolTracker },
   { id:'iv',      cat:'interview', icon:'🎤', title:'面试题生成',         desc:'岗位 × 年限 × 公司类型 — 生成技术面、行为面、高频必问题。',                fn:toolIV },
   { id:'intro',   cat:'interview', icon:'💬', title:'自我介绍润色',       desc:'30 秒 / 2 分钟 / 5 分钟三档。STAR 框架引导。',                           fn:toolIntro },
-  { id:'risk',    cat:'research',  icon:'🛡️', title:'公司背调清单',       desc:'输入公司名，生成一份求职风险自查清单和红旗警告。',                        fn:toolRisk },
+  { id:'risk',    cat:'research',  icon:'🛡️', title:'公司背调清单',       desc:'输入公司名，按 6 组 26 项自查风险，附平台深链与可导出报告。',                        fn:toolRisk },
   { id:'salary',  cat:'research',  icon:'💰', title:'薪资参考',           desc:'九大城市 · 互联网行业薪资范围表。',                                      fn:toolSalary },
   { id:'cover',   cat:'docs',      icon:'✉️', title:'求职信生成',         desc:'结构化生成。记得替换[括号里]的内容。',                                  fn:toolCover },
   { id:'refer',   cat:'docs',      icon:'🔗', title:'内推话术模板',       desc:'三种场景，复制就能发。',                                                fn:toolRefer },
@@ -1863,78 +1898,333 @@ ${hi[2] ? `【核心亮点三】\n${hi[2]}\n这段经历进一步强化了我的
 }
 
 /* =========================================================
-   工具 7: 公司背调清单
+   工具 7: 公司背调清单（结构化自查 + 平台深链 + 本地留痕）
    ========================================================= */
 function toolRisk(c) {
-  c.innerHTML = `
-    <div class="row">
-      <div class="col"><label>公司名称</label><input type="text" id="cr-name" placeholder="如：阿里巴巴 / XX 科技"></div>
-      <div class="col" style="flex:0 0 auto;display:flex;align-items:flex-end">
-        <button class="btn" onclick="doRisk()">生成清单</button>
-      </div>
-    </div>
-    <div id="cr-out"></div>
-  `;
+  var STORE_KEY = 'careerKit_risk_reports';
+  var ATS_CACHE = null;
+  var current = null;
+  var atsHit = null;
+  var STATUS_LABEL = { '': '待查', ok: '正常', bad: '异常', na: '不适用' };
+  var GROUPS = [
+    { title: '主体与资质', items: [
+      { id: 'entity', label: '工商登记可查', w: 8, red: true, how: '国家企业信用信息公示系统 / 天眼查 / 企查查', bad: '查不到主体、被列入经营异常，或经营范围与招聘描述不符' },
+      { id: 'signer', label: '签约主体一致', w: 8, red: true, how: 'offer、劳动合同、社保缴纳主体是否为同一家公司', bad: '要求签第三方外包 / 劳务派遣，或合同主体与面试公司不一致' },
+      { id: 'abnormal', label: '经营异常与行政处罚', w: 7, how: '国家企业信用信息公示系统 → 经营异常名录 / 行政处罚', bad: '有未移出的经营异常，或近一年有行政处罚' },
+      { id: 'office', label: '办公地址真实', w: 4, how: '官网 / 招聘页地址与工商登记地址是否一致', bad: '地址在居民楼、虚拟注册地，且无实际办公场所' },
+      { id: 'equity', label: '股权与实控人', w: 4, how: '天眼查 → 股权穿透，确认实控人', bad: '股权层层嵌套、实控人无法识别' },
+    ] },
+    { title: '经营与司法', items: [
+      { id: 'executed', label: '被执行 / 失信 / 限高', w: 10, red: true, how: '中国执行信息公开网，或天眼查司法风险', bad: '公司或法人被列为被执行人、失信被执行人、限制高消费' },
+      { id: 'labor', label: '劳动争议记录', w: 7, red: true, how: '裁判文书网搜「公司名 + 劳动合同 / 劳动争议」', bad: '存在大量劳动争议、拖欠工资类判决' },
+      { id: 'public', label: '欠薪 / 裁员舆情', w: 6, how: '搜「公司名 + 欠薪 / 裁员 / 跑路 / 维权」', bad: '近期集中出现欠薪、暴力裁员、集体维权帖' },
+      { id: 'funding', label: '融资与现金流', w: 4, how: '天眼查 / IT 桔子的融资记录与投资方', bad: '超过 18 个月无新融资，且没有稳定收入' },
+      { id: 'business', label: '业务真实性', w: 5, how: '官网、产品、客户案例、应用商店 / 公众号更新', bad: '只有空壳官网，产品无法实际使用' },
+    ] },
+    { title: '薪酬与社保', items: [
+      { id: 'salary', label: '薪资结构透明', w: 5, how: 'offer 是否写明 base / 绩效 / 年终比例', bad: '只谈总包、关键数字口头承诺、绩效占比过高' },
+      { id: 'social', label: '五险一金', w: 6, red: true, how: '确认缴纳基数、开始时间、公积金比例', bad: '不缴、按最低基数缴，或转正后才缴' },
+      { id: 'payroll', label: '发薪时间', w: 4, how: '是否每月固定日期发薪、是否压工资', bad: '发薪日不固定，或压一个月以上工资' },
+      { id: 'overtime', label: '加班与调休', w: 4, how: '问清上下班时间、周末是否默认到岗', bad: '默认单休 / 大小周，且没有调休或加班费' },
+    ] },
+    { title: '合同与用工', items: [
+      { id: 'contract', label: '劳动合同条款', w: 7, how: '岗位、地点、薪资、试用期、违约金是否写入合同', bad: '关键条款只口头承诺，或合同留空后补签' },
+      { id: 'tripartite', label: '三方协议与违约金', w: 6, red: true, how: '违约金金额，以及升学 / 入伍 / 不可抗力的解约条款', bad: '违约金明显过高，或不允许任何情况解约' },
+      { id: 'probation', label: '试用期合规', w: 5, how: '合同 1 年试用期不超过 2 个月、3 年不超过 6 个月，工资不低于转正 80%', bad: '试用期超法定上限，或工资低于转正的 80%' },
+      { id: 'fees', label: '入职收费 / 培训贷', w: 10, red: true, how: '任何入职前收费、贷款培训、扣押证件', bad: '收培训费 / 押金 / 服装费，或诱导办理培训贷款' },
+      { id: 'noncompete', label: '竞业与保密', w: 3, how: '竞业范围、期限、补偿标准是否合理', bad: '竞业范围过宽、期限过长且没有补偿' },
+    ] },
+    { title: '团队与成长', items: [
+      { id: 'team', label: '直属团队情况', w: 4, how: '团队人数、汇报对象、岗位是否新设', bad: '团队只有 1-2 人，或岗位反复新设又撤销' },
+      { id: 'churn', label: '招聘频率', w: 4, how: '同一岗位是否长期挂招、招聘平台更新时间', bad: '同岗位连续挂招半年以上' },
+      { id: 'grow', label: '培养与转正', w: 4, how: '校招生培养体系、实习转正比例、是否有书面承诺', bad: '转正比例模糊，或只做口头承诺' },
+      { id: 'reviews', label: '员工评价', w: 4, how: '脉脉 / 看准网，重点看重复出现的问题', bad: '多条独立评价指向同一问题（欠薪 / 加班 / 管理混乱）' },
+    ] },
+    { title: '面试现场', items: [
+      { id: 'process', label: '面试流程规范', w: 4, how: '流程是否清晰、面试官是否专业', bad: '流程随意、频繁改时间、不问业务只画饼' },
+      { id: 'promise', label: '承诺可落地', w: 5, how: '户口、编制、期权、转正是否写进 offer', bad: '关键承诺只停留在口头，拒绝写入 offer' },
+      { id: 'arrival', label: '入职信息明确', w: 3, how: '入职时间、地点、材料、联系人是否明确', bad: '入职时间反复推迟，或地点临时变更' },
+    ] },
+  ];
 
-  window.doRisk = () => {
-    const name = document.getElementById('cr-name').value.trim();
+  function hesc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (ch) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch];
+    });
+  }
+  function pad(n) { return String(n).padStart(2, '0'); }
+  function fmtDate(ts) {
+    var d = new Date(ts);
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+  }
+  // 公司名归一化：用于匹配站内已知企业、复用本地记录
+  function rkey(s) {
+    return String(s || '')
+      .replace(/[（(].*?[)）]/g, '')
+      .replace(/[\s·\-—_]/g, '')
+      .replace(/(股份有限公司|有限责任公司|有限公司|集团公司|集团|控股|总公司|公司)$/g, '')
+      .toLowerCase();
+  }
+  function getStore() {
+    try { return JSON.parse(localStorage.getItem(STORE_KEY) || '{}') || {}; } catch (e) { return {}; }
+  }
+  function putStore(key, value) {
+    var s = getStore();
+    if (value) s[key] = value; else delete s[key];
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(s)); } catch (e) { /* 本地存储不可用时只保留当前会话 */ }
+  }
+  function persist() {
+    if (!current) return;
+    current.updatedAt = new Date().toISOString();
+    putStore(current.key, { name: current.name, statuses: current.statuses, note: current.note, updatedAt: current.updatedAt });
+  }
+  function findAts(name) {
+    if (!ATS_CACHE || !ATS_CACHE.length) return null;
+    var k = rkey(name);
+    if (!k) return null;
+    var partial = null;
+    for (var i = 0; i < ATS_CACHE.length; i++) {
+      var a = ATS_CACHE[i], q = rkey(a.company);
+      if (!q) continue;
+      if (q === k) return a;
+      if (!partial && (k.indexOf(q) === 0 || q.indexOf(k) === 0)) {
+        if (q === '京东' && k.indexOf('京东方') === 0) continue; // 排除「京东方」
+        partial = a;
+      }
+    }
+    return partial;
+  }
+  function compute() {
+    var total = 0, badW = 0, answered = 0, active = 0, redHits = [];
+    GROUPS.forEach(function (g) {
+      g.items.forEach(function (it) {
+        var st = current.statuses[it.id] || '';
+        if (st === 'na') return;
+        active += 1;
+        total += it.w;
+        if (st) answered += 1;
+        if (st === 'bad') {
+          badW += it.w;
+          if (it.red) redHits.push(it.label);
+        }
+      });
+    });
+    var score = total ? Math.round((badW / total) * 100) : 0;
+    var need = Math.max(6, Math.ceil(active * 0.5));
+    var level = 'low', levelName = '低风险', color = 'var(--ok)', cls = 'risk-low';
+    if (!active) {
+      level = 'mid'; levelName = '未开始核验'; color = 'var(--warn)'; cls = 'risk-mid';
+    } else if (redHits.length) {
+      level = 'high'; levelName = '高风险 · 命中红旗'; color = 'var(--bad)'; cls = 'risk-high';
+    } else if (score >= 35) {
+      level = 'high'; levelName = '高风险'; color = 'var(--bad)'; cls = 'risk-high';
+    } else if (score >= 15) {
+      level = 'mid'; levelName = '中风险 · 建议补查'; color = 'var(--warn)'; cls = 'risk-mid';
+    } else if (answered < need) {
+      level = 'mid'; levelName = '待补查 · 核验不足'; color = 'var(--warn)'; cls = 'risk-mid';
+    }
+    return {
+      score: score, total: total, badW: badW, answered: answered, active: active, need: need,
+      redHits: redHits, level: level, levelName: levelName, color: color, cls: cls,
+      progress: active ? answered / active : 0,
+    };
+  }
+
+  /* ---------- 状态变更 / 复制 / 导出 ---------- */
+  window.crStatus = function (id, val) {
+    if (!current) return;
+    if (val) current.statuses[id] = val; else delete current.statuses[id];
+    persist();
+    paint();
+  };
+  window.crNote = function (val) {
+    if (!current) return;
+    current.note = val;
+    persist();
+  };
+  window.crCopyName = function () {
+    if (!current) return;
+    cp(current.name);
+  };
+  window.crClear = function () {
+    if (!current) return;
+    if (!confirm('清空「' + current.name + '」的背调勾选和备注？')) return;
+    current.statuses = {};
+    current.note = '';
+    putStore(current.key, null);
+    paint();
+    toast('已清空该公司记录');
+  };
+  function buildReport() {
+    var r = compute();
+    var lines = [];
+    lines.push('# 公司背调报告 · ' + current.name);
+    lines.push('');
+    lines.push('- 生成时间：' + fmtDate(Date.now()));
+    lines.push('- 风险分：' + r.score + ' / 100（' + r.levelName + '）');
+    lines.push('- 核验进度：' + r.answered + ' / ' + r.active + ' 项');
+    lines.push('- 命中红旗：' + (r.redHits.length ? r.redHits.join('、') : '无'));
+    lines.push('');
+    lines.push('## 检查明细');
+    GROUPS.forEach(function (g) {
+      lines.push('');
+      lines.push('### ' + g.title);
+      g.items.forEach(function (it) {
+        var st = current.statuses[it.id] || '';
+        lines.push('- ' + STATUS_LABEL[st] + '｜' + it.label + '（权重 ' + it.w + '）' + (st === 'bad' ? ' —— ' + it.bad : ''));
+      });
+    });
+    if (current.note) {
+      lines.push('');
+      lines.push('## 备注');
+      lines.push(current.note);
+    }
+    lines.push('');
+    lines.push('## 核验入口');
+    platformList().forEach(function (p) {
+      lines.push('- ' + p[0] + '：' + p[1]);
+    });
+    lines.push('');
+    lines.push('> 本报告由用户自查勾选生成，仅用于求职决策参考，不构成法律意见。');
+    return lines.join('\n');
+  }
+  window.crCopyReport = function () {
+    if (!current) return;
+    cp(buildReport());
+  };
+  window.crDownload = function () {
+    if (!current) return;
+    var blob = new Blob([buildReport()], { type: 'text/markdown;charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = '背调报告-' + current.name.replace(/[\\/:*?"<>|]/g, '-') + '.md';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+  };
+
+  /* ---------- 渲染 ---------- */
+  function platformList() {
+    var n = encodeURIComponent(current.name);
+    return [
+      ['国家企业信用信息公示系统', 'https://www.gsxt.gov.cn/index.html', '工商登记 / 经营异常 / 行政处罚'],
+      ['信用中国', 'https://www.creditchina.gov.cn/', '失信名单 / 行政处罚'],
+      ['中国执行信息公开网', 'https://zxgk.court.gov.cn/', '被执行人 / 限制高消费'],
+      ['中国裁判文书网', 'https://wenshu.court.gov.cn/', '劳动争议 / 合同纠纷'],
+      ['天眼查', 'https://www.tianyancha.com/search?key=' + n, '工商 / 司法 / 融资'],
+      ['企查查', 'https://www.qcc.com/web/search?key=' + n, '工商 / 风险扫描'],
+      ['爱企查', 'https://aiqicha.baidu.com/s?q=' + n, '免费工商查询'],
+      ['看准网', 'https://www.kanzhun.com/', '员工评价 / 面试经验'],
+      ['Boss 直聘', 'https://www.zhipin.com/web/geek/job?query=' + n, '岗位是否长期挂招'],
+      ['站内岗位', '../../?q=' + n, '本站收录的校招 / 实习岗位'],
+    ];
+  }
+  function headerHtml(r) {
+    return '<div class="risk-box ' + r.cls + '">'
+      + '<div class="risk-title" style="color:' + r.color + '">' + hesc(current.name) + ' · ' + hesc(r.levelName) + '</div>'
+      + '<div class="risk-sub">风险分 ' + r.score + ' / 100 · 已核验 ' + r.answered + ' / ' + r.active + ' 项'
+      + (current.updatedAt ? ' · 上次更新 ' + fmtDate(current.updatedAt) : '') + '</div>'
+      + '<div class="risk-progress"><i style="width:' + Math.round(r.progress * 100) + '%;background:' + r.color + '"></i></div>'
+      + (r.redHits.length ? '<div class="risk-redline">命中红旗：' + hesc(r.redHits.join('、')) + '。建议直接放弃，或要求公司书面解释并补齐材料。</div>' : '')
+      + '<div class="risk-actions">'
+      + '<button class="btn ghost btn-sm" onclick="crCopyName()">复制公司名</button>'
+      + '<button class="btn ghost btn-sm" onclick="crCopyReport()">复制报告</button>'
+      + '<button class="btn ghost btn-sm" onclick="crDownload()">下载 .md</button>'
+      + '<button class="btn ghost btn-sm ghost-danger" onclick="crClear()">清空记录</button>'
+      + '</div></div>';
+  }
+  function platformsHtml() {
+    return '<div class="risk-links">' + platformList().map(function (p) {
+      return '<a class="risk-link" href="' + hesc(p[1]) + '" target="_blank" rel="noopener"><b>' + hesc(p[0]) + '</b><span>' + hesc(p[2]) + '</span></a>';
+    }).join('') + '</div>';
+  }
+  function siteHtml() {
+    if (!atsHit) return '';
+    var a = atsHit;
+    var meta = [a.ownership || '', (a.industries || []).join(' / ')].filter(Boolean).join(' · ');
+    return '<div class="risk-site"><b>站内已知信息</b>　' + hesc(a.company) + (meta ? '　' + hesc(meta) : '')
+      + (a.url ? '<br>官方投递渠道：<a href="' + hesc(a.url) + '" target="_blank" rel="noopener">' + hesc(String(a.ats || 'ATS').toUpperCase()) + ' ↗</a>' : '')
+      + '<br><a href="../../?q=' + encodeURIComponent(a.company) + '" target="_blank" rel="noopener">查看站内岗位 ↗</a>'
+      + '</div>';
+  }
+  function itemHtml(it) {
+    var st = current.statuses[it.id] || '';
+    var opts = ['', 'ok', 'bad', 'na'].map(function (v) {
+      return '<option value="' + v + '"' + (st === v ? ' selected' : '') + '>' + STATUS_LABEL[v] + '</option>';
+    }).join('');
+    return '<div class="risk-item">'
+      + '<div class="risk-item-main"><div class="risk-item-label">' + hesc(it.label)
+      + (it.red ? '<span class="risk-red">红旗</span>' : '') + '</div>'
+      + '<div class="risk-item-how">查：' + hesc(it.how) + '</div>'
+      + (st === 'bad' ? '<div class="risk-item-warn">风险信号：' + hesc(it.bad) + '</div>' : '')
+      + '</div>'
+      + '<select class="risk-select st-' + (st || 'todo') + '" aria-label="' + hesc(it.label) + '状态" onchange="crStatus(\'' + it.id + '\', this.value)">' + opts + '</select>'
+      + '</div>';
+  }
+  function groupsHtml() {
+    return GROUPS.map(function (g) {
+      return '<section class="risk-group"><h4>' + hesc(g.title) + '</h4>' + g.items.map(itemHtml).join('') + '</section>';
+    }).join('');
+  }
+  function notesHtml() {
+    return '<div class="risk-notes"><label>备注（HR 口头承诺、待核实事项）</label>'
+      + '<textarea id="cr-note" placeholder="例：HR 口头承诺 3 个月转正、周末双休，但 offer 和合同里都没写，需要补查。"></textarea></div>';
+  }
+  function conclusionHtml(r) {
+    var steps = [];
+    if (r.redHits.length) steps.push('已命中红旗：' + r.redHits.join('、') + '。建议放弃，或要求公司书面解释并补齐材料。');
+    if (r.answered < r.need) steps.push('核验不足：优先补查工商主体、被执行/失信、劳动争议、五险一金、合同与三方条款。');
+    if (r.score >= 15) steps.push('异常项偏多：签约前把合同、社保、违约金条款发给学长学姐或有经验的 HR 再看一遍。');
+    if (!steps.length) steps.push('未发现明显风险。签约前再逐条核对 offer 与劳动合同是否一致。');
+    return '<div class="risk-conclusion"><b>下一步</b><br>' + steps.map(function (s) { return '· ' + hesc(s); }).join('<br>')
+      + '<br><br><span style="color:var(--text-faint)">清单只做自查提示，不构成法律意见；关键条款请以书面合同为准。</span></div>';
+  }
+  function paint() {
+    var out = document.getElementById('cr-out');
+    if (!out || !current) return;
+    var r = compute();
+    out.innerHTML = headerHtml(r) + platformsHtml() + siteHtml() + groupsHtml() + notesHtml() + conclusionHtml(r);
+    var ta = document.getElementById('cr-note');
+    if (ta) {
+      ta.value = current.note || '';
+      ta.addEventListener('input', function () { window.crNote(ta.value); });
+    }
+  }
+
+  c.innerHTML = '<div class="row">'
+    + '<div class="col"><label>公司名称（建议填工商全称）</label><input type="text" id="cr-name" list="cr-name-list" placeholder="如：阿里巴巴（中国）有限公司 / 宁德时代" autocomplete="off"></div>'
+    + '<div class="col" style="flex:0 0 auto;display:flex;align-items:flex-end"><button class="btn" onclick="doRisk()">开始背调</button></div>'
+    + '</div>'
+    + '<datalist id="cr-name-list"></datalist>'
+    + '<p class="cr-tip">勾选状态和备注只保存在本机浏览器；清单用于自查，不构成法律意见。带「红旗」的项一旦异常，建议直接放弃。</p>'
+    + '<div id="cr-out"></div>';
+
+  // 站内已知企业：用于名字联想和官方投递渠道核验
+  fetch('../../data/ats-companies.json').then(function (r) { return r.ok ? r.json() : null; }).then(function (list) {
+    if (!Array.isArray(list)) return;
+    ATS_CACHE = list;
+    var dl = document.getElementById('cr-name-list');
+    if (dl) dl.innerHTML = list.map(function (a) { return '<option value="' + hesc(a.company) + '">'; }).join('');
+    if (current) { atsHit = findAts(current.name); paint(); }
+  }).catch(function () { /* 单独打开工具页或离线时跳过 */ });
+
+  window.doRisk = function () {
+    var name = (document.getElementById('cr-name') || {}).value || '';
+    name = name.trim();
     if (!name) { toast('请先填公司名'); return; }
-
-    // 启发式判断（非真实数据，提醒用户自己查）
-    const hiRisk = ['科技','信息','网络','传媒','文化','咨询','商贸','广告','营销'];
-    const isStart = hiRisk.some(k => name.includes(k)) || name.length > 6;
-    const level = isStart ? 'mid' : 'low';
-    const levelName = level === 'low' ? '低风险' : '重点关注';
-    const levelColor = level === 'low' ? 'var(--ok)' : 'var(--warn)';
-
-    const CHECKLIST_BASE = [
-      ['天眼查/企查查', '工商信息：成立年限、实缴资本、法人、经营范围'],
-      ['国家企业信用信息公示系统', '经营异常、行政处罚、严重违法'],
-      ['中国执行信息公开网', '公司和法人是否是失信被执行人 / 限制高消费'],
-      ['公开开庭公告', '有没有大量劳动合同纠纷（风险信号）'],
-      ['社交媒体', '搜"公司名 + 裁员/跑路/欠薪/加班"看是否有负面'],
-      ['脉脉 / 看准网', '在职员工真实评价（注意区分水军）'],
-      ['Boss/拉勾 JD', '同一个岗位长期挂着招 = 离职率高'],
-    ];
-
-    const ADDITIONAL = isStart ? [
-      ['融资情况', '最近一轮融资时间、金额、投资方。超过 18 个月没融资的创业公司要谨慎'],
-      ['核心团队', 'CEO / CTO 背景 — 是不是连续创业者、有没有成功退出过'],
-      ['业务真实性', '产品/服务有没有在真实运营？还是只有一个空壳官网'],
-    ] : [];
-
-    const RED_FLAGS = [
-      '要求先交钱（培训费、押金、服装费）— 直接拉黑',
-      '工商信息查不到 / 被列入经营异常名录',
-      '老板 / 法人有多个失信被执行人记录',
-      '合同签第三方劳务派遣而非本公司主体',
-      '办公地址在居民楼 / 商住两用楼且规模很小',
-      '面试全程画饼、回避具体业务问题、入职时间模糊',
-      '试用期不缴社保（劳动法规定必须缴）',
-    ];
-
-    let html = `
-      <div class="risk-box risk-${level}">
-        <div class="risk-title" style="color:${levelColor}">📊 ${name} · ${levelName}</div>
-        <div class="risk-sub">基于关键词启发式分析 · 请务必到天眼查/企查查/国家企业信用信息公示系统核实</div>
-      </div>
-
-      <h4 style="margin:20px 0 12px">🔍 必查清单</h4>
-      <ul class="checklist">
-        ${CHECKLIST_BASE.map(([where, what]) => `<li><div><b>${where}</b><br><span style="color:var(--text-dim)">${what}</span></div></li>`).join('')}
-      </ul>
-
-      ${ADDITIONAL.length ? `
-      <h4 style="margin:20px 0 12px;color:var(--warn)">⚡ 创业公司额外关注</h4>
-      <ul class="checklist">
-        ${ADDITIONAL.map(([where, what]) => `<li><div><b>${where}</b><br><span style="color:var(--text-dim)">${what}</span></div></li>`).join('')}
-      </ul>` : ''}
-
-      <h4 style="margin:24px 0 12px;color:var(--bad)">🚩 红旗警告（遇到任何一条直接 Pass）</h4>
-      ${RED_FLAGS.map(f => `<div style="padding:10px 14px;background:#FDF0EF;border-radius:6px;margin-bottom:8px;font-size:13.5px">${f}</div>`).join('')}
-    `;
-
-    document.getElementById('cr-out').innerHTML = html;
+    var key = rkey(name) || name;
+    var saved = getStore()[key];
+    current = {
+      name: name,
+      key: key,
+      statuses: (saved && saved.statuses) ? Object.assign({}, saved.statuses) : {},
+      note: (saved && saved.note) || '',
+      updatedAt: (saved && saved.updatedAt) || '',
+    };
+    atsHit = findAts(name);
+    paint();
+    if (saved) toast('已恢复上次的背调记录');
   };
 }
 
@@ -2232,6 +2522,13 @@ function toolRefer(c) {
     if (p.tool === 'ats-open') {
       window.openTool('ats');
       if (typeof toast === 'function') toast('粘贴简历和 JD 后点「运行多维度检测」');
+      return;
+    }
+    if (p.tool === 'risk') {
+      window.openTool('risk');
+      var rn = document.getElementById('cr-name');
+      if (rn) rn.value = p.company || '';
+      if (p.company && typeof window.doRisk === 'function') window.doRisk();
       return;
     }
     if (!p.jd) return;

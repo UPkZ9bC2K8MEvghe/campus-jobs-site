@@ -459,10 +459,29 @@
     let hasResume = false;
     try { hasResume = !!(localStorage.getItem(RESUME_KEY) || '').trim(); } catch { /* ignore */ }
     const thin = !stripHtml(r.note) && !(r.positions || []).length;
-    return `<section class="detail-section ats-link"><h3>简历匹配度<span class="section-source">ATS 检测 · 本地计算不上传</span></h3>
-      <p class="muted" style="margin:0 0 10px">${hasResume ? '已保存你的简历，点击后会自动给出这个岗位的匹配分和缺失关键词。' : '第一次使用时粘贴一次简历，之后会记住，打开任意岗位都能一键检测。'}${thin ? '（该岗位公告信息较少，结果仅供参考）' : ''}</p>
-      <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="link-btn primary" type="button" id="atsFromJob">🎯 用这个岗位测 ATS 匹配度</button>
-      <button class="link-btn" type="button" id="ivFromJob">🗣️ 生成这家公司的面试题</button></div></section>`;
+    const head = '<section class="detail-section ats-link"><h3>简历匹配度<span class="section-source">ATS 检测 · 本地计算不上传</span></h3>';
+    const actions = '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="link-btn primary" type="button" id="atsFromJob">🎯 在 ATS 中查看完整报告</button>'
+      + '<button class="link-btn" type="button" id="ivFromJob">🗣️ 生成这家公司的面试题</button>'
+      + '<button class="link-btn" type="button" id="riskFromJob">去背调这家公司</button></div>';
+    const detail = hasResume ? resumeDetail(r) : null;
+    if (!detail) {
+      const msg = hasResume
+        ? '该岗位公告里的可识别关键词较少，暂时无法估算。可把完整 JD 粘贴到 ATS 工具里做六维检测。'
+        : '第一次使用时粘贴一次简历，之后会记住，打开任意岗位都能一键检测。';
+      return `${head}<p class="muted" style="margin:0 0 10px">${msg}${thin ? '（该岗位公告信息较少，结果仅供参考）' : ''}</p>${actions}</section>`;
+    }
+    const kw = (list, cls) => list.slice(0, 10).map((x) => `<span class="kw ${cls}">${esc(x)}</span>`).join('');
+    const level = detail.score >= resumeThreshold ? 'high' : detail.score >= Math.round(resumeThreshold * 0.6) ? 'mid' : 'low';
+    return `${head}
+      <div class="resume-score-row">
+        <div class="resume-score ${level}"><strong>${detail.score}%</strong><span>岗位关键词覆盖</span></div>
+        <div class="resume-kws">
+          ${detail.matched.length ? `<div><b>已命中</b>${kw(detail.matched, 'hit')}</div>` : ''}
+          ${detail.missing.length ? `<div><b>待补充</b>${kw(detail.missing, 'miss')}</div>` : '<div class="muted">该岗位的可识别关键词已全部覆盖。</div>'}
+        </div>
+      </div>
+      <p class="muted" style="margin:8px 0">${thin ? '该岗位公告信息较少，结果仅供参考。' : ''}分数基于岗位公告中的关键词估算，完整六维评分请在 ATS 工具中查看。</p>
+      ${actions}</section>`;
   }
   async function openIVWithJob(r) {
     try {
@@ -482,6 +501,16 @@
     if (state.view !== 'tools') await switchView('tools');
     else { if (el.drawer.classList.contains('open')) closeDrawer(); renderTools(); }
     // iframe 已加载时直接通知；首次加载则由工具页 DOMContentLoaded 自行读取
+    const frame = document.getElementById('toolsFrame');
+    try { frame?.contentWindow?.postMessage({ type: 'cj-ats-prefill' }, location.origin); } catch { /* ignore */ }
+  }
+  async function openRiskWithCompany(r) {
+    try {
+      localStorage.setItem(ATS_PREFILL_KEY, JSON.stringify({ tool: 'risk', company: r.company || '', id: r.id, ts: Date.now() }));
+    } catch { toast('浏览器存储不可用'); return; }
+    state.tool = 'career';
+    if (state.view !== 'tools') await switchView('tools');
+    else { if (el.drawer.classList.contains('open')) closeDrawer(); renderTools(); }
     const frame = document.getElementById('toolsFrame');
     try { frame?.contentWindow?.postMessage({ type: 'cj-ats-prefill' }, location.origin); } catch { /* ignore */ }
   }
@@ -686,11 +715,12 @@
       row.__search = index[i] || '';
       row.__s = null;
     });
+    invalidateResumeScores();
   }
 
   function scheduleSearchIndex(tab) {
     loadSearchIndex(tab).catch(() => {}).then(() => {
-      if (state.view === tab && (state.q || profile.major)) renderResults();
+      if (state.view === tab && (state.q || profile.major || resumeKeywords())) renderResults();
     });
   }
 
@@ -966,7 +996,10 @@
     if (state.status.has('private') && row.ownership !== '民企') return false;
     if (state.status.has('fav') && !favorites.has(row.id)) return false;
     if (state.status.has('hot') && !ensureHot(state.view).has(row.id)) return false;
-    if (state.status.has('resume') && resumeKeywords() && !((resumeScore(row) ?? -1) >= resumeThreshold)) return false;
+    if (state.status.has('resume')) {
+      if (!resumeKeywords()) return false;
+      if (!((resumeScore(row) ?? -1) >= resumeThreshold)) return false;
+    }
 
     const includeStatus = ['urgent', 'over', 'asap', 'test'].filter((k) => state.status.has(k));
     if (includeStatus.length) {
@@ -1083,6 +1116,22 @@
     el.mobileCount.textContent = `${rows.length} 条`;
     renderActiveTags();
     if (!rows.length) {
+      if (state.status.has('resume')) {
+        if (!resumeKeywords()) {
+          el.cardList.innerHTML = `<div class="empty"><strong>还没有保存简历</strong>先到「求职工具 → ATS 匹配度检测」粘贴一次简历，之后列表会自动显示匹配分。<div><button id="emptyResumeGo">去粘贴简历</button></div></div>`;
+          $('emptyResumeGo')?.addEventListener('click', () => { state.tool = 'career'; switchView('tools'); });
+        } else {
+          const lower = RESUME_TH_OPTIONS.filter((v) => v < resumeThreshold).pop();
+          el.cardList.innerHTML = `<div class="empty"><strong>没有匹配度 ≥${resumeThreshold}% 的岗位</strong>当前简历与这批岗位的关键词重合较少，可以降低阈值看看。${lower ? `<div><button id="emptyResumeLower">降到 ≥${lower}%</button><button id="emptyResumeOff">关闭简历筛选</button></div>` : '<div><button id="emptyResumeOff">关闭简历筛选</button></div>'}</div>`;
+          $('emptyResumeLower')?.addEventListener('click', () => { setResumeThreshold(lower); onFilterChange(); });
+          $('emptyResumeOff')?.addEventListener('click', () => {
+            state.status.delete('resume');
+            if (state.sort === 'resume') { state.sort = 'updated'; el.sortSelect.value = 'updated'; }
+            onFilterChange();
+          });
+        }
+        return;
+      }
       el.cardList.innerHTML = `<div class="empty"><strong>没有符合条件的岗位</strong>试试减少筛选条件，或者加选「全国多地」——很多企业只在公告里写代表性城市。<div><button id="emptyNationwide">加选「全国多地」</button></div></div>`;
       $('emptyNationwide')?.addEventListener('click', () => { state.cities.add(NATIONWIDE); onFilterChange(); });
       return;
@@ -1295,6 +1344,7 @@
     appendDrawerSection(atsSectionHtml(r), () => {
       el.drawerBody.querySelector('#atsFromJob')?.addEventListener('click', () => openATSWithJob(r));
       el.drawerBody.querySelector('#ivFromJob')?.addEventListener('click', () => openIVWithJob(r));
+      el.drawerBody.querySelector('#riskFromJob')?.addEventListener('click', () => openRiskWithCompany(r));
     });
     // F4/F7/F8/F10 异步加载并追加：相似推荐 / 近期宣讲会 / 面试题 / 面经
     renderDrawerExtras(r, tab);
@@ -1536,60 +1586,265 @@
   function matchBadge(score) {
     if (!score) return '';
     const cls = score >= 70 ? 'match-high' : score >= 40 ? 'match-mid' : 'match-low';
-    return `<span class="badge ${cls}">匹配 ${score}%</span>`;
+    return `<span class="badge ${cls}" title="与「我的专业」的匹配度">专业 ${score}%</span>`;
   }
 
-  /* ---- 列表卡片 · 简历匹配分（轻量版 ATS，复用求职工具箱保存的简历） ---- */
-  const RESUME_POOL = [
-    // 技术
-    'python', 'java', 'javascript', 'typescript', 'golang', 'rust', 'c++', 'c#', 'php', 'kotlin', 'swift', 'scala', 'matlab',
-    'react', 'vue', 'angular', 'node.js', 'spring', 'django', 'flask', 'mysql', 'redis', 'mongodb', 'oracle', 'sql',
-    'linux', 'docker', 'kubernetes', 'k8s', 'aws', 'hadoop', 'spark', 'flink', 'kafka', 'pytorch', 'tensorflow', 'opencv',
-    'llm', 'nlp', 'plc', 'cad', 'solidworks', 'fpga', 'verilog', 'stm32', 'excel', 'ps', 'spss', 'sas',
-    '前端', '后端', '全栈', '客户端', '安卓', 'ios', '测试', '运维', '算法', '数据分析', '数据挖掘', '大数据', '机器学习', '深度学习',
-    '大模型', '人工智能', '计算机视觉', '自然语言处理', '嵌入式', '硬件', '芯片', '集成电路', '半导体', '射频', '单片机', '网络安全', '信息安全',
-    // 专业 / 方向
-    '计算机', '软件工程', '电子', '通信', '电气', '自动化', '机械', '车辆', '材料', '化工', '化学', '物理', '数学', '统计',
-    '土木', '建筑', '测绘', '地质', '采矿', '能源', '动力', '水利', '交通', '航空', '航天', '船舶', '环境', '生物', '医学', '药学', '护理', '食品',
-    '金融', '经济', '会计', '财务', '审计', '税务', '法学', '法律', '市场营销', '人力资源', '工商管理', '物流', '供应链', '采购',
-    '新闻', '传播', '广告', '中文', '英语', '日语', '翻译', '设计', '视觉', '交互', 'ui', '产品经理', '运营', '销售', '客户经理', '咨询', '教育', '师范',
+  /* ---- 列表卡片 · 简历匹配分（轻量版 ATS，复用求职工具箱保存的简历） ----
+   * 词表分三档：硬技能 1.0、职能 0.6、专业/行业 0.5。
+   * 分数 = 岗位关键词的加权覆盖率；英文按整词边界、中文按包含匹配，同义词归并。
+   * 岗位关键词每行只抽取一次（WeakMap 缓存）；简历变更时只重算命中情况。
+   */
+  const RESUME_TERMS = [
+    // [展示名, 权重, 同义词...] —— 硬技能
+    ['Python', 1, 'python'],
+    ['Java', 1, 'java'],
+    ['JavaScript', 1, 'javascript', 'js'],
+    ['TypeScript', 1, 'typescript'],
+    ['Go', 1, 'golang'],
+    ['Rust', 1, 'rust'],
+    ['C++', 1, 'c++'],
+    ['C#', 1, 'c#'],
+    ['PHP', 1, 'php'],
+    ['Kotlin', 1, 'kotlin'],
+    ['Swift', 1, 'swift'],
+    ['Scala', 1, 'scala'],
+    ['MATLAB', 1, 'matlab'],
+    ['React', 1, 'react', 'reactjs'],
+    ['Vue', 1, 'vue', 'vue2', 'vue3'],
+    ['Angular', 1, 'angular'],
+    ['Next.js', 1, 'next.js', 'nextjs'],
+    ['Node.js', 1, 'node.js', 'nodejs'],
+    ['Spring', 1, 'spring', 'spring boot', 'springboot'],
+    ['Django', 1, 'django'],
+    ['Flask', 1, 'flask'],
+    ['MySQL', 1, 'mysql'],
+    ['PostgreSQL', 1, 'postgresql', 'postgres'],
+    ['MongoDB', 1, 'mongodb'],
+    ['Redis', 1, 'redis'],
+    ['Elasticsearch', 1, 'elasticsearch'],
+    ['Oracle', 1, 'oracle'],
+    ['SQL', 1, 'sql'],
+    ['Linux', 1, 'linux'],
+    ['Docker', 1, 'docker'],
+    ['Kubernetes', 1, 'kubernetes', 'k8s'],
+    ['AWS', 1, 'aws'],
+    ['Hadoop', 1, 'hadoop'],
+    ['Spark', 1, 'spark'],
+    ['Flink', 1, 'flink'],
+    ['Kafka', 1, 'kafka'],
+    ['PyTorch', 1, 'pytorch'],
+    ['TensorFlow', 1, 'tensorflow'],
+    ['OpenCV', 1, 'opencv'],
+    ['LLM / 大模型', 1, 'llm', '大模型'],
+    ['机器学习', 1, '机器学习', 'machine learning'],
+    ['深度学习', 1, '深度学习', 'deep learning'],
+    ['自然语言处理', 1, 'nlp', '自然语言处理'],
+    ['计算机视觉', 1, '计算机视觉'],
+    ['前端', 1, '前端'],
+    ['后端', 1, '后端'],
+    ['全栈', 1, '全栈'],
+    ['客户端', 1, '客户端'],
+    ['Android', 1, 'android', '安卓'],
+    ['iOS', 1, 'ios'],
+    ['测试', 1, '测试'],
+    ['运维', 1, '运维'],
+    ['算法', 1, '算法'],
+    ['数据分析', 1, '数据分析', 'data analysis'],
+    ['数据挖掘', 1, '数据挖掘'],
+    ['大数据', 1, '大数据'],
+    ['人工智能', 1, '人工智能'],
+    ['嵌入式', 1, '嵌入式'],
+    ['网络安全', 1, '网络安全'],
+    ['信息安全', 1, '信息安全'],
+    ['芯片', 1, '芯片'],
+    ['集成电路', 1, '集成电路'],
+    ['半导体', 1, '半导体'],
+    ['射频', 1, '射频'],
+    ['单片机', 1, '单片机'],
+    ['FPGA', 1, 'fpga'],
+    ['Verilog', 1, 'verilog'],
+    ['PLC', 1, 'plc'],
+    ['CAD', 1, 'cad'],
+    ['SolidWorks', 1, 'solidworks'],
+    ['Excel', 1, 'excel'],
+    ['SPSS', 1, 'spss'],
+    ['SAS', 1, 'sas'],
+    // 职能
+    ['产品经理', 0.6, '产品经理', 'product manager'],
+    ['运营', 0.6, '运营'],
+    ['销售', 0.6, '销售'],
+    ['市场营销', 0.6, '市场营销'],
+    ['人力资源', 0.6, '人力资源'],
+    ['财务', 0.6, '财务'],
+    ['会计', 0.6, '会计'],
+    ['审计', 0.6, '审计'],
+    ['法务', 0.6, '法务', '法律', '法学'],
+    ['视觉设计', 0.5, '视觉设计', '视觉'],
+    ['交互设计', 0.5, '交互设计', '交互'],
+    ['供应链', 0.6, '供应链'],
+    ['物流', 0.6, '物流'],
+    ['采购', 0.6, '采购'],
+    ['咨询', 0.6, '咨询'],
+    ['客户经理', 0.6, '客户经理'],
+    ['翻译', 0.6, '翻译'],
+    ['新闻传播', 0.5, '新闻传播', '新闻', '传播'],
+    // 专业 / 行业（权重较低，避免“计算机相关专业”把分数整体拉高）
+    ['计算机', 0.5, '计算机'],
+    ['软件工程', 0.5, '软件工程'],
+    ['电子信息', 0.5, '电子'],
+    ['通信', 0.5, '通信'],
+    ['电气', 0.5, '电气'],
+    ['自动化', 0.5, '自动化'],
+    ['机械', 0.5, '机械'],
+    ['车辆', 0.5, '车辆'],
+    ['材料', 0.5, '材料'],
+    ['化工', 0.5, '化工'],
+    ['化学', 0.5, '化学'],
+    ['物理', 0.5, '物理'],
+    ['数学', 0.5, '数学'],
+    ['统计', 0.5, '统计'],
+    ['土木', 0.5, '土木'],
+    ['建筑', 0.5, '建筑'],
+    ['测绘', 0.5, '测绘'],
+    ['地质', 0.5, '地质'],
+    ['采矿', 0.5, '采矿'],
+    ['能源', 0.5, '能源'],
+    ['动力', 0.5, '动力'],
+    ['水利', 0.5, '水利'],
+    ['交通', 0.5, '交通'],
+    ['航空', 0.5, '航空'],
+    ['航天', 0.5, '航天'],
+    ['船舶', 0.5, '船舶'],
+    ['环境', 0.5, '环境'],
+    ['生物', 0.5, '生物'],
+    ['医学', 0.5, '医学'],
+    ['药学', 0.5, '药学'],
+    ['护理', 0.5, '护理'],
+    ['食品', 0.5, '食品'],
+    ['金融', 0.5, '金融'],
+    ['经济', 0.5, '经济'],
+    ['税务', 0.5, '税务'],
+    ['工商管理', 0.5, '工商管理'],
+    ['英语', 0.5, '英语'],
+    ['日语', 0.5, '日语'],
+    ['教育', 0.5, '教育'],
+    ['师范', 0.5, '师范'],
   ];
-  const asciiRe = (w) => new RegExp(`(^|[^a-z0-9+#.])${w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}($|[^a-z0-9+#])`);
-  const RESUME_POOL_RE = RESUME_POOL.map((w) => [w, /^[a-z0-9+#. ]+$/.test(w) ? asciiRe(w) : null]);
-  const hasKw = (text, [w, re]) => (re ? re.test(text) : text.includes(w));
-  const resumeCache = { raw: null, kws: null, scores: new Map() };
+  const RESUME_VARIANTS = [];
+  RESUME_TERMS.forEach((term, idx) => {
+    for (const v of term.slice(2)) RESUME_VARIANTS.push([v, idx]);
+  });
+  const RESUME_ASCII_MAP = new Map(RESUME_VARIANTS.filter(([v]) => /^[a-z0-9+#. ]+$/.test(v)));
+  const RESUME_CN_MAP = new Map(RESUME_VARIANTS.filter(([v]) => !/^[a-z0-9+#. ]+$/.test(v)));
+  const altOf = (map) => [...map.keys()].sort((a, b) => b.length - a.length).map(escRe).join('|');
+  const RESUME_ASCII_RE = RESUME_ASCII_MAP.size
+    ? new RegExp(`(?:^|[^a-z0-9+#.])(${altOf(RESUME_ASCII_MAP)})(?![a-z0-9+#])`, 'gi')
+    : null;
+  const RESUME_CN_RE = RESUME_CN_MAP.size ? new RegExp(altOf(RESUME_CN_MAP), 'g') : null;
+
+  const resumeCache = { raw: null, terms: null, scores: new Map(), jd: new WeakMap() };
+  // 搜索索引补齐 __search 后，岗位关键词会变化：清空分数与行级关键词缓存
+  function invalidateResumeScores() {
+    resumeCache.scores.clear();
+    resumeCache.jd = new WeakMap();
+  }
+  function extractResumeTerms(text) {
+    const out = new Map();
+    if (!text) return out;
+    const add = (idx) => out.set(idx, (out.get(idx) || 0) + 1);
+    if (RESUME_ASCII_RE) {
+      RESUME_ASCII_RE.lastIndex = 0;
+      let m;
+      while ((m = RESUME_ASCII_RE.exec(text))) {
+        const idx = RESUME_ASCII_MAP.get(m[1].toLowerCase());
+        if (idx != null) add(idx);
+        if (m.index === RESUME_ASCII_RE.lastIndex) RESUME_ASCII_RE.lastIndex += 1;
+      }
+    }
+    if (RESUME_CN_RE) {
+      RESUME_CN_RE.lastIndex = 0;
+      let m;
+      while ((m = RESUME_CN_RE.exec(text))) {
+        const idx = RESUME_CN_MAP.get(m[0]);
+        if (idx != null) add(idx);
+        if (m.index === RESUME_CN_RE.lastIndex) RESUME_CN_RE.lastIndex += 1;
+      }
+    }
+    return out;
+  }
+  function jdTextOf(row) {
+    const note = String(row.note || '')
+      .replace(/<[^>]*>/g, ' ')
+      .replace(/&nbsp;/gi, ' ')
+      .replace(/&amp;/gi, '&')
+      .slice(0, 4000);
+    // __search 是完整的搜索文本（含被列表截断的专业/岗位），优先使用它让卡片与详情分数一致
+    return [(row.positions || []).join(' '), row.majors || '', (row.industries || []).join(' '), row.sm || '', String(row.__search || '').slice(0, 8000), note]
+      .join(' ').toLowerCase();
+  }
+  function jdTerms(row) {
+    let cached = resumeCache.jd.get(row);
+    if (!cached) {
+      cached = extractResumeTerms(jdTextOf(row));
+      resumeCache.jd.set(row, cached);
+    }
+    return cached;
+  }
   function resumeKeywords() {
     let raw = '';
     try { raw = localStorage.getItem(RESUME_KEY) || ''; } catch { /* ignore */ }
     if (raw !== resumeCache.raw) {
       resumeCache.raw = raw;
       resumeCache.scores.clear();
-      const t = raw.toLowerCase();
-      resumeCache.kws = raw.trim() ? new Set(RESUME_POOL_RE.filter((k) => hasKw(t, k)).map((k) => k[0])) : null;
+      resumeCache.terms = raw.trim() ? extractResumeTerms(raw.toLowerCase()) : null;
     }
-    return resumeCache.kws;
+    return resumeCache.terms;
   }
-  // 返回 0~100；JD 侧可识别关键词少于 2 个时返回 null（信息不足不打分）
+  // JD 关键词出现频次会轻微加权（最多 1.2 倍），体现“反复强调”的要求
+  function termWeight(idx, freq) {
+    return RESUME_TERMS[idx][1] * (1 + Math.min(freq - 1, 2) * 0.1);
+  }
+  // 返回 0~100；JD 侧可识别关键词少于 2 个或权重过低时返回 null（信息不足不打分）
+  function scoreFromTerms(counts, resumeSet) {
+    let totalW = 0, hitW = 0, totalN = 0;
+    counts.forEach((freq, idx) => {
+      const w = termWeight(idx, freq);
+      totalW += w;
+      totalN += 1;
+      if (resumeSet.has(idx)) hitW += w;
+    });
+    if (totalN < 2 || totalW < 1) return null;
+    return Math.max(0, Math.min(100, Math.round((hitW / totalW) * 100)));
+  }
   function resumeScore(row) {
-    const kws = resumeKeywords();
-    if (!kws || !kws.size) return null;
+    const resume = resumeKeywords();
+    if (!resume || !resume.size) return null;
     if (resumeCache.scores.has(row.id)) return resumeCache.scores.get(row.id);
-    const jd = [(row.positions || []).join(' '), row.majors || '', (row.industries || []).join(' '), row.sm || '', String(row.note || '').slice(0, 4000)]
-      .join(' ').toLowerCase();
-    let total = 0, hit = 0;
-    for (const k of RESUME_POOL_RE) {
-      if (!hasKw(jd, k)) continue;
-      total++;
-      if (kws.has(k[0])) hit++;
-    }
-    const score = total >= 2 ? Math.round((hit / total) * 100) : null;
+    const score = scoreFromTerms(jdTerms(row), resume);
     resumeCache.scores.set(row.id, score);
     return score;
   }
+  // 详情抽屉用：返回分数 + 已命中 / 待补充关键词（按权重排序）
+  function resumeDetail(row) {
+    const resume = resumeKeywords();
+    if (!resume || !resume.size) return null;
+    const counts = jdTerms(row);
+    const score = scoreFromTerms(counts, resume);
+    if (score == null) return null;
+    const matched = [], missing = [];
+    counts.forEach((freq, idx) => {
+      const item = { label: RESUME_TERMS[idx][0], w: termWeight(idx, freq) };
+      (resume.has(idx) ? matched : missing).push(item);
+    });
+    const byWeight = (a, b) => b.w - a.w || a.label.localeCompare(b.label, 'zh');
+    matched.sort(byWeight);
+    missing.sort(byWeight);
+    return { score, matched: matched.map((x) => x.label), missing: missing.map((x) => x.label), total: counts.size };
+  }
   function resumeBadge(score) {
     if (score == null) return '';
-    const cls = score >= 60 ? 'match-high' : score >= 30 ? 'match-mid' : 'match-low';
-    return `<span class="badge resume-match ${cls}" title="根据你在「求职工具」里保存的简历估算的关键词匹配度，点开岗位可做完整 ATS 检测">简历 ${score}%</span>`;
+    const cls = score >= resumeThreshold ? 'match-high' : score >= Math.round(resumeThreshold * 0.6) ? 'match-mid' : 'match-low';
+    return `<span class="badge resume-match ${cls}" title="按岗位关键词与你保存的简历估算，当前筛选阈值 ≥${resumeThreshold}%">简历 ${score}%</span>`;
   }
   // 在求职工具里修改简历后（同源 iframe 会触发 storage 事件），刷新列表上的分数
   window.addEventListener('storage', (e) => {

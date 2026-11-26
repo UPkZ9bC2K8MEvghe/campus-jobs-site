@@ -1443,6 +1443,21 @@ a.soe-card:hover {
 
 .resume-th { margin-left: -4px; padding: 3px 6px; border: 1px solid rgba(127,127,127,.35); border-radius: 999px; background: transparent; color: inherit; font: inherit; font-size: 12px; cursor: pointer; }
 
+/* 岗位详情 · 简历匹配明细 */
+.resume-score-row { display: flex; gap: 14px; align-items: flex-start; flex-wrap: wrap; }
+.resume-score { flex: 0 0 auto; width: 100px; padding: 10px 8px; border-radius: 10px; text-align: center; background: rgba(43,89,255,.08); }
+.resume-score strong { display: block; font-size: 26px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.resume-score span { display: block; margin-top: 2px; font-size: 11px; color: var(--muted); }
+.resume-score.high { background: #e6f7ee; color: #047857; }
+.resume-score.mid { background: #fff6e6; color: #a4610a; }
+.resume-score.low { background: #f1f3f7; color: var(--muted); }
+.resume-kws { flex: 1 1 220px; min-width: 0; font-size: 12px; }
+.resume-kws > div + div { margin-top: 6px; }
+.resume-kws b { display: inline-block; margin-right: 6px; font-weight: 600; color: var(--ink); }
+.kw { display: inline-block; margin: 2px 4px 2px 0; padding: 1px 7px; border-radius: 999px; font-size: 12px; }
+.kw.hit { background: rgba(4,120,87,.12); color: #047857; }
+.kw.miss { background: rgba(43,89,255,.1); color: #2b59ff; }
+
 /* 访问量（独立访客） */
 .visit-counter { flex: 0 0 auto; display: inline-flex; align-items: baseline; gap: 4px; padding: 6px 10px; border: 1px solid var(--line); border-radius: 999px; background: #fff; color: var(--muted); font-size: 12px; white-space: nowrap; }
 .visit-counter[hidden] { display: none; }
