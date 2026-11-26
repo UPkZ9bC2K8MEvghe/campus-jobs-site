@@ -1,15 +1,15 @@
 {
-  "generatedAt": "2026-11-25T02:05:47.682Z",
-  "durationMs": 71666,
-  "total": 26313,
-  "warnings": [],
+  "generatedAt": "2026-11-26T01:23:05.562Z",
+  "durationMs": 130761,
+  "total": 26331,
+  "warnings": [
+    "上海银行: stale（53 条）",
+    "奥克斯集团: stale（24 条）",
+    "赛轮集团: error（92 条，北森来源 beisen-sailun 超过 90 秒预算）",
+    "中国航空综合技术研究所: error（39 条，北森来源 beisen-avic301 超过 90 秒预算）",
+    "交控科技: error（36 条，北森来源 beisen-bjtct 超过 90 秒预算）"
+  ],
   "history": [
-    {
-      "generatedAt": "2026-11-24T03:39:17.405Z",
-      "total": 26340,
-      "warnings": 4,
-      "failed": 5
-    },
     {
       "generatedAt": "2026-11-24T03:55:02.324Z",
       "total": 26320,
@@ -87,6 +87,12 @@
       "total": 26313,
       "warnings": 0,
       "failed": 1
+    },
+    {
+      "generatedAt": "2026-11-26T01:23:05.562Z",
+      "total": 26331,
+      "warnings": 5,
+      "failed": 6
     }
   ],
   "sources": [
@@ -100,9 +106,9 @@
       "count": 10,
       "freshCount": 10,
       "attempts": 1,
-      "durationMs": 1567,
+      "durationMs": 1883,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -112,12 +118,12 @@
       "optional": false,
       "status": "ok",
       "unchanged": false,
-      "count": 20,
-      "freshCount": 20,
+      "count": 10,
+      "freshCount": 10,
       "attempts": 1,
-      "durationMs": 11973,
+      "durationMs": 13223,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -130,9 +136,9 @@
       "count": 40,
       "freshCount": 40,
       "attempts": 1,
-      "durationMs": 12871,
+      "durationMs": 13863,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -140,14 +146,14 @@
       "company": "京东",
       "mode": "browser",
       "optional": false,
-      "status": "cached",
-      "unchanged": true,
+      "status": "ok",
+      "unchanged": false,
       "count": 50,
       "freshCount": 50,
       "attempts": 1,
-      "durationMs": 10025,
+      "durationMs": 13696,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -160,9 +166,9 @@
       "count": 50,
       "freshCount": 50,
       "attempts": 1,
-      "durationMs": 11926,
+      "durationMs": 14333,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -175,9 +181,9 @@
       "count": 77,
       "freshCount": 77,
       "attempts": 1,
-      "durationMs": 5369,
+      "durationMs": 6429,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -187,12 +193,12 @@
       "optional": false,
       "status": "ok",
       "unchanged": false,
-      "count": 125,
-      "freshCount": 125,
+      "count": 127,
+      "freshCount": 127,
       "attempts": 1,
-      "durationMs": 5141,
+      "durationMs": 11425,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -205,10 +211,10 @@
       "count": 0,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 2401,
-      "consecutiveFailures": 25,
+      "durationMs": 2594,
+      "consecutiveFailures": 26,
       "lastSuccessAt": null,
-      "lastFailureAt": "2026-11-25T02:05:10.731Z"
+      "lastFailureAt": "2026-11-26T01:21:14.402Z"
     },
     {
       "key": "ctrip",
@@ -220,9 +226,9 @@
       "count": 43,
       "freshCount": 43,
       "attempts": 1,
-      "durationMs": 2035,
+      "durationMs": 1994,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -230,14 +236,14 @@
       "company": "理想汽车",
       "mode": "collect",
       "optional": false,
-      "status": "cached",
-      "unchanged": true,
-      "count": 670,
-      "freshCount": 670,
+      "status": "ok",
+      "unchanged": false,
+      "count": 669,
+      "freshCount": 669,
       "attempts": 1,
-      "durationMs": 27722,
+      "durationMs": 29350,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -250,9 +256,9 @@
       "count": 8,
       "freshCount": 8,
       "attempts": 1,
-      "durationMs": 1259,
+      "durationMs": 1207,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -262,12 +268,12 @@
       "optional": false,
       "status": "ok",
       "unchanged": false,
-      "count": 39,
-      "freshCount": 39,
+      "count": 44,
+      "freshCount": 44,
       "attempts": 1,
-      "durationMs": 38463,
+      "durationMs": 33665,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": "2026-11-24T04:42:28.812Z"
     },
     {
@@ -275,14 +281,14 @@
       "company": "金蝶",
       "mode": "browser",
       "optional": false,
-      "status": "cached",
-      "unchanged": true,
+      "status": "ok",
+      "unchanged": false,
       "count": 191,
-      "freshCount": 0,
+      "freshCount": 191,
       "attempts": 1,
-      "durationMs": 28875,
+      "durationMs": 15378,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": "2026-11-25T01:37:16.136Z"
     },
     {
@@ -290,14 +296,14 @@
       "company": "华润置地",
       "mode": "browser",
       "optional": false,
-      "status": "cached",
-      "unchanged": true,
+      "status": "ok",
+      "unchanged": false,
       "count": 385,
       "freshCount": 385,
       "attempts": 1,
-      "durationMs": 19129,
+      "durationMs": 19343,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": "2026-11-23T07:09:23.645Z"
     },
     {
@@ -310,9 +316,9 @@
       "count": 27,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 10898,
+      "durationMs": 15021,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -325,9 +331,9 @@
       "count": 35,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 12322,
+      "durationMs": 15032,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -340,9 +346,9 @@
       "count": 19,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 9056,
+      "durationMs": 10959,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -355,9 +361,9 @@
       "count": 8,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 11837,
+      "durationMs": 12433,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -370,9 +376,9 @@
       "count": 43,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 9420,
+      "durationMs": 14062,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -385,9 +391,9 @@
       "count": 66,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 17486,
+      "durationMs": 15752,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -399,10 +405,10 @@
       "unchanged": false,
       "count": 2207,
       "freshCount": 2207,
-      "attempts": 2,
-      "durationMs": 46617,
+      "attempts": 1,
+      "durationMs": 37554,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": "2026-11-24T01:27:29.293Z"
     },
     {
@@ -415,9 +421,9 @@
       "count": 47,
       "freshCount": 47,
       "attempts": 1,
-      "durationMs": 4225,
+      "durationMs": 4369,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -430,9 +436,9 @@
       "count": 22,
       "freshCount": 22,
       "attempts": 1,
-      "durationMs": 3362,
+      "durationMs": 7507,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": "2026-11-24T10:34:12.847Z"
     },
     {
@@ -445,9 +451,9 @@
       "count": 9,
       "freshCount": 9,
       "attempts": 1,
-      "durationMs": 4213,
+      "durationMs": 2055,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -460,9 +466,9 @@
       "count": 10,
       "freshCount": 10,
       "attempts": 1,
-      "durationMs": 3317,
+      "durationMs": 3784,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -475,9 +481,9 @@
       "count": 34,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 12746,
+      "durationMs": 17761,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -490,9 +496,9 @@
       "count": 30,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 12814,
+      "durationMs": 15749,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -505,9 +511,9 @@
       "count": 20,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 11723,
+      "durationMs": 13294,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -520,9 +526,9 @@
       "count": 14,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 9988,
+      "durationMs": 13484,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -535,9 +541,9 @@
       "count": 401,
       "freshCount": 401,
       "attempts": 1,
-      "durationMs": 21025,
+      "durationMs": 35691,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": "2026-11-25T00:43:48.815Z"
     },
     {
@@ -550,9 +556,9 @@
       "count": 18,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 8478,
+      "durationMs": 11511,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -565,9 +571,9 @@
       "count": 116,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 22422,
+      "durationMs": 26428,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -580,9 +586,9 @@
       "count": 51,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 14233,
+      "durationMs": 15252,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -595,9 +601,9 @@
       "count": 154,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 20651,
+      "durationMs": 29357,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": "2026-11-22T04:21:04.501Z"
     },
     {
@@ -605,14 +611,14 @@
       "company": "巨一科技",
       "mode": "browser",
       "optional": false,
-      "status": "cached",
-      "unchanged": true,
-      "count": 59,
-      "freshCount": 0,
+      "status": "ok",
+      "unchanged": false,
+      "count": 60,
+      "freshCount": 60,
       "attempts": 1,
-      "durationMs": 13012,
+      "durationMs": 16961,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": "2026-11-23T07:09:23.645Z"
     },
     {
@@ -625,9 +631,9 @@
       "count": 17,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 11380,
+      "durationMs": 10339,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -640,9 +646,9 @@
       "count": 102,
       "freshCount": 102,
       "attempts": 1,
-      "durationMs": 5787,
+      "durationMs": 9773,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -655,9 +661,9 @@
       "count": 968,
       "freshCount": 968,
       "attempts": 1,
-      "durationMs": 14957,
+      "durationMs": 14616,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -669,10 +675,10 @@
       "unchanged": false,
       "count": 236,
       "freshCount": 236,
-      "attempts": 2,
-      "durationMs": 70005,
+      "attempts": 1,
+      "durationMs": 8422,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -684,10 +690,10 @@
       "unchanged": false,
       "count": 64,
       "freshCount": 64,
-      "attempts": 2,
-      "durationMs": 71316,
+      "attempts": 1,
+      "durationMs": 2940,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": "2026-11-25T00:43:59.813Z"
     },
     {
@@ -697,12 +703,12 @@
       "optional": false,
       "status": "ok",
       "unchanged": false,
-      "count": 89,
-      "freshCount": 89,
+      "count": 90,
+      "freshCount": 90,
       "attempts": 1,
-      "durationMs": 6072,
+      "durationMs": 4434,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -710,14 +716,14 @@
       "company": "潍柴动力",
       "mode": "collect",
       "optional": false,
-      "status": "ok",
-      "unchanged": false,
+      "status": "cached",
+      "unchanged": true,
       "count": 29,
       "freshCount": 29,
       "attempts": 1,
-      "durationMs": 3980,
+      "durationMs": 5453,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -725,14 +731,14 @@
       "company": "蜜雪冰城",
       "mode": "collect",
       "optional": false,
-      "status": "ok",
-      "unchanged": false,
+      "status": "cached",
+      "unchanged": true,
       "count": 25,
       "freshCount": 25,
       "attempts": 1,
-      "durationMs": 4238,
+      "durationMs": 4518,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -745,9 +751,9 @@
       "count": 32,
       "freshCount": 32,
       "attempts": 1,
-      "durationMs": 5235,
+      "durationMs": 4549,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -760,9 +766,9 @@
       "count": 78,
       "freshCount": 78,
       "attempts": 1,
-      "durationMs": 65655,
+      "durationMs": 4814,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -775,9 +781,9 @@
       "count": 65,
       "freshCount": 65,
       "attempts": 1,
-      "durationMs": 20473,
+      "durationMs": 6629,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -790,9 +796,9 @@
       "count": 6,
       "freshCount": 6,
       "attempts": 1,
-      "durationMs": 11906,
+      "durationMs": 2009,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -802,12 +808,12 @@
       "optional": false,
       "status": "ok",
       "unchanged": false,
-      "count": 60,
-      "freshCount": 60,
+      "count": 59,
+      "freshCount": 59,
       "attempts": 1,
-      "durationMs": 2562,
+      "durationMs": 5032,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -817,12 +823,12 @@
       "optional": false,
       "status": "ok",
       "unchanged": false,
-      "count": 125,
-      "freshCount": 125,
+      "count": 127,
+      "freshCount": 127,
       "attempts": 1,
-      "durationMs": 5581,
+      "durationMs": 5577,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -834,10 +840,10 @@
       "unchanged": false,
       "count": 121,
       "freshCount": 121,
-      "attempts": 1,
-      "durationMs": 5190,
+      "attempts": 2,
+      "durationMs": 24146,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -850,9 +856,9 @@
       "count": 36,
       "freshCount": 36,
       "attempts": 1,
-      "durationMs": 7365,
+      "durationMs": 7986,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -865,9 +871,9 @@
       "count": 31,
       "freshCount": 31,
       "attempts": 1,
-      "durationMs": 5285,
+      "durationMs": 2494,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -877,12 +883,12 @@
       "optional": false,
       "status": "ok",
       "unchanged": false,
-      "count": 28,
-      "freshCount": 28,
+      "count": 29,
+      "freshCount": 29,
       "attempts": 1,
-      "durationMs": 3109,
+      "durationMs": 4813,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -894,10 +900,10 @@
       "unchanged": false,
       "count": 106,
       "freshCount": 106,
-      "attempts": 2,
-      "durationMs": 36540,
+      "attempts": 1,
+      "durationMs": 6272,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -905,30 +911,29 @@
       "company": "上海银行",
       "mode": "collect",
       "optional": false,
-      "status": "skipped",
-      "unchanged": true,
-      "skipped": true,
+      "status": "stale",
+      "unchanged": false,
       "count": 53,
       "freshCount": 0,
-      "attempts": 0,
-      "durationMs": 0,
-      "consecutiveFailures": 10,
+      "attempts": 1,
+      "durationMs": 2310,
+      "consecutiveFailures": 11,
       "lastSuccessAt": "2026-11-22T04:15:34.357Z",
-      "lastFailureAt": "2026-11-25T01:54:46.123Z"
+      "lastFailureAt": "2026-11-26T01:21:25.699Z"
     },
     {
       "key": "beisen-9air",
       "company": "九元航空",
       "mode": "collect",
       "optional": false,
-      "status": "ok",
-      "unchanged": false,
+      "status": "cached",
+      "unchanged": true,
       "count": 6,
       "freshCount": 6,
       "attempts": 1,
-      "durationMs": 3476,
+      "durationMs": 4219,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -936,14 +941,14 @@
       "company": "湖北星辰",
       "mode": "collect",
       "optional": false,
-      "status": "cached",
-      "unchanged": true,
+      "status": "ok",
+      "unchanged": false,
       "count": 51,
       "freshCount": 51,
       "attempts": 1,
-      "durationMs": 5753,
+      "durationMs": 2502,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -956,9 +961,9 @@
       "count": 44,
       "freshCount": 44,
       "attempts": 1,
-      "durationMs": 3438,
+      "durationMs": 4054,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -966,14 +971,14 @@
       "company": "360集团",
       "mode": "collect",
       "optional": false,
-      "status": "cached",
-      "unchanged": true,
+      "status": "ok",
+      "unchanged": false,
       "count": 27,
       "freshCount": 27,
-      "attempts": 2,
-      "durationMs": 7365,
+      "attempts": 1,
+      "durationMs": 2320,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -986,9 +991,9 @@
       "count": 144,
       "freshCount": 144,
       "attempts": 1,
-      "durationMs": 3790,
+      "durationMs": 6439,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -1001,9 +1006,9 @@
       "count": 33,
       "freshCount": 33,
       "attempts": 1,
-      "durationMs": 3638,
+      "durationMs": 4399,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -1016,9 +1021,9 @@
       "count": 61,
       "freshCount": 61,
       "attempts": 1,
-      "durationMs": 3695,
+      "durationMs": 3916,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -1031,9 +1036,9 @@
       "count": 49,
       "freshCount": 49,
       "attempts": 1,
-      "durationMs": 4723,
+      "durationMs": 18350,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -1041,14 +1046,14 @@
       "company": "广东华兴银行",
       "mode": "collect",
       "optional": false,
-      "status": "ok",
-      "unchanged": false,
+      "status": "cached",
+      "unchanged": true,
       "count": 13,
       "freshCount": 13,
       "attempts": 1,
-      "durationMs": 4654,
+      "durationMs": 3151,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -1061,9 +1066,9 @@
       "count": 58,
       "freshCount": 58,
       "attempts": 1,
-      "durationMs": 5066,
+      "durationMs": 5011,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -1076,9 +1081,9 @@
       "count": 108,
       "freshCount": 108,
       "attempts": 1,
-      "durationMs": 17682,
+      "durationMs": 25609,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -1088,12 +1093,12 @@
       "optional": false,
       "status": "ok",
       "unchanged": false,
-      "count": 221,
-      "freshCount": 221,
+      "count": 220,
+      "freshCount": 220,
       "attempts": 1,
-      "durationMs": 6821,
+      "durationMs": 7991,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -1101,14 +1106,14 @@
       "company": "近岸蛋白",
       "mode": "collect",
       "optional": false,
-      "status": "cached",
-      "unchanged": true,
+      "status": "ok",
+      "unchanged": false,
       "count": 6,
       "freshCount": 6,
       "attempts": 1,
-      "durationMs": 3550,
+      "durationMs": 4579,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -1121,9 +1126,9 @@
       "count": 25,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 8143,
+      "durationMs": 13488,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -1136,9 +1141,9 @@
       "count": 22,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 9809,
+      "durationMs": 11043,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -1146,14 +1151,14 @@
       "company": "卓识私募",
       "mode": "browser",
       "optional": false,
-      "status": "cached",
-      "unchanged": true,
-      "count": 18,
-      "freshCount": 0,
+      "status": "ok",
+      "unchanged": false,
+      "count": 19,
+      "freshCount": 19,
       "attempts": 1,
-      "durationMs": 7555,
+      "durationMs": 7832,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -1166,9 +1171,9 @@
       "count": 31,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 16684,
+      "durationMs": 16829,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -1181,9 +1186,9 @@
       "count": 21,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 6546,
+      "durationMs": 11662,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -1196,9 +1201,9 @@
       "count": 11,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 7792,
+      "durationMs": 10477,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -1206,14 +1211,14 @@
       "company": "徕芬",
       "mode": "browser",
       "optional": false,
-      "status": "cached",
-      "unchanged": true,
-      "count": 21,
-      "freshCount": 21,
+      "status": "ok",
+      "unchanged": false,
+      "count": 22,
+      "freshCount": 22,
       "attempts": 1,
-      "durationMs": 7855,
+      "durationMs": 7990,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -1226,9 +1231,9 @@
       "count": 51,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 14935,
+      "durationMs": 15545,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -1241,9 +1246,9 @@
       "count": 15,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 7933,
+      "durationMs": 10980,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -1256,9 +1261,9 @@
       "count": 34,
       "freshCount": 34,
       "attempts": 1,
-      "durationMs": 13022,
+      "durationMs": 13239,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -1271,9 +1276,9 @@
       "count": 50,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 17915,
+      "durationMs": 19131,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -1286,9 +1291,9 @@
       "count": 3,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 11544,
+      "durationMs": 9851,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -1301,9 +1306,9 @@
       "count": 15,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 11875,
+      "durationMs": 9263,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -1311,14 +1316,14 @@
       "company": "珠海万达商管",
       "mode": "browser",
       "optional": false,
-      "status": "cached",
-      "unchanged": true,
-      "count": 172,
-      "freshCount": 0,
+      "status": "ok",
+      "unchanged": false,
+      "count": 173,
+      "freshCount": 173,
       "attempts": 1,
-      "durationMs": 25266,
+      "durationMs": 21216,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -1331,9 +1336,9 @@
       "count": 19,
       "freshCount": 19,
       "attempts": 1,
-      "durationMs": 1947,
+      "durationMs": 4275,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -1346,9 +1351,9 @@
       "count": 79,
       "freshCount": 79,
       "attempts": 1,
-      "durationMs": 5655,
+      "durationMs": 5929,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -1358,12 +1363,12 @@
       "optional": false,
       "status": "ok",
       "unchanged": false,
-      "count": 307,
-      "freshCount": 307,
-      "attempts": 1,
-      "durationMs": 8646,
+      "count": 306,
+      "freshCount": 306,
+      "attempts": 2,
+      "durationMs": 23931,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -1376,9 +1381,9 @@
       "count": 8,
       "freshCount": 8,
       "attempts": 1,
-      "durationMs": 4854,
+      "durationMs": 4554,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -1391,9 +1396,9 @@
       "count": 213,
       "freshCount": 213,
       "attempts": 1,
-      "durationMs": 7002,
+      "durationMs": 9104,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -1406,9 +1411,9 @@
       "count": 76,
       "freshCount": 76,
       "attempts": 1,
-      "durationMs": 4175,
+      "durationMs": 4972,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -1421,9 +1426,9 @@
       "count": 92,
       "freshCount": 92,
       "attempts": 1,
-      "durationMs": 4447,
+      "durationMs": 3743,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -1433,12 +1438,12 @@
       "optional": false,
       "status": "ok",
       "unchanged": false,
-      "count": 2029,
-      "freshCount": 2029,
-      "attempts": 1,
-      "durationMs": 22032,
+      "count": 2042,
+      "freshCount": 2042,
+      "attempts": 2,
+      "durationMs": 40180,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": "2026-11-24T07:37:04.845Z"
     },
     {
@@ -1448,12 +1453,12 @@
       "optional": false,
       "status": "ok",
       "unchanged": false,
-      "count": 861,
-      "freshCount": 861,
+      "count": 867,
+      "freshCount": 867,
       "attempts": 1,
-      "durationMs": 31010,
+      "durationMs": 24908,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": "2026-11-24T06:20:18.752Z"
     },
     {
@@ -1466,9 +1471,9 @@
       "count": 43,
       "freshCount": 43,
       "attempts": 1,
-      "durationMs": 4828,
+      "durationMs": 21959,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -1478,12 +1483,12 @@
       "optional": false,
       "status": "ok",
       "unchanged": false,
-      "count": 609,
-      "freshCount": 609,
-      "attempts": 2,
-      "durationMs": 29663,
+      "count": 610,
+      "freshCount": 610,
+      "attempts": 1,
+      "durationMs": 13854,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -1496,9 +1501,9 @@
       "count": 77,
       "freshCount": 77,
       "attempts": 1,
-      "durationMs": 6719,
+      "durationMs": 2685,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -1506,14 +1511,14 @@
       "company": "华东勘测设计研究院",
       "mode": "collect",
       "optional": false,
-      "status": "cached",
-      "unchanged": true,
+      "status": "ok",
+      "unchanged": false,
       "count": 82,
       "freshCount": 82,
       "attempts": 1,
-      "durationMs": 4520,
+      "durationMs": 7672,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -1521,14 +1526,14 @@
       "company": "移远通信",
       "mode": "browser",
       "optional": false,
-      "status": "cached",
-      "unchanged": true,
-      "count": 114,
-      "freshCount": 114,
+      "status": "ok",
+      "unchanged": false,
+      "count": 123,
+      "freshCount": 123,
       "attempts": 1,
-      "durationMs": 9671,
+      "durationMs": 17172,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -1541,9 +1546,9 @@
       "count": 88,
       "freshCount": 88,
       "attempts": 1,
-      "durationMs": 8898,
+      "durationMs": 12318,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": "2026-11-24T03:38:07.950Z"
     },
     {
@@ -1556,9 +1561,9 @@
       "count": 8,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 11383,
+      "durationMs": 10582,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -1571,9 +1576,9 @@
       "count": 14,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 11897,
+      "durationMs": 8930,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -1586,9 +1591,9 @@
       "count": 171,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 17267,
+      "durationMs": 22716,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -1596,14 +1601,14 @@
       "company": "兆易创新",
       "mode": "browser",
       "optional": false,
-      "status": "cached",
-      "unchanged": true,
-      "count": 25,
-      "freshCount": 25,
+      "status": "ok",
+      "unchanged": false,
+      "count": 23,
+      "freshCount": 23,
       "attempts": 1,
-      "durationMs": 8221,
+      "durationMs": 7036,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -1616,9 +1621,9 @@
       "count": 5,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 11527,
+      "durationMs": 9353,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -1626,14 +1631,14 @@
       "company": "安踏集团",
       "mode": "browser",
       "optional": false,
-      "status": "cached",
-      "unchanged": true,
+      "status": "ok",
+      "unchanged": false,
       "count": 175,
-      "freshCount": 0,
+      "freshCount": 175,
       "attempts": 1,
-      "durationMs": 16313,
+      "durationMs": 14815,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": "2026-11-22T04:21:04.501Z"
     },
     {
@@ -1646,9 +1651,9 @@
       "count": 95,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 10023,
+      "durationMs": 9835,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -1661,9 +1666,9 @@
       "count": 22,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 11301,
+      "durationMs": 9767,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -1676,9 +1681,9 @@
       "count": 19,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 9549,
+      "durationMs": 15379,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -1691,9 +1696,9 @@
       "count": 28,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 8412,
+      "durationMs": 11302,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -1706,9 +1711,9 @@
       "count": 11,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 7182,
+      "durationMs": 9007,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -1721,9 +1726,9 @@
       "count": 15,
       "freshCount": 15,
       "attempts": 1,
-      "durationMs": 3058,
+      "durationMs": 3201,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -1735,10 +1740,10 @@
       "unchanged": false,
       "count": 6,
       "freshCount": 6,
-      "attempts": 2,
-      "durationMs": 22018,
+      "attempts": 1,
+      "durationMs": 18029,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -1750,10 +1755,10 @@
       "unchanged": false,
       "count": 53,
       "freshCount": 53,
-      "attempts": 2,
-      "durationMs": 21677,
+      "attempts": 1,
+      "durationMs": 21601,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -1765,10 +1770,10 @@
       "unchanged": false,
       "count": 53,
       "freshCount": 53,
-      "attempts": 2,
-      "durationMs": 70296,
+      "attempts": 1,
+      "durationMs": 5909,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -1780,10 +1785,10 @@
       "unchanged": false,
       "count": 118,
       "freshCount": 118,
-      "attempts": 1,
-      "durationMs": 5344,
+      "attempts": 2,
+      "durationMs": 7927,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": "2026-11-24T10:34:12.847Z"
     },
     {
@@ -1796,9 +1801,9 @@
       "count": 42,
       "freshCount": 42,
       "attempts": 1,
-      "durationMs": 4345,
+      "durationMs": 3852,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -1811,9 +1816,9 @@
       "count": 89,
       "freshCount": 89,
       "attempts": 1,
-      "durationMs": 4180,
+      "durationMs": 4490,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -1826,9 +1831,9 @@
       "count": 20,
       "freshCount": 20,
       "attempts": 1,
-      "durationMs": 2330,
+      "durationMs": 19571,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -1841,9 +1846,9 @@
       "count": 8,
       "freshCount": 8,
       "attempts": 1,
-      "durationMs": 2508,
+      "durationMs": 4523,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -1856,9 +1861,9 @@
       "count": 17,
       "freshCount": 17,
       "attempts": 1,
-      "durationMs": 2316,
+      "durationMs": 3823,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -1866,14 +1871,14 @@
       "company": "君乐宝",
       "mode": "collect",
       "optional": false,
-      "status": "cached",
-      "unchanged": true,
+      "status": "ok",
+      "unchanged": false,
       "count": 21,
       "freshCount": 21,
       "attempts": 1,
-      "durationMs": 4074,
+      "durationMs": 3641,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -1886,9 +1891,9 @@
       "count": 9,
       "freshCount": 9,
       "attempts": 1,
-      "durationMs": 5004,
+      "durationMs": 13333,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -1898,12 +1903,12 @@
       "optional": false,
       "status": "ok",
       "unchanged": false,
-      "count": 1193,
-      "freshCount": 1193,
+      "count": 1190,
+      "freshCount": 1190,
       "attempts": 1,
-      "durationMs": 13579,
+      "durationMs": 15303,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": "2026-11-24T10:34:02.644Z"
     },
     {
@@ -1911,14 +1916,14 @@
       "company": "TCL中环",
       "mode": "collect",
       "optional": false,
-      "status": "ok",
-      "unchanged": false,
+      "status": "cached",
+      "unchanged": true,
       "count": 10,
       "freshCount": 10,
       "attempts": 1,
-      "durationMs": 5190,
+      "durationMs": 4502,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -1931,9 +1936,9 @@
       "count": 37,
       "freshCount": 37,
       "attempts": 1,
-      "durationMs": 6856,
+      "durationMs": 10510,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -1946,9 +1951,9 @@
       "count": 105,
       "freshCount": 105,
       "attempts": 1,
-      "durationMs": 9903,
+      "durationMs": 11260,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -1961,9 +1966,9 @@
       "count": 19,
       "freshCount": 19,
       "attempts": 1,
-      "durationMs": 9420,
+      "durationMs": 6100,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -1974,11 +1979,11 @@
       "status": "cached",
       "unchanged": true,
       "count": 69,
-      "freshCount": 69,
+      "freshCount": 0,
       "attempts": 1,
-      "durationMs": 12476,
+      "durationMs": 13081,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -1991,9 +1996,9 @@
       "count": 39,
       "freshCount": 39,
       "attempts": 1,
-      "durationMs": 6174,
+      "durationMs": 11660,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -2006,9 +2011,9 @@
       "count": 7,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 12027,
+      "durationMs": 9269,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -2021,9 +2026,9 @@
       "count": 15,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 10794,
+      "durationMs": 11953,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -2036,9 +2041,9 @@
       "count": 12,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 7497,
+      "durationMs": 11243,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -2051,9 +2056,9 @@
       "count": 5,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 9073,
+      "durationMs": 8079,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -2066,9 +2071,9 @@
       "count": 8,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 9265,
+      "durationMs": 8019,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -2081,9 +2086,9 @@
       "count": 41,
       "freshCount": 41,
       "attempts": 1,
-      "durationMs": 19056,
+      "durationMs": 21323,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -2096,9 +2101,9 @@
       "count": 7,
       "freshCount": 7,
       "attempts": 1,
-      "durationMs": 8282,
+      "durationMs": 2677,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -2106,14 +2111,14 @@
       "company": "中冶建筑研究总院",
       "mode": "collect",
       "optional": false,
-      "status": "cached",
-      "unchanged": true,
+      "status": "ok",
+      "unchanged": false,
       "count": 22,
       "freshCount": 22,
       "attempts": 1,
-      "durationMs": 3318,
+      "durationMs": 4345,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -2126,9 +2131,9 @@
       "count": 53,
       "freshCount": 53,
       "attempts": 1,
-      "durationMs": 4520,
+      "durationMs": 4768,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -2140,10 +2145,10 @@
       "unchanged": false,
       "count": 4,
       "freshCount": 4,
-      "attempts": 1,
-      "durationMs": 3787,
+      "attempts": 2,
+      "durationMs": 7671,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -2156,9 +2161,9 @@
       "count": 10,
       "freshCount": 10,
       "attempts": 1,
-      "durationMs": 3240,
+      "durationMs": 3599,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -2171,9 +2176,9 @@
       "count": 11,
       "freshCount": 11,
       "attempts": 1,
-      "durationMs": 3158,
+      "durationMs": 4472,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -2186,9 +2191,9 @@
       "count": 13,
       "freshCount": 13,
       "attempts": 1,
-      "durationMs": 16363,
+      "durationMs": 2957,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -2201,9 +2206,9 @@
       "count": 57,
       "freshCount": 57,
       "attempts": 1,
-      "durationMs": 5373,
+      "durationMs": 4504,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -2211,14 +2216,14 @@
       "company": "国瓷材料",
       "mode": "collect",
       "optional": false,
-      "status": "ok",
-      "unchanged": false,
+      "status": "cached",
+      "unchanged": true,
       "count": 2,
       "freshCount": 2,
       "attempts": 1,
-      "durationMs": 3828,
+      "durationMs": 2771,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -2230,10 +2235,10 @@
       "unchanged": false,
       "count": 144,
       "freshCount": 144,
-      "attempts": 1,
-      "durationMs": 6457,
+      "attempts": 2,
+      "durationMs": 43149,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -2246,9 +2251,9 @@
       "count": 109,
       "freshCount": 109,
       "attempts": 1,
-      "durationMs": 6138,
+      "durationMs": 6045,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -2261,9 +2266,9 @@
       "count": 9,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 9080,
+      "durationMs": 9253,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -2276,9 +2281,9 @@
       "count": 32,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 10661,
+      "durationMs": 12275,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -2291,9 +2296,9 @@
       "count": 11,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 9500,
+      "durationMs": 8509,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -2306,9 +2311,9 @@
       "count": 17,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 9226,
+      "durationMs": 10567,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -2321,9 +2326,9 @@
       "count": 38,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 9596,
+      "durationMs": 10451,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -2336,9 +2341,9 @@
       "count": 54,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 12214,
+      "durationMs": 12252,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": "2026-11-24T04:47:21.673Z"
     },
     {
@@ -2351,9 +2356,9 @@
       "count": 45,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 9840,
+      "durationMs": 8975,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -2361,14 +2366,14 @@
       "company": "顾家家居",
       "mode": "browser",
       "optional": false,
-      "status": "cached",
-      "unchanged": true,
-      "count": 39,
-      "freshCount": 0,
+      "status": "ok",
+      "unchanged": false,
+      "count": 37,
+      "freshCount": 37,
       "attempts": 1,
-      "durationMs": 10639,
+      "durationMs": 7186,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -2381,9 +2386,9 @@
       "count": 16,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 8944,
+      "durationMs": 7296,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -2396,9 +2401,9 @@
       "count": 82,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 10740,
+      "durationMs": 13388,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -2411,9 +2416,9 @@
       "count": 5,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 8545,
+      "durationMs": 6669,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -2426,9 +2431,9 @@
       "count": 7,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 8364,
+      "durationMs": 5625,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -2441,9 +2446,9 @@
       "count": 51,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 8569,
+      "durationMs": 12200,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -2456,9 +2461,9 @@
       "count": 10,
       "freshCount": 10,
       "attempts": 1,
-      "durationMs": 2411,
+      "durationMs": 4655,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": "2026-11-24T07:37:16.453Z"
     },
     {
@@ -2471,9 +2476,9 @@
       "count": 9,
       "freshCount": 9,
       "attempts": 1,
-      "durationMs": 4794,
+      "durationMs": 3991,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -2486,9 +2491,9 @@
       "count": 20,
       "freshCount": 20,
       "attempts": 1,
-      "durationMs": 3673,
+      "durationMs": 7112,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -2496,14 +2501,14 @@
       "company": "上汽大通",
       "mode": "collect",
       "optional": false,
-      "status": "ok",
-      "unchanged": false,
+      "status": "cached",
+      "unchanged": true,
       "count": 6,
       "freshCount": 6,
       "attempts": 1,
-      "durationMs": 4666,
+      "durationMs": 6142,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -2516,9 +2521,9 @@
       "count": 446,
       "freshCount": 446,
       "attempts": 1,
-      "durationMs": 8908,
+      "durationMs": 10131,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -2530,10 +2535,10 @@
       "unchanged": false,
       "count": 149,
       "freshCount": 149,
-      "attempts": 1,
-      "durationMs": 19356,
+      "attempts": 2,
+      "durationMs": 21738,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -2545,10 +2550,10 @@
       "unchanged": true,
       "count": 8,
       "freshCount": 8,
-      "attempts": 1,
-      "durationMs": 2682,
+      "attempts": 2,
+      "durationMs": 7099,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -2561,9 +2566,9 @@
       "count": 11,
       "freshCount": 11,
       "attempts": 1,
-      "durationMs": 3533,
+      "durationMs": 6324,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -2576,9 +2581,9 @@
       "count": 40,
       "freshCount": 40,
       "attempts": 1,
-      "durationMs": 17775,
+      "durationMs": 4465,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": "2026-11-24T10:34:02.644Z"
     },
     {
@@ -2591,9 +2596,9 @@
       "count": 11,
       "freshCount": 11,
       "attempts": 1,
-      "durationMs": 2965,
+      "durationMs": 4424,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -2606,9 +2611,9 @@
       "count": 26,
       "freshCount": 26,
       "attempts": 1,
-      "durationMs": 2448,
+      "durationMs": 3469,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -2621,9 +2626,9 @@
       "count": 11,
       "freshCount": 11,
       "attempts": 1,
-      "durationMs": 4188,
+      "durationMs": 5262,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -2636,9 +2641,9 @@
       "count": 17,
       "freshCount": 17,
       "attempts": 1,
-      "durationMs": 17747,
+      "durationMs": 2770,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -2651,9 +2656,9 @@
       "count": 27,
       "freshCount": 27,
       "attempts": 1,
-      "durationMs": 4341,
+      "durationMs": 2991,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -2666,9 +2671,9 @@
       "count": 21,
       "freshCount": 21,
       "attempts": 1,
-      "durationMs": 3465,
+      "durationMs": 2993,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -2681,9 +2686,9 @@
       "count": 3,
       "freshCount": 3,
       "attempts": 1,
-      "durationMs": 2700,
+      "durationMs": 2571,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -2696,9 +2701,9 @@
       "count": 180,
       "freshCount": 180,
       "attempts": 1,
-      "durationMs": 5819,
+      "durationMs": 6007,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -2711,9 +2716,9 @@
       "count": 24,
       "freshCount": 24,
       "attempts": 1,
-      "durationMs": 3162,
+      "durationMs": 5305,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -2726,9 +2731,9 @@
       "count": 9,
       "freshCount": 9,
       "attempts": 1,
-      "durationMs": 3351,
+      "durationMs": 2388,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -2741,9 +2746,9 @@
       "count": 12,
       "freshCount": 12,
       "attempts": 1,
-      "durationMs": 3292,
+      "durationMs": 4085,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -2756,9 +2761,9 @@
       "count": 23,
       "freshCount": 23,
       "attempts": 1,
-      "durationMs": 4562,
+      "durationMs": 4835,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -2770,10 +2775,10 @@
       "unchanged": true,
       "count": 57,
       "freshCount": 57,
-      "attempts": 1,
-      "durationMs": 4388,
+      "attempts": 2,
+      "durationMs": 22009,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": "2026-11-24T01:27:29.293Z"
     },
     {
@@ -2783,12 +2788,12 @@
       "optional": false,
       "status": "ok",
       "unchanged": false,
-      "count": 93,
-      "freshCount": 93,
+      "count": 92,
+      "freshCount": 92,
       "attempts": 1,
-      "durationMs": 4474,
+      "durationMs": 6839,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -2796,14 +2801,14 @@
       "company": "得力集团",
       "mode": "browser",
       "optional": false,
-      "status": "cached",
-      "unchanged": true,
-      "count": 31,
-      "freshCount": 0,
+      "status": "ok",
+      "unchanged": false,
+      "count": 29,
+      "freshCount": 29,
       "attempts": 1,
-      "durationMs": 7473,
+      "durationMs": 5218,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -2816,9 +2821,9 @@
       "count": 31,
       "freshCount": 31,
       "attempts": 1,
-      "durationMs": 5322,
+      "durationMs": 6788,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -2831,9 +2836,9 @@
       "count": 9,
       "freshCount": 9,
       "attempts": 1,
-      "durationMs": 2967,
+      "durationMs": 3806,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -2841,14 +2846,14 @@
       "company": "青蛙王子",
       "mode": "collect",
       "optional": false,
-      "status": "ok",
-      "unchanged": false,
+      "status": "cached",
+      "unchanged": true,
       "count": 11,
       "freshCount": 11,
       "attempts": 1,
-      "durationMs": 4803,
+      "durationMs": 3519,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -2856,14 +2861,14 @@
       "company": "新产业生物",
       "mode": "collect",
       "optional": false,
-      "status": "ok",
-      "unchanged": false,
+      "status": "cached",
+      "unchanged": true,
       "count": 19,
       "freshCount": 19,
       "attempts": 1,
-      "durationMs": 5348,
+      "durationMs": 3123,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": "2026-11-25T01:37:59.554Z"
     },
     {
@@ -2876,9 +2881,9 @@
       "count": 65,
       "freshCount": 65,
       "attempts": 1,
-      "durationMs": 4457,
+      "durationMs": 4417,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -2891,9 +2896,9 @@
       "count": 23,
       "freshCount": 23,
       "attempts": 1,
-      "durationMs": 2186,
+      "durationMs": 3865,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -2906,9 +2911,9 @@
       "count": 6,
       "freshCount": 6,
       "attempts": 1,
-      "durationMs": 3933,
+      "durationMs": 4632,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -2921,9 +2926,9 @@
       "count": 10,
       "freshCount": 10,
       "attempts": 1,
-      "durationMs": 3237,
+      "durationMs": 3344,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -2936,9 +2941,9 @@
       "count": 14,
       "freshCount": 14,
       "attempts": 1,
-      "durationMs": 4264,
+      "durationMs": 2481,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -2946,14 +2951,14 @@
       "company": "振石控股",
       "mode": "collect",
       "optional": false,
-      "status": "ok",
-      "unchanged": false,
+      "status": "cached",
+      "unchanged": true,
       "count": 25,
       "freshCount": 25,
       "attempts": 1,
-      "durationMs": 5016,
+      "durationMs": 6898,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -2963,12 +2968,12 @@
       "optional": false,
       "status": "ok",
       "unchanged": false,
-      "count": 30,
-      "freshCount": 30,
+      "count": 32,
+      "freshCount": 32,
       "attempts": 1,
-      "durationMs": 4437,
+      "durationMs": 3751,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -2976,14 +2981,14 @@
       "company": "纵横股份",
       "mode": "collect",
       "optional": false,
-      "status": "cached",
-      "unchanged": true,
+      "status": "ok",
+      "unchanged": false,
       "count": 24,
       "freshCount": 24,
       "attempts": 1,
-      "durationMs": 4213,
+      "durationMs": 3136,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -2996,9 +3001,9 @@
       "count": 28,
       "freshCount": 28,
       "attempts": 1,
-      "durationMs": 4488,
+      "durationMs": 3616,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -3010,10 +3015,10 @@
       "unchanged": true,
       "count": 2,
       "freshCount": 2,
-      "attempts": 1,
-      "durationMs": 2618,
+      "attempts": 2,
+      "durationMs": 5785,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -3026,9 +3031,9 @@
       "count": 11,
       "freshCount": 11,
       "attempts": 1,
-      "durationMs": 2508,
+      "durationMs": 4906,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -3041,9 +3046,9 @@
       "count": 24,
       "freshCount": 24,
       "attempts": 1,
-      "durationMs": 4665,
+      "durationMs": 3704,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -3051,14 +3056,14 @@
       "company": "石头科技",
       "mode": "collect",
       "optional": false,
-      "status": "cached",
-      "unchanged": true,
+      "status": "ok",
+      "unchanged": false,
       "count": 41,
       "freshCount": 41,
       "attempts": 1,
-      "durationMs": 3511,
+      "durationMs": 2432,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -3066,14 +3071,14 @@
       "company": "追觅科技",
       "mode": "collect",
       "optional": false,
-      "status": "ok",
-      "unchanged": false,
+      "status": "cached",
+      "unchanged": true,
       "count": 76,
       "freshCount": 76,
       "attempts": 1,
-      "durationMs": 4710,
+      "durationMs": 4465,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -3086,9 +3091,9 @@
       "count": 5,
       "freshCount": 5,
       "attempts": 1,
-      "durationMs": 5054,
+      "durationMs": 4229,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -3100,10 +3105,10 @@
       "unchanged": true,
       "count": 213,
       "freshCount": 213,
-      "attempts": 2,
-      "durationMs": 22370,
+      "attempts": 1,
+      "durationMs": 6824,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -3116,9 +3121,9 @@
       "count": 73,
       "freshCount": 73,
       "attempts": 1,
-      "durationMs": 17629,
+      "durationMs": 4118,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -3131,9 +3136,9 @@
       "count": 20,
       "freshCount": 20,
       "attempts": 1,
-      "durationMs": 16796,
+      "durationMs": 3626,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -3146,9 +3151,9 @@
       "count": 17,
       "freshCount": 17,
       "attempts": 1,
-      "durationMs": 19446,
+      "durationMs": 6423,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -3160,10 +3165,10 @@
       "unchanged": false,
       "count": 98,
       "freshCount": 98,
-      "attempts": 2,
-      "durationMs": 22544,
+      "attempts": 1,
+      "durationMs": 7671,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -3171,14 +3176,14 @@
       "company": "以岭药业",
       "mode": "collect",
       "optional": false,
-      "status": "ok",
-      "unchanged": false,
+      "status": "cached",
+      "unchanged": true,
       "count": 49,
       "freshCount": 49,
       "attempts": 1,
-      "durationMs": 4561,
+      "durationMs": 4721,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -3191,9 +3196,9 @@
       "count": 83,
       "freshCount": 83,
       "attempts": 1,
-      "durationMs": 5858,
+      "durationMs": 4142,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -3206,9 +3211,9 @@
       "count": 5,
       "freshCount": 5,
       "attempts": 1,
-      "durationMs": 3484,
+      "durationMs": 3497,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -3216,14 +3221,14 @@
       "company": "三元食品",
       "mode": "collect",
       "optional": false,
-      "status": "ok",
-      "unchanged": false,
+      "status": "cached",
+      "unchanged": true,
       "count": 6,
       "freshCount": 6,
       "attempts": 1,
-      "durationMs": 3558,
+      "durationMs": 3966,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -3231,14 +3236,14 @@
       "company": "旺旺",
       "mode": "collect",
       "optional": false,
-      "status": "cached",
-      "unchanged": true,
+      "status": "ok",
+      "unchanged": false,
       "count": 3,
       "freshCount": 3,
       "attempts": 1,
-      "durationMs": 2923,
+      "durationMs": 2457,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -3251,9 +3256,9 @@
       "count": 3,
       "freshCount": 3,
       "attempts": 1,
-      "durationMs": 3548,
+      "durationMs": 3598,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -3261,14 +3266,14 @@
       "company": "芯海科技",
       "mode": "collect",
       "optional": false,
-      "status": "ok",
-      "unchanged": false,
+      "status": "cached",
+      "unchanged": true,
       "count": 20,
       "freshCount": 20,
       "attempts": 1,
-      "durationMs": 3387,
+      "durationMs": 8964,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -3276,14 +3281,14 @@
       "company": "基本半导体",
       "mode": "collect",
       "optional": false,
-      "status": "cached",
-      "unchanged": true,
+      "status": "ok",
+      "unchanged": false,
       "count": 9,
       "freshCount": 9,
       "attempts": 1,
-      "durationMs": 3078,
+      "durationMs": 4877,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -3296,9 +3301,9 @@
       "count": 54,
       "freshCount": 54,
       "attempts": 1,
-      "durationMs": 3334,
+      "durationMs": 4394,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -3311,9 +3316,9 @@
       "count": 1,
       "freshCount": 1,
       "attempts": 1,
-      "durationMs": 2717,
+      "durationMs": 2701,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -3326,9 +3331,9 @@
       "count": 21,
       "freshCount": 21,
       "attempts": 1,
-      "durationMs": 3182,
+      "durationMs": 3602,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -3340,10 +3345,10 @@
       "unchanged": true,
       "count": 2,
       "freshCount": 2,
-      "attempts": 2,
-      "durationMs": 30311,
+      "attempts": 1,
+      "durationMs": 3678,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -3353,12 +3358,12 @@
       "optional": false,
       "status": "ok",
       "unchanged": false,
-      "count": 413,
-      "freshCount": 413,
+      "count": 402,
+      "freshCount": 402,
       "attempts": 1,
-      "durationMs": 11621,
+      "durationMs": 14349,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -3371,9 +3376,9 @@
       "count": 60,
       "freshCount": 0,
       "attempts": 1,
-      "durationMs": 11372,
+      "durationMs": 12123,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": "2026-11-22T04:50:09.183Z"
     },
     {
@@ -3381,14 +3386,14 @@
       "company": "比亚迪",
       "mode": "collect",
       "optional": false,
-      "status": "cached",
-      "unchanged": true,
-      "count": 376,
-      "freshCount": 376,
+      "status": "ok",
+      "unchanged": false,
+      "count": 374,
+      "freshCount": 374,
       "attempts": 1,
-      "durationMs": 4539,
+      "durationMs": 5374,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -3401,9 +3406,9 @@
       "count": 35,
       "freshCount": 35,
       "attempts": 1,
-      "durationMs": 2291,
+      "durationMs": 2029,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -3413,12 +3418,12 @@
       "optional": false,
       "status": "ok",
       "unchanged": false,
-      "count": 27,
-      "freshCount": 27,
+      "count": 28,
+      "freshCount": 28,
       "attempts": 1,
-      "durationMs": 19177,
+      "durationMs": 4907,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -3431,9 +3436,9 @@
       "count": 24,
       "freshCount": 24,
       "attempts": 1,
-      "durationMs": 4731,
+      "durationMs": 20426,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -3446,9 +3451,9 @@
       "count": 2,
       "freshCount": 2,
       "attempts": 1,
-      "durationMs": 4130,
+      "durationMs": 3772,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -3461,9 +3466,9 @@
       "count": 34,
       "freshCount": 34,
       "attempts": 1,
-      "durationMs": 3931,
+      "durationMs": 3505,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -3476,9 +3481,9 @@
       "count": 66,
       "freshCount": 66,
       "attempts": 1,
-      "durationMs": 3016,
+      "durationMs": 5402,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -3491,9 +3496,9 @@
       "count": 62,
       "freshCount": 62,
       "attempts": 1,
-      "durationMs": 2996,
+      "durationMs": 3951,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -3503,12 +3508,12 @@
       "optional": false,
       "status": "ok",
       "unchanged": false,
-      "count": 79,
-      "freshCount": 79,
+      "count": 78,
+      "freshCount": 78,
       "attempts": 1,
-      "durationMs": 5348,
+      "durationMs": 7538,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -3520,10 +3525,10 @@
       "unchanged": true,
       "count": 1564,
       "freshCount": 1564,
-      "attempts": 2,
-      "durationMs": 32094,
+      "attempts": 1,
+      "durationMs": 22677,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": "2026-11-24T10:33:53.924Z"
     },
     {
@@ -3531,14 +3536,14 @@
       "company": "正大天晴",
       "mode": "collect",
       "optional": false,
-      "status": "cached",
-      "unchanged": true,
+      "status": "ok",
+      "unchanged": false,
       "count": 107,
       "freshCount": 107,
       "attempts": 1,
-      "durationMs": 5151,
+      "durationMs": 7082,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -3551,9 +3556,9 @@
       "count": 23,
       "freshCount": 23,
       "attempts": 1,
-      "durationMs": 4180,
+      "durationMs": 5887,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -3566,9 +3571,9 @@
       "count": 12,
       "freshCount": 12,
       "attempts": 1,
-      "durationMs": 3612,
+      "durationMs": 6198,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -3581,9 +3586,9 @@
       "count": 140,
       "freshCount": 140,
       "attempts": 1,
-      "durationMs": 3967,
+      "durationMs": 4941,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -3596,9 +3601,9 @@
       "count": 43,
       "freshCount": 43,
       "attempts": 1,
-      "durationMs": 3845,
+      "durationMs": 5404,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -3611,9 +3616,9 @@
       "count": 43,
       "freshCount": 43,
       "attempts": 2,
-      "durationMs": 5141,
+      "durationMs": 7856,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -3626,9 +3631,9 @@
       "count": 100,
       "freshCount": 100,
       "attempts": 1,
-      "durationMs": 10316,
+      "durationMs": 18108,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -3641,9 +3646,9 @@
       "count": 107,
       "freshCount": 107,
       "attempts": 1,
-      "durationMs": 7299,
+      "durationMs": 6800,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -3656,9 +3661,9 @@
       "count": 9,
       "freshCount": 9,
       "attempts": 1,
-      "durationMs": 2889,
+      "durationMs": 8373,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -3666,14 +3671,14 @@
       "company": "泡泡玛特",
       "mode": "collect",
       "optional": false,
-      "status": "ok",
-      "unchanged": false,
+      "status": "cached",
+      "unchanged": true,
       "count": 18,
       "freshCount": 18,
       "attempts": 1,
-      "durationMs": 4453,
+      "durationMs": 4013,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -3686,9 +3691,9 @@
       "count": 11,
       "freshCount": 11,
       "attempts": 1,
-      "durationMs": 4307,
+      "durationMs": 6605,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -3701,9 +3706,9 @@
       "count": 4,
       "freshCount": 4,
       "attempts": 1,
-      "durationMs": 3842,
+      "durationMs": 6509,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -3711,14 +3716,14 @@
       "company": "齐鲁制药",
       "mode": "collect",
       "optional": false,
-      "status": "ok",
-      "unchanged": false,
+      "status": "cached",
+      "unchanged": true,
       "count": 43,
       "freshCount": 43,
       "attempts": 1,
-      "durationMs": 4051,
+      "durationMs": 3813,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -3731,9 +3736,9 @@
       "count": 26,
       "freshCount": 26,
       "attempts": 1,
-      "durationMs": 3473,
+      "durationMs": 4096,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -3746,9 +3751,9 @@
       "count": 16,
       "freshCount": 16,
       "attempts": 1,
-      "durationMs": 5244,
+      "durationMs": 19520,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": "2026-11-24T10:34:12.847Z"
     },
     {
@@ -3761,9 +3766,9 @@
       "count": 4,
       "freshCount": 4,
       "attempts": 1,
-      "durationMs": 3824,
+      "durationMs": 4362,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -3775,10 +3780,10 @@
       "unchanged": true,
       "count": 14,
       "freshCount": 14,
-      "attempts": 2,
-      "durationMs": 20293,
+      "attempts": 1,
+      "durationMs": 4889,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -3790,10 +3795,10 @@
       "unchanged": true,
       "count": 814,
       "freshCount": 814,
-      "attempts": 2,
-      "durationMs": 25337,
+      "attempts": 1,
+      "durationMs": 16221,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -3806,9 +3811,9 @@
       "count": 3,
       "freshCount": 3,
       "attempts": 1,
-      "durationMs": 18061,
+      "durationMs": 6863,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -3816,14 +3821,14 @@
       "company": "正大集团",
       "mode": "collect",
       "optional": false,
-      "status": "cached",
-      "unchanged": true,
+      "status": "ok",
+      "unchanged": false,
       "count": 371,
       "freshCount": 371,
       "attempts": 1,
-      "durationMs": 7129,
+      "durationMs": 9861,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -3833,12 +3838,12 @@
       "optional": false,
       "status": "ok",
       "unchanged": false,
-      "count": 264,
-      "freshCount": 264,
+      "count": 267,
+      "freshCount": 267,
       "attempts": 1,
-      "durationMs": 6423,
+      "durationMs": 7667,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -3851,9 +3856,9 @@
       "count": 202,
       "freshCount": 202,
       "attempts": 1,
-      "durationMs": 5720,
+      "durationMs": 7898,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -3866,9 +3871,9 @@
       "count": 144,
       "freshCount": 144,
       "attempts": 1,
-      "durationMs": 18758,
+      "durationMs": 8690,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -3881,9 +3886,9 @@
       "count": 106,
       "freshCount": 106,
       "attempts": 1,
-      "durationMs": 19075,
+      "durationMs": 4778,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -3891,14 +3896,14 @@
       "company": "上海启源芯动力",
       "mode": "collect",
       "optional": false,
-      "status": "ok",
-      "unchanged": false,
+      "status": "cached",
+      "unchanged": true,
       "count": 102,
       "freshCount": 102,
       "attempts": 1,
-      "durationMs": 5403,
+      "durationMs": 7333,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -3906,15 +3911,16 @@
       "company": "赛轮集团",
       "mode": "collect",
       "optional": false,
-      "status": "ok",
+      "status": "error",
       "unchanged": false,
       "count": 92,
-      "freshCount": 92,
+      "freshCount": 0,
       "attempts": 1,
-      "durationMs": 6037,
-      "consecutiveFailures": 0,
+      "durationMs": 90001,
+      "error": "北森来源 beisen-sailun 超过 90 秒预算",
+      "consecutiveFailures": 1,
       "lastSuccessAt": "2026-11-25T02:05:11.582Z",
-      "lastFailureAt": null
+      "lastFailureAt": "2026-11-26T01:22:38.210Z"
     },
     {
       "key": "beisen-yfpo",
@@ -3926,9 +3932,9 @@
       "count": 71,
       "freshCount": 71,
       "attempts": 1,
-      "durationMs": 4238,
+      "durationMs": 5184,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -3936,14 +3942,14 @@
       "company": "新宙邦",
       "mode": "collect",
       "optional": false,
-      "status": "cached",
-      "unchanged": true,
-      "count": 66,
-      "freshCount": 66,
+      "status": "ok",
+      "unchanged": false,
+      "count": 67,
+      "freshCount": 67,
       "attempts": 1,
-      "durationMs": 4202,
+      "durationMs": 4037,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -3955,10 +3961,10 @@
       "unchanged": true,
       "count": 65,
       "freshCount": 65,
-      "attempts": 2,
-      "durationMs": 7152,
+      "attempts": 1,
+      "durationMs": 5004,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -3970,10 +3976,10 @@
       "unchanged": false,
       "count": 63,
       "freshCount": 63,
-      "attempts": 2,
-      "durationMs": 7476,
+      "attempts": 1,
+      "durationMs": 5009,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -3986,9 +3992,9 @@
       "count": 62,
       "freshCount": 62,
       "attempts": 1,
-      "durationMs": 3778,
+      "durationMs": 4639,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -4001,9 +4007,9 @@
       "count": 48,
       "freshCount": 48,
       "attempts": 1,
-      "durationMs": 4288,
+      "durationMs": 5780,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -4011,14 +4017,14 @@
       "company": "鼎桥技术",
       "mode": "collect",
       "optional": false,
-      "status": "ok",
-      "unchanged": false,
+      "status": "cached",
+      "unchanged": true,
       "count": 49,
       "freshCount": 49,
       "attempts": 1,
-      "durationMs": 4852,
+      "durationMs": 4294,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -4031,9 +4037,9 @@
       "count": 46,
       "freshCount": 46,
       "attempts": 1,
-      "durationMs": 2680,
+      "durationMs": 4772,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -4046,9 +4052,9 @@
       "count": 46,
       "freshCount": 46,
       "attempts": 1,
-      "durationMs": 4749,
+      "durationMs": 5007,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -4061,9 +4067,9 @@
       "count": 42,
       "freshCount": 42,
       "attempts": 1,
-      "durationMs": 5125,
+      "durationMs": 5374,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -4071,15 +4077,16 @@
       "company": "中国航空综合技术研究所",
       "mode": "collect",
       "optional": false,
-      "status": "cached",
-      "unchanged": true,
+      "status": "error",
+      "unchanged": false,
       "count": 39,
-      "freshCount": 39,
+      "freshCount": 0,
       "attempts": 1,
-      "durationMs": 3287,
-      "consecutiveFailures": 0,
+      "durationMs": 90001,
+      "error": "北森来源 beisen-avic301 超过 90 秒预算",
+      "consecutiveFailures": 1,
       "lastSuccessAt": "2026-11-25T02:05:10.731Z",
-      "lastFailureAt": null
+      "lastFailureAt": "2026-11-26T01:22:38.210Z"
     },
     {
       "key": "beisen-snowvalley",
@@ -4091,9 +4098,9 @@
       "count": 38,
       "freshCount": 38,
       "attempts": 1,
-      "durationMs": 3630,
+      "durationMs": 4405,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -4101,14 +4108,14 @@
       "company": "劲牌",
       "mode": "collect",
       "optional": false,
-      "status": "cached",
-      "unchanged": true,
+      "status": "ok",
+      "unchanged": false,
       "count": 40,
       "freshCount": 40,
       "attempts": 1,
-      "durationMs": 2139,
+      "durationMs": 4451,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -4121,9 +4128,9 @@
       "count": 36,
       "freshCount": 36,
       "attempts": 1,
-      "durationMs": 4030,
+      "durationMs": 5090,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -4131,29 +4138,30 @@
       "company": "交控科技",
       "mode": "collect",
       "optional": false,
-      "status": "cached",
-      "unchanged": true,
+      "status": "error",
+      "unchanged": false,
       "count": 36,
-      "freshCount": 36,
+      "freshCount": 0,
       "attempts": 1,
-      "durationMs": 4107,
-      "consecutiveFailures": 0,
+      "durationMs": 90001,
+      "error": "北森来源 beisen-bjtct 超过 90 秒预算",
+      "consecutiveFailures": 1,
       "lastSuccessAt": "2026-11-25T02:05:10.731Z",
-      "lastFailureAt": null
+      "lastFailureAt": "2026-11-26T01:22:38.210Z"
     },
     {
       "key": "beisen-51world",
       "company": "51WORLD",
       "mode": "collect",
       "optional": false,
-      "status": "ok",
-      "unchanged": false,
+      "status": "cached",
+      "unchanged": true,
       "count": 35,
       "freshCount": 35,
       "attempts": 1,
-      "durationMs": 4360,
+      "durationMs": 4291,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -4166,9 +4174,9 @@
       "count": 33,
       "freshCount": 33,
       "attempts": 1,
-      "durationMs": 3225,
+      "durationMs": 4520,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -4181,9 +4189,9 @@
       "count": 32,
       "freshCount": 32,
       "attempts": 1,
-      "durationMs": 3821,
+      "durationMs": 4307,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -4196,9 +4204,9 @@
       "count": 29,
       "freshCount": 29,
       "attempts": 1,
-      "durationMs": 4358,
+      "durationMs": 4426,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -4211,9 +4219,9 @@
       "count": 27,
       "freshCount": 27,
       "attempts": 1,
-      "durationMs": 18209,
+      "durationMs": 3304,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -4226,9 +4234,9 @@
       "count": 24,
       "freshCount": 24,
       "attempts": 1,
-      "durationMs": 5040,
+      "durationMs": 4247,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -4236,16 +4244,15 @@
       "company": "奥克斯集团",
       "mode": "collect",
       "optional": false,
-      "status": "skipped",
-      "unchanged": true,
-      "skipped": true,
+      "status": "stale",
+      "unchanged": false,
       "count": 24,
       "freshCount": 0,
-      "attempts": 0,
-      "durationMs": 0,
-      "consecutiveFailures": 8,
+      "attempts": 1,
+      "durationMs": 2700,
+      "consecutiveFailures": 9,
       "lastSuccessAt": "2026-11-24T01:23:11.255Z",
-      "lastFailureAt": "2026-11-25T01:54:46.123Z"
+      "lastFailureAt": "2026-11-26T01:21:24.516Z"
     },
     {
       "key": "beisen-skoito",
@@ -4257,9 +4264,9 @@
       "count": 24,
       "freshCount": 24,
       "attempts": 1,
-      "durationMs": 3640,
+      "durationMs": 4869,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -4267,14 +4274,14 @@
       "company": "建投国际",
       "mode": "collect",
       "optional": false,
-      "status": "ok",
-      "unchanged": false,
+      "status": "cached",
+      "unchanged": true,
       "count": 23,
       "freshCount": 23,
       "attempts": 1,
-      "durationMs": 2454,
+      "durationMs": 3985,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -4287,9 +4294,9 @@
       "count": 22,
       "freshCount": 22,
       "attempts": 1,
-      "durationMs": 18385,
+      "durationMs": 4659,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -4302,9 +4309,9 @@
       "count": 22,
       "freshCount": 22,
       "attempts": 1,
-      "durationMs": 3801,
+      "durationMs": 4331,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -4314,12 +4321,12 @@
       "optional": false,
       "status": "ok",
       "unchanged": false,
-      "count": 23,
-      "freshCount": 23,
+      "count": 22,
+      "freshCount": 22,
       "attempts": 1,
-      "durationMs": 18535,
+      "durationMs": 4756,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -4332,9 +4339,9 @@
       "count": 22,
       "freshCount": 22,
       "attempts": 1,
-      "durationMs": 1984,
+      "durationMs": 4721,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -4342,14 +4349,14 @@
       "company": "志邦家居",
       "mode": "collect",
       "optional": false,
-      "status": "cached",
-      "unchanged": true,
+      "status": "ok",
+      "unchanged": false,
       "count": 21,
       "freshCount": 21,
-      "attempts": 1,
-      "durationMs": 3676,
+      "attempts": 2,
+      "durationMs": 5958,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -4362,9 +4369,9 @@
       "count": 21,
       "freshCount": 21,
       "attempts": 1,
-      "durationMs": 18034,
+      "durationMs": 3606,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -4377,9 +4384,9 @@
       "count": 20,
       "freshCount": 20,
       "attempts": 1,
-      "durationMs": 4367,
+      "durationMs": 6608,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -4387,14 +4394,14 @@
       "company": "中国科学院自动化研究所",
       "mode": "collect",
       "optional": false,
-      "status": "cached",
-      "unchanged": true,
+      "status": "ok",
+      "unchanged": false,
       "count": 20,
       "freshCount": 20,
       "attempts": 1,
-      "durationMs": 3335,
+      "durationMs": 2236,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -4406,10 +4413,10 @@
       "unchanged": false,
       "count": 19,
       "freshCount": 19,
-      "attempts": 1,
-      "durationMs": 3209,
+      "attempts": 2,
+      "durationMs": 20310,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -4422,9 +4429,9 @@
       "count": 19,
       "freshCount": 19,
       "attempts": 1,
-      "durationMs": 3128,
+      "durationMs": 2750,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -4432,14 +4439,14 @@
       "company": "数坤科技",
       "mode": "collect",
       "optional": false,
-      "status": "ok",
-      "unchanged": false,
+      "status": "cached",
+      "unchanged": true,
       "count": 18,
       "freshCount": 18,
       "attempts": 1,
-      "durationMs": 3652,
+      "durationMs": 4061,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -4452,9 +4459,9 @@
       "count": 17,
       "freshCount": 17,
       "attempts": 1,
-      "durationMs": 3208,
+      "durationMs": 3352,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -4467,9 +4474,9 @@
       "count": 16,
       "freshCount": 16,
       "attempts": 1,
-      "durationMs": 4000,
+      "durationMs": 17903,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -4477,14 +4484,14 @@
       "company": "华鑫证券",
       "mode": "collect",
       "optional": false,
-      "status": "cached",
-      "unchanged": true,
+      "status": "ok",
+      "unchanged": false,
       "count": 13,
       "freshCount": 13,
       "attempts": 1,
-      "durationMs": 3954,
+      "durationMs": 2050,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -4497,9 +4504,9 @@
       "count": 13,
       "freshCount": 13,
       "attempts": 1,
-      "durationMs": 3781,
+      "durationMs": 3524,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -4512,9 +4519,9 @@
       "count": 12,
       "freshCount": 12,
       "attempts": 1,
-      "durationMs": 2935,
+      "durationMs": 4555,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -4522,14 +4529,14 @@
       "company": "洽洽食品",
       "mode": "collect",
       "optional": false,
-      "status": "ok",
-      "unchanged": false,
+      "status": "cached",
+      "unchanged": true,
       "count": 12,
       "freshCount": 12,
       "attempts": 1,
-      "durationMs": 2710,
+      "durationMs": 3117,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -4537,14 +4544,14 @@
       "company": "华康医疗",
       "mode": "collect",
       "optional": false,
-      "status": "ok",
-      "unchanged": false,
+      "status": "cached",
+      "unchanged": true,
       "count": 12,
       "freshCount": 12,
       "attempts": 1,
-      "durationMs": 3468,
+      "durationMs": 6137,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -4552,14 +4559,14 @@
       "company": "灵明光子",
       "mode": "collect",
       "optional": false,
-      "status": "ok",
-      "unchanged": false,
+      "status": "cached",
+      "unchanged": true,
       "count": 12,
       "freshCount": 12,
       "attempts": 1,
-      "durationMs": 3711,
+      "durationMs": 4416,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -4572,9 +4579,9 @@
       "count": 12,
       "freshCount": 12,
       "attempts": 1,
-      "durationMs": 3368,
+      "durationMs": 2560,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -4587,9 +4594,9 @@
       "count": 11,
       "freshCount": 11,
       "attempts": 1,
-      "durationMs": 2793,
+      "durationMs": 3030,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -4602,9 +4609,9 @@
       "count": 10,
       "freshCount": 10,
       "attempts": 1,
-      "durationMs": 3186,
+      "durationMs": 6167,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -4617,9 +4624,9 @@
       "count": 11,
       "freshCount": 11,
       "attempts": 1,
-      "durationMs": 3961,
+      "durationMs": 3845,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -4632,9 +4639,9 @@
       "count": 10,
       "freshCount": 10,
       "attempts": 1,
-      "durationMs": 5083,
+      "durationMs": 3396,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -4647,9 +4654,9 @@
       "count": 9,
       "freshCount": 9,
       "attempts": 1,
-      "durationMs": 4114,
+      "durationMs": 5236,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -4662,9 +4669,9 @@
       "count": 9,
       "freshCount": 9,
       "attempts": 1,
-      "durationMs": 3449,
+      "durationMs": 3750,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -4672,14 +4679,14 @@
       "company": "享道出行",
       "mode": "collect",
       "optional": false,
-      "status": "ok",
-      "unchanged": false,
+      "status": "cached",
+      "unchanged": true,
       "count": 9,
       "freshCount": 9,
       "attempts": 1,
-      "durationMs": 2436,
+      "durationMs": 2882,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -4687,14 +4694,14 @@
       "company": "佳士科技",
       "mode": "collect",
       "optional": false,
-      "status": "cached",
-      "unchanged": true,
+      "status": "ok",
+      "unchanged": false,
       "count": 8,
       "freshCount": 8,
       "attempts": 1,
-      "durationMs": 2686,
+      "durationMs": 2689,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -4702,14 +4709,14 @@
       "company": "中达集团",
       "mode": "collect",
       "optional": false,
-      "status": "ok",
-      "unchanged": false,
+      "status": "cached",
+      "unchanged": true,
       "count": 8,
       "freshCount": 8,
       "attempts": 1,
-      "durationMs": 3409,
+      "durationMs": 3750,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -4722,9 +4729,9 @@
       "count": 8,
       "freshCount": 8,
       "attempts": 1,
-      "durationMs": 2971,
+      "durationMs": 3776,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -4737,9 +4744,9 @@
       "count": 8,
       "freshCount": 8,
       "attempts": 1,
-      "durationMs": 3331,
+      "durationMs": 6203,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -4752,9 +4759,9 @@
       "count": 7,
       "freshCount": 7,
       "attempts": 1,
-      "durationMs": 3290,
+      "durationMs": 3797,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -4766,10 +4773,10 @@
       "unchanged": true,
       "count": 6,
       "freshCount": 6,
-      "attempts": 2,
-      "durationMs": 5227,
+      "attempts": 1,
+      "durationMs": 4189,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -4777,14 +4784,14 @@
       "company": "华宝集团",
       "mode": "collect",
       "optional": false,
-      "status": "cached",
-      "unchanged": true,
+      "status": "ok",
+      "unchanged": false,
       "count": 6,
       "freshCount": 6,
       "attempts": 1,
-      "durationMs": 3359,
+      "durationMs": 2000,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -4797,9 +4804,9 @@
       "count": 5,
       "freshCount": 5,
       "attempts": 1,
-      "durationMs": 2481,
+      "durationMs": 3056,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -4812,9 +4819,9 @@
       "count": 5,
       "freshCount": 5,
       "attempts": 1,
-      "durationMs": 3792,
+      "durationMs": 4601,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:22:38.210Z",
       "lastFailureAt": null
     },
     {
@@ -4822,14 +4829,14 @@
       "company": "维达国际",
       "mode": "collect",
       "optional": false,
-      "status": "ok",
-      "unchanged": false,
+      "status": "cached",
+      "unchanged": true,
       "count": 4,
       "freshCount": 4,
       "attempts": 1,
-      "durationMs": 3539,
+      "durationMs": 4766,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -4837,14 +4844,14 @@
       "company": "汉德车桥",
       "mode": "collect",
       "optional": false,
-      "status": "cached",
-      "unchanged": true,
+      "status": "ok",
+      "unchanged": false,
       "count": 4,
       "freshCount": 4,
       "attempts": 1,
-      "durationMs": 3748,
+      "durationMs": 17250,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -4857,9 +4864,9 @@
       "count": 4,
       "freshCount": 4,
       "attempts": 1,
-      "durationMs": 5343,
+      "durationMs": 4201,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:24.516Z",
       "lastFailureAt": null
     },
     {
@@ -4872,9 +4879,9 @@
       "count": 4,
       "freshCount": 4,
       "attempts": 1,
-      "durationMs": 3586,
+      "durationMs": 3196,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -4887,9 +4894,9 @@
       "count": 4,
       "freshCount": 4,
       "attempts": 1,
-      "durationMs": 3241,
+      "durationMs": 4123,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -4902,9 +4909,9 @@
       "count": 3,
       "freshCount": 3,
       "attempts": 1,
-      "durationMs": 3292,
+      "durationMs": 4120,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -4917,9 +4924,9 @@
       "count": 3,
       "freshCount": 3,
       "attempts": 1,
-      "durationMs": 2699,
+      "durationMs": 2465,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -4932,9 +4939,9 @@
       "count": 3,
       "freshCount": 3,
       "attempts": 1,
-      "durationMs": 2019,
+      "durationMs": 2922,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:11.582Z",
+      "lastSuccessAt": "2026-11-26T01:21:39.932Z",
       "lastFailureAt": null
     },
     {
@@ -4947,9 +4954,9 @@
       "count": 7,
       "freshCount": 7,
       "attempts": 1,
-      "durationMs": 3367,
+      "durationMs": 4119,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -4957,14 +4964,14 @@
       "company": "中国船舶712所",
       "mode": "collect",
       "optional": false,
-      "status": "cached",
-      "unchanged": true,
+      "status": "ok",
+      "unchanged": false,
       "count": 21,
       "freshCount": 21,
       "attempts": 1,
-      "durationMs": 3828,
+      "durationMs": 2285,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:05.298Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -4977,9 +4984,9 @@
       "count": 16,
       "freshCount": 16,
       "attempts": 1,
-      "durationMs": 2649,
+      "durationMs": 2865,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:10.731Z",
+      "lastSuccessAt": "2026-11-26T01:21:25.699Z",
       "lastFailureAt": null
     },
     {
@@ -4987,14 +4994,14 @@
       "company": "中国空间技术研究院",
       "mode": "collect",
       "optional": false,
-      "status": "ok",
-      "unchanged": false,
+      "status": "cached",
+      "unchanged": true,
       "count": 8,
       "freshCount": 8,
       "attempts": 1,
-      "durationMs": 2806,
+      "durationMs": 2560,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:05:09.264Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     },
     {
@@ -5007,9 +5014,9 @@
       "count": 5,
       "freshCount": 5,
       "attempts": 1,
-      "durationMs": 2911,
+      "durationMs": 2719,
       "consecutiveFailures": 0,
-      "lastSuccessAt": "2026-11-25T02:04:45.890Z",
+      "lastSuccessAt": "2026-11-26T01:21:14.402Z",
       "lastFailureAt": null
     }
   ]
