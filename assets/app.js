@@ -15,7 +15,7 @@
   const STORAGE_KEY = 'campus-jobs-state-v2';
   const FAV_KEY = 'campus-jobs-favorites';
   // 求职工具：iframe 嵌入的独立工具页（来源：12/career-tools、12/ai-tools）
-  const TOOL_PAGES = { career: 'tools/career/index.html', ai: 'tools/ai/index.html' };
+  const TOOL_PAGES = { career: 'tools/career/', ai: 'tools/ai/' };
   const LIST_VIEWS = new Set(['jobs', 'internships']);
   const ALL_VIEWS = new Set(['jobs', 'internships', 'apps', 'events', 'dashboard', 'soe', 'docs', 'tools']);
   const QUICK_FILTERS = [
@@ -112,7 +112,7 @@
     ownership: $('filter-ownership'), degrees: $('filter-degree'), status: $('filter-status'),
     soeGrid: $('soeGrid'), soeTotal: $('soeTotal'), docBody: $('docBody'),
     // 新增功能元素（F1/F3/F5/F9/F11/F12）
-    appsPane: $('appsPane'), toolsPane: $('toolsPane'), appsList: $('appsList'), appsStats: $('appsStats'), countApps: $('countApps'),
+    appsPane: $('appsPane'), appsList: $('appsList'), appsStats: $('appsStats'), countApps: $('countApps'),
     exportFavIcs: $('exportFavIcs'), exportEventsIcs: $('exportEventsIcs'), clearApps: $('clearApps'),
     majorInput: $('majorInput'), majorOnly: $('majorOnly'),
     shareBtn: $('shareBtn'),
@@ -389,11 +389,15 @@
     } catch { /* ignore */ }
   }
 
+  let pendingToolSheet = null;
+
   function parseUrlState() {
     const p = new URLSearchParams(location.search);
-    state.view = ALL_VIEWS.has(p.get('view')) ? p.get('view') : 'jobs';
+    const rawView = p.get('view');
+    state.view = ALL_VIEWS.has(rawView) ? rawView : 'jobs';
     state.doc = ['usage', 'interview', 'experience'].includes(p.get('doc')) ? p.get('doc') : 'interview';
     state.tool = TOOL_PAGES[p.get('tool')] ? p.get('tool') : (state.tool || 'career');
+    if (rawView === 'tools') { state.view = 'jobs'; pendingToolSheet = state.tool; }
     if (RESUME_TH_OPTIONS.includes(Number(p.get('rt')))) setResumeThreshold(Number(p.get('rt')));
     // 深链直达求职工具：?view=tools&ct=iv|ats&company=公司&role=岗位（企业静态页按钮使用）
     const ct = p.get('ct');
@@ -404,8 +408,9 @@
           company: (p.get('company') || '').slice(0, 80), role: (p.get('role') || '').slice(0, 80), ts: Date.now(),
         }));
       } catch { /* ignore */ }
-      state.view = 'tools';
+      state.view = 'jobs';
       state.tool = 'career';
+      pendingToolSheet = 'career';
     }
     state.q = p.get('q') || '';
     state.years = new Set((p.get('y') || '').split(',').filter(Boolean));
@@ -430,6 +435,7 @@
           industries: new Set(s.industries || []), ownership: new Set(s.ownership || []),
           degrees: new Set(s.degrees || []), status: new Set(s.status || []),
         });
+        if (state.view === 'tools') { state.view = 'jobs'; pendingToolSheet = state.tool || 'career'; }
         return true;
       }
     } catch { /* ignore */ }
@@ -587,33 +593,6 @@
   if (document.readyState === 'complete') setTimeout(trackVisit, 1500);
   else window.addEventListener('load', () => setTimeout(trackVisit, 1500), { once: true });
 
-  /* ---------- 求职工具（iframe） ---------- */
-  let toolsBound = false;
-  function renderTools() {
-    const frame = document.getElementById('toolsFrame');
-    if (!frame) return;
-    const key = TOOL_PAGES[state.tool] ? state.tool : 'career';
-    state.tool = key;
-    const src = TOOL_PAGES[key];
-    // 仅在首次进入或切换工具时设置 src，避免重复加载
-    if (frame.dataset.tool !== key) { frame.src = src; frame.dataset.tool = key; }
-    const open = document.getElementById('toolsOpenNew');
-    if (open) open.href = src.replace('index.html', '');
-    for (const b of document.querySelectorAll('#toolsSwitch [data-tool]')) {
-      b.setAttribute('aria-selected', String(b.dataset.tool === key));
-    }
-    if (!toolsBound) {
-      toolsBound = true;
-      document.getElementById('toolsSwitch')?.addEventListener('click', (e) => {
-        const b = e.target.closest('[data-tool]');
-        if (!b || b.dataset.tool === state.tool) return;
-        state.tool = b.dataset.tool;
-        writeState();
-        renderTools();
-      });
-    }
-  }
-
   /* ---------- 视图切换 ---------- */
   function applyView() {
     const isList = LIST_VIEWS.has(state.view);
@@ -623,7 +602,6 @@
     el.eventsPane.hidden = state.view !== 'events';
     el.docsPane.hidden = state.view !== 'docs';
     el.appsPane.hidden = state.view !== 'apps';
-    if (el.toolsPane) el.toolsPane.hidden = state.view !== 'tools';
     el.docsSubTabs.hidden = state.view !== 'docs';
     el.searchBox.style.display = (isList || state.view === 'soe') ? '' : 'none';
 
@@ -667,6 +645,7 @@
 
   async function switchView(view) {
     if (view === state.view) return;
+    if (view === 'tools') { openToolSheet(state.tool || 'career'); return; }
     if (el.drawer.classList.contains('open')) closeDrawer();
     state.view = view;
     if (view === 'docs') state.doc = state.doc || 'interview';
@@ -677,7 +656,6 @@
     else if (view === 'events') await renderEvents();
     else if (view === 'docs') renderDocs();
     else if (view === 'apps') await renderApps();
-    else if (view === 'tools') renderTools();
     else await renderListView();
     window.scrollTo({ top: 0 });
   }
@@ -2417,7 +2395,6 @@
       else if (state.view === 'events') await renderEvents();
       else if (state.view === 'docs') renderDocs();
       else if (state.view === 'apps') await renderApps();
-      else if (state.view === 'tools') renderTools();
     } catch (err) {
       el.cardList.innerHTML = `<div class="empty"><strong>数据加载失败</strong>${esc(err.message)}</div>`;
     }
@@ -2425,6 +2402,7 @@
     if (jobId) await openJobById(jobId, { history: false });
     else if (el.drawer.classList.contains('open')) closeDrawer();
     writeState();
+    if (pendingToolSheet) { openToolSheet(pendingToolSheet); pendingToolSheet = null; }
     window.scrollTo({ top: 0 });
   }
 
@@ -2572,7 +2550,6 @@
     else if (state.view === 'events') await renderEvents();
     else if (state.view === 'docs') renderDocs();
     else if (state.view === 'apps') await renderApps();
-      else if (state.view === 'tools') renderTools();
 
     hotReady.then(() => {
       cache.hot.jobs = null;
@@ -2587,6 +2564,7 @@
     if (jobId) await openJobById(jobId, { history: false });
 
     writeState();
+    if (pendingToolSheet) { openToolSheet(pendingToolSheet); pendingToolSheet = null; }
     loadChangelog();
 
     // F12 离线可用：预取已收藏岗位的详情分片，断网时也能查看收藏详情

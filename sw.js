@@ -1,11 +1,11 @@
 /* 校招信息查询站 Service Worker：应用外壳缓存 + 数据网络优先 */
-const VERSION = 'v45';
+const VERSION = 'v46';
 const SHELL = `campus-jobs-shell-${VERSION}`;
 const DATA = `campus-jobs-data-${VERSION}`;
 const SHELL_FILES = [
   './', './index.html', './assets/app.js', './assets/styles.css',
   './manifest.webmanifest', './icon.svg', './icon-192.png', './icon-512.png',
-  './tools/career/index.html', './tools/ai/index.html',
+  './tools/career/', './tools/ai/',
 ];
 
 self.addEventListener('install', (event) => {
