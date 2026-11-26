@@ -163,7 +163,7 @@
       <button class="tab" role="tab" data-view="dashboard" aria-selected="false">数据看板</button>
       <button class="tab" role="tab" data-view="soe" aria-selected="false">央国企名录</button>
       <button class="tab" role="tab" data-view="docs" aria-selected="false">求职资料</button>
-      <button class="tab" role="tab" data-view="tools" aria-selected="false">求职工具</button>
+      <a class="tab" role="tab" href="tools/career/" data-view="tools" aria-selected="false">求职工具</a>
     </nav>
     <nav class="sub-tabs" id="docsSubTabs" role="tablist" aria-label="资料子栏目" hidden>
       <button class="sub-tab" data-doc="interview" aria-selected="true">面试题库</button>
@@ -280,7 +280,7 @@
   <div id="appsList"><div class="loading">正在加载…</div></div>
 </section>
 
-<p class="footer-note">信息整理自各企业官方招聘公告，仅供参考；投递前请以企业官方最新公告为准。数据共 <span id="footerTotal">—</span> 条 · 最后更新 <span id="lastUpdated">—</span><span id="changelogNote"></span>。</p>
+<p class="footer-note">信息整理自各企业官方招聘公告，仅供参考；投递前请以企业官方最新公告为准。数据共 <span id="footerTotal">—</span> 条 · 最后更新 <span id="lastUpdated">—</span><span id="changelogNote"></span> · 版本 v48。</p>
 
 <div class="compare-bar" id="compareBar" hidden>
   <span>已选 <b id="compareCount">0</b> 个岗位（最多 4 个）</span>
@@ -331,7 +331,19 @@
   </section>
 </div>
 
-<script src="assets/app.js?v=47"></script>
+<script>
+/* 兜底：app.js 未加载或初始化失败时，点击「求职工具」直接打开工具页，避免点了没反应 */
+(function () {
+  document.addEventListener('click', function (e) {
+    var tab = e.target && e.target.closest ? e.target.closest('[data-view="tools"]') : null;
+    if (!tab || window.__cjToolsReady) return;
+    e.preventDefault();
+    e.stopPropagation();
+    location.href = tab.getAttribute('href') || 'tools/career/';
+  }, true);
+})();
+</script>
+<script src="assets/app.js?v=48"></script>
 <noscript>
   <div class="noscript-note">
     <h2>校招信息查询</h2>

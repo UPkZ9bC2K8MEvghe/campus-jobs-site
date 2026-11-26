@@ -2409,10 +2409,12 @@
 
   function bindEvents() {
     window.addEventListener('popstate', onPopState);
-    for (const tab of el.tabs) tab.addEventListener('click', () => {
-      if (tab.dataset.view === 'tools') { openToolSheet(state.tool || 'career'); return; }
+    for (const tab of el.tabs) tab.addEventListener('click', (e) => {
+      if (tab.dataset.view === 'tools') { e.preventDefault(); openToolSheet(state.tool || 'career'); return; }
       if (state.view !== tab.dataset.view) switchView(tab.dataset.view);
     });
+    // 导航已可用：关闭 index.html 里的跳转兜底，改由弹层接管
+    window.__cjToolsReady = true;
     for (const t of el.subTabs) t.addEventListener('click', () => { state.doc = t.dataset.doc; applyView(); writeState(); renderDocs(); });
 
     el.searchInput.addEventListener('input', () => {

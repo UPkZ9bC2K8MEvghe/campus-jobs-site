@@ -163,6 +163,8 @@ button { font-family: inherit; cursor: pointer; }
   color: var(--muted);
   border-bottom: 2px solid transparent;
   transition: color 0.15s;
+  text-decoration: none;
+  cursor: pointer;
 }
 
 .tab[aria-selected="true"] { color: var(--brand); border-bottom-color: var(--brand); }
@@ -1212,6 +1214,8 @@ a.soe-card:hover {
 /* 顶部 tab 数量增多后允许横向滚动 */
 .tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
 .tabs::-webkit-scrollbar { display: none; }
+/* 不压缩导航项，窄屏改为横向滚动，避免文字被挤成一列 */
+.tab { flex: 0 0 auto; white-space: nowrap; }
 .results-head { gap: 10px; }
 
 /* ---------- 我的专业（F9） ---------- */
