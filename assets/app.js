@@ -506,7 +506,8 @@
     if (!TOOL_PAGES[tool]) tool = 'career';
     state.tool = tool;
     const sheet = document.getElementById('toolSheet');
-    if (!sheet) return;
+    // 兼容旧缓存页面：如果 HTML 里还没有弹层结构，直接打开独立工具页
+    if (!sheet) { location.href = TOOL_PAGES[tool]; return; }
     sheet.hidden = false;
     syncToolSheet();
     document.body.style.overflow = 'hidden';
@@ -2520,9 +2521,6 @@
   }
 
   async function init() {
-    try { await loadFacets(); }
-    catch (err) { el.listPane.innerHTML = `<div class="empty"><strong>数据加载失败</strong>${esc(err.message)}<br>请通过本地服务器打开页面。</div>`; return; }
-
     loadFavorites();
     loadApps();
     migrateCareerTracker();
@@ -2536,35 +2534,48 @@
     el.searchInput.value = state.q;
     el.searchClear.style.display = state.q ? 'block' : 'none';
     el.sortSelect.value = state.sort;
+    // 先绑定导航和视图：即使数据接口失败，求职工具等入口仍然可用
     bindEvents();
     applyView();
+    if (pendingToolSheet) { openToolSheet(pendingToolSheet); pendingToolSheet = null; }
+
+    let facetsOk = true;
+    try { await loadFacets(); }
+    catch (err) {
+      facetsOk = false;
+      el.listPane.innerHTML = `<div class="empty"><strong>数据加载失败</strong>${esc(err.message)}<br>请检查网络后刷新重试。</div>`;
+    }
+
     loadJSON('events.json')
       .then((d) => { cache.events = d; el.countEvents.textContent = (d.events || []).length || ''; })
       .catch(() => { /* 宣讲会为增量模块，失败不影响主列表 */ });
 
     const hotReady = loadExternalHot().catch(() => {});
 
-    if (LIST_VIEWS.has(state.view)) await renderListView();
-    else if (state.view === 'dashboard') await renderDashboard();
-    else if (state.view === 'soe') await renderSOE();
-    else if (state.view === 'events') await renderEvents();
-    else if (state.view === 'docs') renderDocs();
-    else if (state.view === 'apps') await renderApps();
+    if (facetsOk) {
+      if (LIST_VIEWS.has(state.view)) await renderListView();
+      else if (state.view === 'dashboard') await renderDashboard();
+      else if (state.view === 'soe') await renderSOE();
+      else if (state.view === 'events') await renderEvents();
+    } else if (state.view === 'docs') {
+      renderDocs();
+    } else if (state.view === 'apps') {
+      await renderApps();
+    }
 
     hotReady.then(() => {
       cache.hot.jobs = null;
       cache.hot.internships = null;
-      if (LIST_VIEWS.has(state.view)) {
+      if (facetsOk && LIST_VIEWS.has(state.view)) {
         renderQuickFilters();
         if (state.status.has('hot')) renderResults();
       }
     });
 
     const jobId = new URLSearchParams(location.search).get('job');
-    if (jobId) await openJobById(jobId, { history: false });
+    if (jobId && facetsOk) await openJobById(jobId, { history: false });
 
     writeState();
-    if (pendingToolSheet) { openToolSheet(pendingToolSheet); pendingToolSheet = null; }
     loadChangelog();
 
     // F12 离线可用：预取已收藏岗位的详情分片，断网时也能查看收藏详情
